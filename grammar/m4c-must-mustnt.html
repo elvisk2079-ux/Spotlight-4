@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Must or Mustn&#x27;t?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column — mastery board of the 20 phrases, then five drills in a fixed ladder */
+:root {
+  --paper: #F1F4F0; --card: #FFFFFF; --ink: #1B2733; --muted: #5B6977; --line: #D6DCD5;
+  --accent: #2A55C9; --accent-soft: #E4EBFB; --on-accent: #FFFFFF;
+  --ok: #1D8455; --ok-soft: #DCF1E5; --bad: #BF3F2D; --bad-soft: #F8E2DD;
+  --mark: #FFE892; --mark-ink: #4A3C00; --dot: #CBD3CC;
+  --font-display: "Young Serif", Georgia, "Times New Roman", serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11171D; --card: #19212A; --ink: #E4EAF0; --muted: #9AA7B4; --line: #2B3642;
+    --accent: #8AA8FF; --accent-soft: #1F2C4A; --on-accent: #0E1730;
+    --ok: #62D39F; --ok-soft: #163327; --bad: #FF8E7C; --bad-soft: #3B201B;
+    --mark: #5B4C14; --mark-ink: #FFF1BF; --dot: #34404C; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11171D; --card: #19212A; --ink: #E4EAF0; --muted: #9AA7B4; --line: #2B3642;
+  --accent: #8AA8FF; --accent-soft: #1F2C4A; --on-accent: #0E1730;
+  --ok: #62D39F; --ok-soft: #163327; --bad: #FF8E7C; --bad-soft: #3B201B;
+  --mark: #5B4C14; --mark-ink: #FFF1BF; --dot: #34404C; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.55; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.wrap { max-width: 760px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+.hero { padding-block: 40px 16px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(32px, 6vw, 46px); line-height: 1.1; margin: 0 0 12px; text-wrap: balance; }
+.sub { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); border-bottom: 1px solid var(--line); }
+.bar .wrap { display: flex; flex-direction: column; gap: 8px; padding-block: 10px; }
+.nav { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.nav::-webkit-scrollbar { display: none; }
+.nav a { flex: none; text-decoration: none; color: var(--ink); font-size: 14px; font-weight: 600; padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); }
+.nav a:hover { border-color: var(--accent); color: var(--accent); }
+.progress { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.track { flex: 1; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.fill { height: 100%; width: 0; background: var(--ok); transition: width .4s ease; }
+.progress b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+main { padding-block: 8px 64px; }
+section { padding-top: 26px; scroll-margin-top: 110px; }
+h2 { font-family: var(--font-display); font-weight: 400; font-size: 26px; line-height: 1.2; margin: 0 0 4px; }
+.lead { margin: 0 0 14px; color: var(--muted); }
+
+/* Mastery board */
+.board { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; }
+.chip { min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; display: flex; flex-direction: column; gap: 4px; }
+.chip .ph { font-weight: 600; font-size: 15px; line-height: 1.3; }
+.chip .ru { font-size: 12.5px; color: var(--muted); line-height: 1.3; }
+.dots { display: flex; gap: 3px; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--dot); }
+.dots i.on { background: var(--ok); }
+.chip.weak { border-color: var(--bad); }
+.chip.master { border-color: var(--ok); background: var(--ok-soft); }
+.board-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; font-size: 13px; color: var(--muted); }
+
+/* Exercise card */
+.ex { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 18px 16px; }
+.ex-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+h3 { margin: 0; font-size: 18px; font-weight: 700; }
+h3 .num { font-family: var(--font-mono); font-size: 13px; color: var(--accent); margin-right: 8px; }
+.score { flex: none; font-family: var(--font-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); }
+.score.done { color: var(--ok); border-color: var(--ok); background: var(--ok-soft); }
+.instr { margin: 6px 0 14px; color: var(--muted); font-size: 15px; }
+ol.items { margin: 0; padding-left: 1.6em; display: flex; flex-direction: column; gap: 10px; }
+ol.items li { line-height: 2; padding-left: 4px; }
+ol.items li::marker { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+
+.choice { display: inline-flex; flex-wrap: wrap; gap: 4px; vertical-align: baseline; }
+.opt { font: inherit; font-size: 16px; line-height: 1.4; color: var(--ink); cursor: pointer; background: var(--card); border: 1.5px solid var(--line); border-radius: 999px; padding: 1px 11px; text-align: left; }
+.opt:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.opt.ok { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); font-weight: 600; cursor: default; }
+.opt.bad { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); text-decoration: line-through; cursor: default; }
+.opt.dim { opacity: .4; cursor: default; }
+.shake { animation: shake .3s; }
+@keyframes shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+
+/* MCQ */
+.q { margin: 0 0 6px; line-height: 1.5; }
+.mcq { display: flex; flex-wrap: wrap; gap: 6px; }
+.mcq .opt { border-radius: 8px; padding: 4px 12px; }
+
+/* Right or wrong */
+.tf-line { line-height: 1.5; margin: 0 0 6px; }
+.tf-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.fix { margin: 6px 0 0; font-size: 15px; line-height: 1.5; }
+.fix.ok { color: var(--ok); }
+.fix.bad { color: var(--bad); }
+.fix b { color: var(--ink); }
+
+.gap { font: inherit; font-size: 16px; color: var(--ink); background: var(--accent-soft); border: none; border-bottom: 2px dashed var(--accent); border-radius: 4px 4px 0 0; padding: 1px 6px; max-width: 100%; }
+.gap:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.gap.ok { background: var(--ok-soft); border-bottom: 2px solid var(--ok); }
+.gap.bad { background: var(--bad-soft); border-bottom: 2px solid var(--bad); }
+.gap.shown { background: var(--mark); color: var(--mark-ink); border-bottom: 2px solid var(--mark-ink); }
+
+/* Translate */
+.tr li { line-height: 1.5 !important; }
+.tr .ru-line { margin: 0 0 6px; font-weight: 500; }
+.tr textarea { width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; resize: vertical; min-height: 44px; }
+.tr textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.tr textarea.ok { border-color: var(--ok); background: var(--ok-soft); }
+.tr textarea.bad { border-color: var(--bad); background: var(--bad-soft); }
+.tr .line { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; align-items: center; }
+.model { margin: 8px 0 2px; font-size: 15px; color: var(--muted); }
+.model b { color: var(--ink); }
+
+.foot { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.btn { font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.primary:hover { filter: brightness(1.08); color: var(--on-accent); }
+.btn.small { font-size: 13px; padding: 4px 10px; }
+.btn:focus-visible, .opt:focus-visible, .nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.note { margin: 14px 0 0; padding: 10px 12px; border-radius: 8px; font-size: 15px; background: var(--accent-soft); }
+
+@media (max-width: 480px) { body { font-size: 16px; } .ex { padding: 14px; } ol.items { padding-left: 1.3em; } }
+@media (prefers-reduced-motion: reduce) { .shake { animation: none; } .fill { transition: none; } html { scroll-behavior: auto; } }
+
+/* Word order */
+.uns { display: flex; flex-direction: column; gap: 6px; }
+.answer-line { min-height: 42px; display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; border: 1.5px dashed var(--line); border-radius: 8px; background: var(--paper); }
+.answer-line.ok { border: 1.5px solid var(--ok); background: var(--ok-soft); }
+.answer-line.bad { border: 1.5px solid var(--bad); background: var(--bad-soft); }
+.tiles { display: flex; flex-wrap: wrap; gap: 6px; }
+.tile { font: inherit; font-size: 16px; padding: 3px 10px; border-radius: 6px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+.tile:hover { border-color: var(--accent); color: var(--accent); }
+.tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.uns .line { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.uns .fix { margin: 0; }
+
+.cue { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .06em; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin: 0 3px; white-space: nowrap; }
+.bank { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; padding: 10px; border: 1px dashed var(--line); border-radius: 8px; }
+.bank span { font-size: 14px; padding: 2px 9px; border-radius: 6px; background: var(--accent-soft); }
+p.text { margin: 0 0 10px; line-height: 2.2; }
+
+/* flashcards */
+.fc-tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.btn.ghost { background: transparent; border: 1px solid var(--line); color: inherit; }
+.flip { perspective: 1200px; cursor: pointer; outline: none; margin: 0 auto; max-width: 560px; }
+.flip-in { position: relative; min-height: 220px; transition: transform .45s; transform-style: preserve-3d; }
+.flip.on .flip-in { transform: rotateY(180deg); }
+.flip:focus-visible .flip-in { box-shadow: 0 0 0 3px var(--accent-soft); border-radius: 14px; }
+.face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 22px 18px 30px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+.face.back { transform: rotateY(180deg); background: var(--accent-soft); }
+.fc-word { font-size: clamp(22px, 5vw, 30px); font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.fc-ru { font-size: clamp(19px, 4.4vw, 25px); font-weight: 600; line-height: 1.3; }
+.fc-def { font-size: 14px; opacity: .75; max-width: 42ch; }
+.fc-hint { position: absolute; bottom: 8px; font-size: 12px; opacity: .45; }
+.speak { font-size: 22px; line-height: 1; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+.fc-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 12px 0 6px; }
+.fc-nav .btn { font-size: 20px; padding: 4px 16px; }
+.fc-count { font-variant-numeric: tabular-nums; min-width: 5ch; text-align: center; }
+.fc-rate { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.btn.again { background: transparent; border: 1px solid #d9822b; color: #d9822b; }
+.btn.know { background: #2e9e5b; border: 1px solid #2e9e5b; color: #fff; }
+.fc-done { text-align: center; }
+.fc-done p { font-weight: 600; margin: 8px 0 10px; }
+.btn.know:hover { color: #fff; filter: brightness(1.08); border-color: #2e9e5b; }
+.btn.again:hover { color: #d9822b; border-color: #d9822b; background: rgba(217,130,43,.08); }
+.match { margin-bottom: 14px; }
+.match-n { margin: 0 0 6px; font-size: 13px; color: var(--muted); }
+.match-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.match-col { display: flex; flex-direction: column; gap: 6px; }
+.opt.pair { border-radius: 8px; padding: 8px 10px; text-align: center; min-height: 44px; }
+.opt.sel { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.listen-q { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.listen-word { font-size: 18px; }
+.match-cols { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+.board { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+/* Grammar additions */
+.story-head { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; padding: 10px 14px; background: var(--accent-soft); border-radius: 10px; }
+.story-head .pic { font-size: 30px; line-height: 1; letter-spacing: 2px; }
+.story-t { font-family: var(--font-display); font-weight: 400; font-size: 20px; }
+.rule { display: flex; flex-direction: column; gap: 10px; }
+.rule-b { border: 1px solid var(--line); border-left: 4px solid var(--ok); border-radius: 10px; padding: 10px 14px; background: var(--card); }
+.rule-b.warn { border-left-color: var(--bad); }
+.rule-b h4 { margin: 0 0 6px; font-size: 16px; }
+.rule-l { margin: 2px 0; display: flex; flex-wrap: wrap; column-gap: 10px; }
+.rule-en { font-weight: 600; }
+.rule-en mark { background: var(--mark); color: var(--mark-ink); border-radius: 3px; padding: 0 2px; }
+.rule-ru { color: var(--muted); font-size: 15px; }
+.why { color: var(--muted); }
+.sort-btns .opt { min-width: 9em; }
+
+[hidden] { display: none !important; }
+.home { display: inline-block; margin-bottom: 14px; font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.fc-past { font-size: 16px; color: var(--muted); margin-top: -4px; }
+.chip .past { font-size: 12.5px; color: var(--accent); line-height: 1.3; }
+.pic svg { display: block; width: 100%; height: 100%; }
+.fc-pic { width: 150px; height: 200px; }
+.flip.has-pic .flip-in { min-height: 380px; }
+.q-pic { width: 120px; height: 160px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 6px; padding: 2px; }
+/* ===== Spotlight 4: pictures ===== */
+.pic.has-img { position: relative; display: flex; align-items: center; justify-content: center; }
+.pics { display: flex; align-items: center; justify-content: center; gap: 6%; width: 100%; height: 100%; }
+.pics .pi { display: block; height: 100%; aspect-ratio: 1; }
+.pics.n2 .pi { height: 70%; } .pics.n3 .pi { height: 52%; }
+.pics .pi svg, .pic-no svg, .pic-yes svg { display: block; width: 100%; height: 100%; }
+.pic-no { position: absolute; inset: 4%; margin: auto; aspect-ratio: 1; height: 92%; opacity: .82; pointer-events: none; }
+.pic-yes { position: absolute; right: 2%; bottom: 2%; width: 34%; aspect-ratio: 1; pointer-events: none; }
+.fc-pic.has-img { width: 190px; height: 170px; }
+.flip.has-pic .flip-in { min-height: 340px; }
+.q-pic.has-img { width: 150px; height: 120px; padding: 10px; background: var(--card); }
+.i-pic { width: 128px; height: 84px; flex: none; margin-bottom: 8px; padding: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.i-pic .pics.n1 .pi { height: 100%; }
+ol.items li.has-ip { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+ol.items li.has-ip .i-pic { margin: 0; }
+ol.items li.has-ip .gl { flex: 1; min-width: 14em; }
+.chip.with-pic { display: grid; grid-template-columns: 40px minmax(0,1fr); column-gap: 8px; align-items: center; }
+.chip.with-pic .chip-pic { grid-row: span 3; width: 40px; height: 40px; }
+.chip.with-pic > :not(.chip-pic) { grid-column: 2; }
+.board { grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); }
+.big-q { font-size: 22px; font-weight: 700; margin: 0 0 8px; }
+.pic-opts { display: grid; grid-template-columns: repeat(4, minmax(0, 96px)); gap: 10px; margin: 2px 0 6px; }
+.popt { position: relative; aspect-ratio: 1; padding: 10px; border: 2px solid var(--line); border-radius: 14px; background: var(--card); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.popt:hover:not(:disabled) { border-color: var(--accent); }
+.popt.ok { border-color: var(--ok); background: var(--ok-soft); }
+.popt.bad { border-color: var(--bad); background: var(--bad-soft); opacity: .55; }
+.popt.dim { opacity: .35; }
+.popt .pics { pointer-events: none; }
+@media (max-width: 480px) { .pic-opts { grid-template-columns: repeat(2, minmax(0, 120px)); } }
+/* bigger, friendlier type for young learners */
+body { font-size: 18px; }
+.opt { font-size: 17px; padding: 3px 13px; }
+.tile { font-size: 18px; padding: 5px 12px; }
+.q { font-weight: 600; }
+.credits { padding-block: 0 40px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="hero wrap">
+  <a class="home" href="index.html">← Все темы</a>
+  <p class="eyebrow">Spotlight 4 Grammar · Module 4 · Unit 8b</p>
+  <h1>Must or Mustn&#x27;t?</h1>
+  <p class="sub">Правила в зоопарке и в школе: must, mustn&#x27;t, have to, don&#x27;t have to, can&#x27;t, may. Знаки-картинки и задания с проверкой.</p>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <nav class="nav" id="nav" aria-label="Задания"></nav>
+    <div class="progress" aria-live="polite">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <span><b id="mastered">0</b> / <b id="ptotal">0</b> выучено</span>
+    </div>
+  </div>
+</div>
+
+<main class="wrap" id="main">
+  <section id="board-sec">
+    <h2>Твои правила</h2>
+    <p class="lead">Каждый правильный ответ — одна точка. Все точки зелёные — правило усвоено. Красная рамка — повтори это правило.</p>
+    <div class="board" id="board"></div>
+    <div class="board-foot">
+      <span>Прогресс сохраняется в этом браузере.</span>
+      <button class="btn small" type="button" id="reset-all">Сбросить прогресс</button>
+    </div>
+  </section>
+</main>
+<footer class="wrap credits">Картинки: Noto Emoji (Google), лицензия Apache 2.0.</footer>
+
+<script>
+const PICS = {"banana": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#ff8e00\" d=\"M119.22 95.12c-1.14 2.36-5.91 2.21-8.54 1.38c-6.72-2.12-10.9-7.9-10.9-7.9L65.14 73.9l-10.61-5.57s-2.06-3.5 2.06-6.17s7.01-2.87 7.01-2.87l11.94 7.6s7.71-6 15.54-6.91c7.48-.86 16.79 5.22 19.24 16.7c1.99 9.31 5.14 12.59 6.09 13.8c.95 1.22 3.79 2.62 2.81 4.64\"/><path fill=\"#ffe4b4\" d=\"M77.72 32.15C74.65 21.99 70.77 10.1 64.91 6.03c-5.19-3.6-10.24-2.95-12.64-1.38c0 0-4.33 1.77-5.47 6.24c-1.88 7.34.59 16.15 2.2 25.25s2.45 15.36 3.18 22.67c.07.66 12.16 22.18 12.16 22.18l9.65 5.17s7.37-15.94 7.26-18.19c-.1-2.26-1.29-28.4-3.53-35.82\"/><path fill=\"#ffe265\" d=\"M52.55 66.94c-.13 2.43 5.73 21.8 5.73 21.8L74 86.14s11.15-6.6 11.46-18.57c.48-18.05-2.61-26.55-4.85-33.97c-3.08-10.14-9.94-23.5-15.75-27.64c-3.41-2.43-7.19-2.79-8.74-2.49c0 0 10.32 8.08 15.54 21.9s6.45 29.79 6.45 29.79s-3.84 2.83-12.9 4.13c-7 1.01-13.04-.7-13.04-.7s.55 5.27.38 8.35\"/><path fill=\"#ffa726\" d=\"m85.33 83.75l-6.29-13.14l.34-4.68s1.34-3.93-7.03 2.42c-3.88 2.94-6.22 8.36-6.22 8.36s-1.18-2.92-5.32-6.78c-3.68-3.42-8.63-5.08-8.63-5.08s-10.28-2-11.4-1.13c-7.25 5.66-12.55 12.55-12.55 12.55L22.9 96.42l-8.86 5.43s2.42 3.54 5.92 2.22c2.73-1.03 6.11-4.12 7.93-8.01c2.5-5.35 7.75-15.47 10.42-18.67c5.16-6.16 10.22-8.41 13.99-6.62c4.29 2.03.86 22.29.86 22.29l-27.58 23.21l-.47 3.16s4.01 3.85 15.06 3.49s25.83-4.45 35.18-17.2c8.25-11.24 9.98-21.97 9.98-21.97\"/><path fill=\"#ffb803\" d=\"M63.58 84.96c.24 5.55-3.22 13.96-11.22 20.97c-7.99 7.01-16.43 9.33-21.67 9.73c-3.8.29-4.93-1.88-4.93-1.88s7.66-7.05 13.35-12.7c5.4-5.37 11.28-16.65 12.56-21.84s.12-8.68.12-8.68s2.48.69 6.13 4.35c3.54 3.55 5.53 6.97 5.66 10.05\"/><path fill=\"#875b54\" d=\"M29.45 118.74c-.83 1.93-3.68 2.01-4.92.94c-1.17-1.01-2.31-3.02-1.13-5.27c.78-1.48 3.34-1.89 4.78-.74s2.02 3.32 1.27 5.07\"/><path fill=\"#fee4b4\" d=\"M23.76 97.84c-3.28 4.55-6.57 5.24-7.93 5.39c-1.19.14-2.49-1.38-2.34-2.78s2.45-3.37 2.73-7.67s-.06-20.07 8.69-29.13c6.17-6.38 13.73-4.18 18.61-2.49c5.5 1.9 8.67 3.7 8.67 3.7s-4.5-.31-12.26 5.81c-4.51 3.56-7.16 8.45-9.66 14.06c-1.8 4.06-4.2 9.91-6.51 13.11\"/><path fill=\"#feb804\" d=\"M111 109.58c-.92 1.84-3.17 2.98-5.16 2.89c-4.21-.18-8.05-2.35-12.3-7.83c-6.01-7.76-11.24-26.38-15.16-31.34c-2.65-3.35-5.95-5.01-5.95-5.01s1.82-1.54 3.64-2.49s6.22-.5 6.22-.5l18.78 30.18z\"/><path fill=\"#ffe4b4\" d=\"M100.39 68.46c4.12 5.89 4.66 11.06 5.28 16.34c.56 4.77 1.71 14.8 3.44 18.07c1.74 3.27 3.43 5.4 1.56 7.39s-7.37 1.28-11.32-3.02c-3.18-3.47-4.94-7.25-7.33-12.8s-5.91-18.65-10.48-24.57c-2.92-3.78-5.83-3.89-5.83-3.89s3.85-3.14 11.2-3.22c6.59-.07 10.05.8 13.48 5.7\"/></svg>", "bicycle": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#b9baba\" d=\"m98.48 98.57l-26.14-5.68l.37-1.74l26.24 5.48zM72 108.31l-.25-1.73l28.15-5.79l.41 1.96z\"/><path fill=\"#858587\" d=\"M70.37 91.11c-5.28-.25-9.15 5.17-8.71 9.54c.46 4.54 3.78 7.88 8.89 7.78c4.82-.09 8.15-3.43 8.24-8.52s-2.59-8.52-8.42-8.8m2.5 12.79c-2.32 1.2-5.15.42-6.48-2.04c-1.2-2.22.18-5.59 2.59-6.39c2.22-.74 4.48.19 5.65 2.04c1.29 2.03.74 5.09-1.76 6.39\"/><path fill=\"#b9baba\" d=\"m101.094 96.468l3.797-16.95l.976.219l-3.797 16.95zm.296 1.962l11.75-14.76l.78.62l-9.18 11.55l13.77-6.19l.41.91zm18.39 8.41l-18.2-6.97l19.08-3.1l.16.99l-15.42 2.5l14.73 5.65zM99.4 96l-3.04-16.43l.99-.15l3.04 16.43zM86.127 85.228l.757-.653l11.06 12.817l-.756.654zm-.947 28.312l-.6-.8l.3.4l-.32-.38c.39-.35 9.5-9.63 12.98-13.17l.71.7c-3.84 3.91-12.81 13.05-13.07 13.25m13.192-11.521l.99-.136l2.537 18.548l-.99.135z\"/><path fill=\"#b9baba\" d=\"m92.8 119.43l-.87-.48l9.19-16.84l14.78 11.09l-.6.8l-13.86-10.39z\"/><path fill=\"#b9baba\" d=\"m102.566 101.489l.932-.363l6.64 17.053l-.933.363z\"/><ellipse cx=\"100.66\" cy=\"99.48\" fill=\"#c9c8c8\" rx=\"4.08\" ry=\"3.96\"/><path fill=\"#484d50\" d=\"M100.17 75.1c-13.87.15-24.01 10.51-24.41 24.18c-.39 13.1 10 24.52 23.87 24.96c14.82.47 25.75-11.01 25.43-24.69c-.32-13.3-10.69-24.61-24.89-24.45m-.51 45.46c-11.89-.38-20.8-10.16-20.46-21.4c.35-11.72 9.04-20.6 20.93-20.73c12.17-.13 21.06 9.56 21.33 20.96c.27 11.73-9.09 21.57-21.8 21.17\"/><path fill=\"#c9c9c9\" d=\"M100.28 77.9c-12.29.14-21.27 9.31-21.63 21.41c-.35 11.6 8.86 21.71 21.14 22.1c13.13.41 22.81-9.75 22.52-21.86c-.27-11.77-9.46-21.78-22.03-21.65m-.57 41.7c-11.26-.35-19.25-9.6-18.93-20.14c.33-11 8-19.05 19.27-19.17c11.53-.13 20.36 8.97 20.21 19.68c-.16 10.65-8.51 20.01-20.55 19.63\"/><path fill=\"#b9baba\" d=\"m23.93 120.374l4.302-19.736l1.074.234l-4.302 19.737zM29.054 99.1l17.476-6.71l.394 1.026l-17.476 6.711z\"/><path fill=\"#b9baba\" d=\"M41.2 115.01L28.02 98.58l-4.76-19.09l1.07-.26l4.7 18.85l13.03 16.24z\"/><path fill=\"#b9baba\" d=\"m27.01 98.57l-.95-.43l6.24-18.33l1.05.33zm.808.244l14.486-13.586l.753.802L28.57 99.616zM9.314 88.773l.544-.956L26.357 97.2l-.544.956zm7.726 29.047l-.98-.48l8.51-17.26l-18.02-4.21l.25-1.07l19.37 4.52z\"/><path fill=\"#b9baba\" d=\"m6.83 105.25l-.3-1.06l19.43-5.53l-10.16-16.2l.93-.59l10.94 17.44zm3.95 8.02l-.6-.93l16.95-10.96l19.4 4.83l-.26 1.06l-18.94-4.71z\"/><path fill=\"#b9baba\" d=\"m25.75 102.024l1.01-.436l7.686 17.801l-1.01.436zm4.737-3.554l.114-1.095l17.148 1.78l-.114 1.093z\"/><path fill=\"#484d50\" d=\"M27.26 75.17c-13.87.15-24 10.51-24.41 24.18c-.39 13.1 10 24.52 23.87 24.96c14.82.47 25.75-11.01 25.43-24.69c-.31-13.3-10.69-24.61-24.89-24.45m-.51 45.46c-11.89-.38-20.8-10.16-20.46-21.4c.35-11.72 9.04-20.6 20.93-20.73c12.17-.13 21.06 9.56 21.33 20.96c.28 11.73-9.09 21.57-21.8 21.17\"/><path fill=\"#c9c9c9\" d=\"M27.37 77.97c-12.29.14-21.26 9.31-21.62 21.42c-.35 11.6 8.86 21.71 21.14 22.1c13.13.41 22.81-9.75 22.52-21.86c-.28-11.78-9.46-21.79-22.04-21.66m-.56 41.7c-11.26-.35-19.25-9.6-18.93-20.14c.33-11 8-19.05 19.27-19.17c11.53-.13 20.36 8.97 20.21 19.68c-.17 10.65-8.52 20.01-20.55 19.63M48.1 53.21s1.43-3.36 1.49-4.18c.06-.83-.24-1.77-1.62-1.82c-1.38-.06-4.23-.16-4.23-.16l-2.8-5.6l-1.92-3.04s-1.43-.5-2.37.33s-1.16 1.76-.5 3.03s3.96 8.26 4.73 8.48s3.96.06 4.18.17s-.99 2.53-.99 2.53z\"/><path fill=\"#b3b3b3\" d=\"m90.15 55.08l-4.82 2.96l-3.5-2s-1.76-1.36-3.04-1.83c-1.57-.58-3.72-.29-4.76-1.78c-.81-1.15 14.35-1.59 14.35-1.59z\"/><path fill=\"#5e6268\" d=\"M76.55 48.89c-2.59.18-3.75.27-4.02 1.34c-.29 1.15 1.95 2.78 2.92 3.25c1.01.49 5.9-.98 6.6-.83c2.04.44 5.12 3.08 6.71 3.14c1.6.06 6.34-3.68 6.77-4.02c.77-.61 1.05-2.75-1.38-2.97c-2.41-.21-15.56-.05-17.6.09M39.36 37.43c-1.41.08-1.14 2.89-.67 3.67c.66 1.1 1.6 1.98 3.25 2.04s15.41-.72 16.46-.88c1.05-.17 1.04-1.58.65-3.03c-.25-.91-1.09-2.51-2.13-2.59c-1.48-.11-15.95.7-17.56.79\"/><path fill=\"#67a6ad\" d=\"m101.26 97.73l-16.79-33.9l1.1-5.89l-4.67-.44s-.84 4.53-1.06 4.69c-.22.17-33.01-.56-33.01-.56l1.73-5.85l-4.81-.59c-.5 1.54-9.14 31.43-11.23 35.11c-2.09 3.69-4.35 7.08-4.35 7.08s-.89-.46-1.91-.1c-.79.28-2.17 1.23-1.76 3.21c.33 1.6 2.1 2.59 3.55 2.1c2.2-.75 1.98-2.83 1.98-2.83s5.21-4.97 7.01-7.92c1.78-2.93 5.7-17.05 5.8-17.04c.38.04 25.89 28.15 26.73 28.42c.66.22 30.66-2.04 30.66-2.04l1.71-1.32zm-32.28-2.26S44.43 69.63 44.6 69.12c.02-.06.62-2.24.69-2.34c.2-.29 32.86.74 32.86.74zm3.88 3.25L82.38 69L97.3 97.62z\"/><path fill=\"#626168\" d=\"M27.02 98.22c-.26.04-1.62 1.38-1.59 1.93c.02.56 1.47 1.59 1.91 1.62c.43.02 1.62-1.5 1.62-1.86c-.01-.36-1.61-1.74-1.94-1.69m73.1-.66c-.28.16-1.2 1.46-1.23 1.85s.66 1.85.9 1.94s1.61.12 1.97.03s1.2-1.4 1.2-1.76s-.51-1.46-.72-1.73s-1.91-.45-2.12-.33\"/><path fill=\"#c9c9c9\" d=\"M79.79 55.94c-.35.29-.79 2.88.05 2.93s5.7.16 6.02 0s.37-2.41.1-2.72s-5.86-.48-6.17-.21\"/><path fill=\"#b3b3b3\" d=\"M43.31 51.91c-.58.21-1.78 3.82-1.52 4.24s7.64 1.26 8.01 1.2c.37-.05 1.31-4.08 1.05-4.4s-7.01-1.24-7.54-1.04m16.61 54.69s6.78-6.64 7.56-7.36c.64-.59 1.28-1.42 2.43-1.28s1.49.88 1.49.88l-1.26 3.11l-7.65 6.54l-.95 3.98l-6.85-1.58s-.01-2.3 0-2.87c.01-.63-.13-1.31 1.32-1.31s3.91-.11 3.91-.11\"/><path fill=\"#858587\" d=\"M61.36 108.1c-.16.24-.04 2.19-.16 2.54c-.12.36-1.9.2-2.83.24c-1.13.05-3.68 0-3.68 0s0 1.62.04 1.98s.32.93 1.54.93s5.22-.16 5.87-.2s1.34-.59 1.33-1.7c-.01-.85.01-2.57.01-2.57s6.75-6.49 7.48-7.13c.73-.65 1.19-1.01 1.13-1.98c-.04-.65-.68-1.37-.68-1.37z\"/></svg>", "books": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#01579b\" d=\"M118.03 102.32L72.29 123c-2.82 1.33-5.76 1.2-8.46-.36L6.09 93.32c-1.65-1.06-2.14-2.61-2.04-3.69s.35-2.25 3.25-3.09l4.28-1.58l57.92 31.57l41.16-16.82z\"/><path fill=\"#f5f5f5\" d=\"M71.74 119.69a7.95 7.95 0 0 1-7.26-.26L8.11 91.03c-.8-.44-1.04-1.45-.56-2.23c1.24-2.05 3.52-8.53-.24-13.91l63.66 30.65z\"/><path fill=\"#94c6d6\" d=\"m115.59 99.98l-43.85 19.71c-1.45.63-4.34 1.75-7.67-.49c2.63.19 4.48-.9 5.43-2.67c.93-1.72.65-4.54-.48-6.13c-.69-.96-2.54-2.49-3.35-3.35L113.1 88.5c4.2-1.73 8.14.86 8.77 4.01c.7 3.56-3.84 6.47-6.28 7.47\"/><path fill=\"#01579b\" d=\"m117.78 86.96l-45.27 20.2c-2.85 1.13-6.04.98-8.77-.4L5.9 77.38c-.56-.28-1.39-1.05-1.72-2.1c-.54-1.75.14-3.95 2.19-4.65l62.68 31.95l42.92-18.37z\"/><path fill=\"#0091ea\" d=\"m121.19 89.89l-4.93-1.79l-10.16.59l-33.58 14.99c-2.85 1.13-6.04.98-8.77-.4L5.9 73.91c-1.49-.76-1.17-2.97.47-3.28l41.69-18.65c1.19-.22 2.41-.09 3.52.38l59.49 28.36s9.45 6.47 10.12 9.17\"/><path fill=\"#616161\" d=\"M105.53 88.98s6.26-2.45 11.18-2.23s6.63 3.67 6.63 3.67c-.93-4.23-5.3-6.39-5.3-6.39l-65-32.73c-.45-.19-2.11-.58-4.66.47c-2.06.85-8.79 4-8.79 4z\"/><path fill=\"#424242\" d=\"M123.62 91.22c-.47-1.87-1.63-3.87-3.77-4.84c-2.82-1.27-6.84-.94-9.41.4l-4.91 2.18v3.46l6.21-2.76c6.04-2.69 8.72 1.34 8.95 2.29c.96 3.87-.9 6.11-6.39 8.63l-8.92 4.02v3.48l10.26-4.57c4.54-1.82 9.72-5.24 7.98-12.29\"/><path fill=\"#01579b\" d=\"M33.01 90.31L15.74 66.44l2.71-1.21l19.43 26.7zm22.15 11l-3.08-2.44l53.45-10.91v1.75l-7.49 2.84z\"/><path fill=\"#f44336\" d=\"M14.8 46.18L82.31 34.9l29.49 32.47c1.49 1.57.68 4.17-1.44 4.6l-69.7 14.3z\"/><path fill=\"#c62828\" d=\"M110.36 69.17L41.14 83.19l-.22 3.3l69.44-14.24c1.96-.41 2.78-2.65 1.71-4.23c-.38.56-.96 1-1.71 1.15m3.73 15.13c.73 1.16.07 2.69-1.27 2.96L49.1 100.18c-3.83.79-7.59-1.72-7.93-5.62c-.29-3.3 1.94-6.29 5.19-6.97l61.28-13.76z\"/><path fill=\"#616161\" d=\"M55.59 80.1L30.21 43.78l-14.48 3.83c-3.35 3.33-2.1 8.8-2.1 8.8S35.8 91.99 39.3 96.54s8.61 3.84 8.61 3.84l8.63-1.74l-.9-16.1z\"/><path fill=\"#424242\" d=\"M55.59 80.34L43.4 82.86c-3.33.75-3.93 3.88-3.93 3.88L10.04 44.57s-4.19 5.07-1.41 9.38L39.3 96.54c3.35 4.77 8.61 3.88 8.61 3.88l8.63-1.74l-.89-15.78z\"/><path fill=\"#b9e4ea\" d=\"M110.25 83c.31.68-.09 1.47-.82 1.62L48.5 97.12c-3.83.79-6.54-1.75-6.4-5.21c.18-4.37 2.63-6.22 5.87-6.89l61.23-12.51s-2.08 2.34-.49 6.72c.54 1.51 1.12 2.85 1.54 3.77\"/><path fill=\"none\" stroke=\"#424242\" stroke-miterlimit=\"10\" stroke-width=\"2.071\" d=\"M45.21 83.7L19.1 46.76\"/><path fill=\"#424242\" d=\"M47.26 67.95L13.68 51.03l-1.36 2.68l38.8 19.77z\"/><path fill=\"#c62828\" d=\"m108.79 64.03l-2.46-2.7L68.5 78.69L47.26 68.18l3.62 5.18l14.07 7.19l10.48-1.61z\"/><path fill=\"#3e8938\" d=\"M118.02 57.35L72.29 78.03c-2.82 1.33-5.76 1.2-8.46-.36L6.09 48.35c-1.65-1.06-2.14-2.61-2.04-3.69s.35-2.25 3.25-3.09l2.71-1l59.32 29.11l48.17-19.93z\"/><path fill=\"#f5f5f5\" d=\"M71.73 74.72a7.95 7.95 0 0 1-7.26-.26L8.1 46.06c-.8-.44-1.04-1.45-.56-2.23c1.24-2.05 3.52-8.53-.24-13.91l62.24 31.66z\"/><path fill=\"#94c6d6\" d=\"M115.58 55.01L71.73 74.72c-1.45.63-4.34 1.75-7.67-.49c2.63.19 4.48-.9 5.43-2.67c.93-1.72.65-4.54-.48-6.13c-.69-.96-2.54-2.49-3.35-3.35l47.43-18.55c4.2-1.73 8.14.86 8.77 4.01c.7 3.56-3.84 6.47-6.28 7.47\"/><path fill=\"#3e8938\" d=\"m117.78 41.99l-45.27 20.2c-2.85 1.13-6.04.98-8.77-.4L5.89 32.41c-.6-.3-1.5-1.07-1.79-2.16c-.43-1.62.13-3.75 2.26-4.59l53.01-11.23z\"/><path fill=\"#56b750\" d=\"m121.18 44.92l-4.93-1.79l-10.16.59l-33.58 14.99c-2.85 1.13-6.04.98-8.77-.4L5.89 28.93c-1.49-.76-.96-2.77.47-3.28l41.7-18.64c1.19-.22 2.41-.09 3.52.38l59.49 28.36s9.44 6.46 10.11 9.17\"/><path fill=\"#616161\" d=\"M105.53 44s5.21-1.83 10.13-1.61s7.69 3.05 7.69 3.05c-1.01-4.52-5.3-6.39-5.3-6.39l-65-32.73c-.45-.19-2.11-.58-4.66.47c-2.06.85-8.79 4-8.79 4z\"/><path fill=\"#424242\" d=\"M111.48 41.86L44.97 8.31l2.2-.99l67.64 33.9z\"/><path fill=\"#424242\" d=\"M123.61 46.25c-.47-1.87-1.26-3.68-3.49-4.62c-2.85-1.2-5.45-1.45-9.69.18l-4.91 2.18v3.46l6.21-2.76c3.15-1.48 7.79-1.16 8.95 2.29c1.27 3.78-.9 6.11-6.39 8.63l-8.92 4.02v3.48l10.26-4.57c4.55-1.82 9.73-5.24 7.98-12.29\"/></svg>", "calendar": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#fafafa\" stroke=\"#bdbdbd\" stroke-miterlimit=\"10\" stroke-width=\"3\" d=\"M111.42 113.34H16.58a4.88 4.88 0 0 1-4.88-4.88V42.03c0-7.27 5.65-13.16 12.62-13.16h79.37c6.97 0 12.62 5.89 12.62 13.16v66.43c0 2.7-2.19 4.88-4.89 4.88z\"/><path fill=\"#f44336\" d=\"M112.11 4h-4.8c-1 0-1.81.81-1.81 1.81V9.9c0 .67.38 1.25.95 1.6c2.01 1.2 3.24 3.57 2.71 6.17c-.45 2.2-2.21 3.98-4.41 4.44a5.788 5.788 0 0 1-7.03-5.65c0-2.12 1.14-3.97 2.85-4.97c.57-.34.94-.92.94-1.58v-4.1c0-1-.81-1.81-1.81-1.81H28.27c-.98 0-1.77.79-1.77 1.77v4.16c0 .65.37 1.22.93 1.55a5.78 5.78 0 0 1 2.73 6.18c-.45 2.2-2.21 3.98-4.41 4.44a5.788 5.788 0 0 1-7.03-5.65c0-2.13 1.16-3.98 2.87-4.99c.55-.32.91-.9.91-1.54V5.77c0-.98-.79-1.77-1.77-1.77h-4.85a5.75 5.75 0 0 0-5.75 5.75v37.52H117.7l.16-37.49A5.745 5.745 0 0 0 112.11 4\"/><path fill=\"#fff\" d=\"M45.09 15.46h4.12V29.3c0 1.27-.28 2.4-.84 3.37s-1.36 1.73-2.38 2.26c-1.03.53-2.18.8-3.47.8c-2.11 0-3.76-.54-4.94-1.61s-1.77-2.6-1.77-4.56h4.15c0 .98.21 1.7.62 2.17s1.06.7 1.95.7c.79 0 1.41-.27 1.88-.81s.7-1.31.7-2.31V15.46zm16.28 18.48c-.98 1.19-2.33 1.78-4.06 1.78c-1.59 0-2.81-.46-3.64-1.37c-.84-.91-1.27-2.26-1.28-4.02V20.6h3.97v9.61c0 1.55.7 2.32 2.11 2.32c1.35 0 2.27-.47 2.77-1.4V20.6h3.98v14.85h-3.73zm11.02 1.51h-3.98V14.37h3.98zm8.81-5.62l2.75-9.24h4.26l-5.97 17.16l-.33.78c-.89 1.94-2.35 2.91-4.39 2.91c-.58 0-1.16-.09-1.76-.26v-3.01l.6.01c.75 0 1.31-.11 1.68-.34q.555-.345.87-1.14l.47-1.22l-5.2-14.89h4.27z\"/><path d=\"M53.22 102.31h-8.57V69.26l-10.24 3.17v-6.97l17.89-6.41h.92zM93.59 63.9l-16.7 38.41h-9.05l16.73-36.28H63.09v-6.91h30.5z\"/></svg>", "candy": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#e0e0e0\" d=\"M26.54 15.7s.79-4.27 2.36-6.74s4.16-5.28 4.94-4.94c.79.34 1.57 3.48 4.5 9.78s7.87 14.83 7.75 20.45s-2.25 8.43-2.25 8.43s-6.05 9.99-17.5 9.06c-9.3-.75-13.45-3.86-18.55-6.57c-2.13-1.13-4.75-1.25-4.97-2.38c-.22-1.12 1.1-2.95 2.14-4.16c1.75-2.04 5.46-3.28 6.93-5.91s1.48-6.62 3.86-9.97c4.42-6.19 10.79-7.05 10.79-7.05\"/><path fill=\"#fff\" d=\"M33.23 13.68c-.91-.1-2.14 2.33-1.96 4.04s1.65 4.44 3.31 7.96c1.96 4.16 3.42 9.98 5.27 9.55c1.84-.43.37-6.18-1.22-10.59c-1.61-4.41-4.24-10.84-5.4-10.96m-4.06 21.38c1.49-.72.8-3.98-.37-7.96s-1.9-5.87-4.16-6.31c-2.2-.43-3.73.86-4.9 2.51s-2.02 3.61-1.96 4.71s.37 1.84 2.02 2.51c.99.4 2.5.88 3.98 1.84c1.71 1.1 3.73 3.49 5.39 2.7m-18.23 2c-1.6 0-4.29 2.08-3.8 3.61c.55 1.72 4.27 1.62 8.69 2.51c6.98 1.41 11.23 3.02 11.88.98c.43-1.35-5.2-3.61-8.63-4.78c-2.57-.86-6.18-2.32-8.14-2.32\"/><path fill=\"#e0e0e0\" d=\"M81.73 81.65c-4.85 5.17-7.37 12.51-2.6 21.25c3.73 6.82 8.65 9.22 11.68 14.07s2.67 7.81 3.45 7.74c.77-.07 3.24-2.53 4.5-5.21c1.27-2.67.77-5.07 2.04-6.61s5.49-1.76 7.95-4.71s2.11-5.42 4.36-7.74s5.56-3.03 7.81-5.63s4.29-5.91 3.8-6.68s-2.25-.35-7.46-1.9s-15.69-8.3-23.5-8.86c-5.49-.4-8.86.91-12.03 4.28\"/><path fill=\"#fff\" d=\"M89.74 83.42c-.81 1.43 7.27 3.2 11.68 6s6.87 5.45 8.55 5.45s6.01-2.44 5.66-4.19s-3.19-1.7-4.42-2.07c-1.39-.43-7.46-3.33-9.55-4.25c-3.02-1.35-10.62-3.23-11.92-.94m-.43 6.46c-.82.92 1.55 3.47 5.69 7.89c4.49 4.8 6.63 6.44 8.59 4.49c1.78-1.78.31-3.87-3.33-6.61c-2.65-2-9.98-6.85-10.95-5.77m-1.55 7.68c-1.3.47 1.24 6.85 2.09 9.59c.85 2.75 2.48 6.19 4.18 6.19s3.33-2.09 3.06-4.22s-3.8-5.87-4.76-7.04c-1.36-1.66-3.72-4.83-4.57-4.52\"/><path fill=\"#ff5960\" d=\"M39.09 44.82c-6.47 6.72-8.63 13.58-7.9 22.97c.95 12.07 14.11 27.36 29.97 27.01c12.8-.28 20.09-6.7 23.41-11.37c3.06-4.3 7.29-10.97 6.22-21.12c-1.28-12.18-13.96-26.76-29.25-26.85c-12.22-.08-17.48 4.2-22.45 9.36\"/><path fill=\"#fe7c84\" d=\"M40.82 54c-4.42 9.69-9.69 12.85-9.69 12.85s.1 1.98.5 3.81c.47 2.15 1.22 3.85 1.22 3.85s5.65-4.17 9.13-10.22c3.78-6.57 6.2-12.13 7.15-17.09s1.37-10.22 1.37-10.22s-1.67.52-3.67 1.56c-1.59.83-2.39 1.49-2.39 1.49s.07 5.89-3.62 13.97m16.52-18.37s.75 4.09-1.17 11.9c-.93 3.78-2.46 8.74-5.04 14.22c-2.31 4.92-4.53 8.43-6.46 11.34c-4.53 6.85-7.65 8.79-7.65 8.79s1.01 1.4 2.04 2.52s2.37 2.34 2.37 2.34s5.3-2.89 12.31-15.45s8.89-20.42 9.65-25.8c.77-5.38.64-9.89.64-9.89s-1.79-.16-3.33-.15c-1.91.01-3.36.18-3.36.18m13.69 1.76s-.45 15.85-7.47 29.7c-6.53 12.88-16.6 23.78-16.6 23.78s1.4.91 3.26 1.72c2.12.92 3.94 1.34 3.94 1.34s2.29-2.1 5.68-6.95c2.84-4.08 6.95-9.85 10.61-18.2c2.99-6.81 4.28-12 5.3-16.42c1.63-7.05 1.38-11.62 1.38-11.62s-1.11-.9-2.95-1.87c-1.79-.96-3.15-1.48-3.15-1.48m12.27 8.94s-.39 10.78-7.32 26.44c-2.69 6.07-5.04 9.94-7.32 13.26c-4.21 6.12-7.5 8.77-7.5 8.77s2.79-.09 5-.44c2.45-.39 4.37-1.02 4.37-1.02s5.57-5.68 10.86-17.37c5.08-11.22 6.78-22.35 6.78-22.35s-.75-1.76-2.17-3.82c-1.1-1.6-2.7-3.47-2.7-3.47\"/><path fill=\"#fff\" d=\"M55.7 41.92c-5.44 1.19-10.95 5.01-12.33 8.46c-1.4 3.5 1.01 5.24 3.4 4.51c2.39-.74 5.61-4.19 10.76-5.11s9.52-.41 11.68.18s3.93.42 4.38-1.24c.43-1.58-.43-3.71-4.06-5.57c-4-2.04-9.83-2.1-13.83-1.23\"/><path fill=\"#fff\" d=\"M90.8 62.31c-1.28-12.18-13.96-26.76-29.25-26.85c-12.23-.08-17.49 4.21-22.46 9.37c-6.47 6.72-8.63 13.58-7.9 22.97c.95 12.07 14.11 27.36 29.97 27.01c12.8-.28 20.09-6.7 23.41-11.37c3.07-4.31 7.3-10.98 6.23-21.13m-9.54 18.63c-2.88 4.04-9.18 9.6-20.26 9.84c-13.72.3-25.11-12.93-25.94-23.38c-.64-8.12 1.23-14.06 6.83-19.88c4.3-4.47 8.85-8.17 19.43-8.1c13.23.08 24.21 12.7 25.31 23.24c.94 8.79-2.73 14.56-5.37 18.28\" opacity=\".5\"/></svg>", "check-mark-button": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#689f38\" d=\"M116.46 3.96h-104c-4.42 0-8 3.58-8 8v104c0 4.42 3.58 8 8 8h104c4.42 0 8-3.58 8-8v-104c0-4.42-3.58-8-8-8\"/><path fill=\"#7cb342\" d=\"M110.16 3.96h-98.2a7.555 7.555 0 0 0-7.5 7.5v97.9c-.01 4.14 3.34 7.49 7.48 7.5h98.12c4.14.01 7.49-3.34 7.5-7.48V11.46c.09-4.05-3.13-7.41-7.18-7.5z\"/><path fill=\"#fff\" d=\"M40.16 12.86c0-2.3-1.6-3-10.8-2.7c-7.7.3-11.5 1.2-13.8 4s-2.9 8.5-3 15.3c0 4.8 0 9.3 2.5 9.3c3.4 0 3.4-7.9 6.2-12.3c5.4-8.7 18.9-10.6 18.9-13.6\" opacity=\".3\"/><path fill=\"#fbf9f9\" d=\"M43.26 109.46a8.86 8.86 0 0 1-8.7-6.2l-15.1-45.5c-1.46-4.81 1.26-9.9 6.07-11.36c4.65-1.41 9.59 1.08 11.23 5.66l9.8 29.5l47.1-59.6c3.12-3.95 8.85-4.62 12.8-1.5s4.62 8.85 1.5 12.8l-57.6 72.7a9.09 9.09 0 0 1-7.1 3.5\"/></svg>", "dog-face": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#ffeac8\" d=\"M110.161 52.346c-.802-9.173-7.105-32.792-46.161-32.792S18.641 43.173 17.839 52.346c-.625 7.133-1.7 33.22 13.574 50.742c7.827 8.98 22.102 13.245 32.587 13.245s24.76-4.265 32.587-13.245c15.273-17.522 14.199-43.61 13.574-50.742\"/><path fill=\"#d27856\" d=\"M97.669 68.24c.957 8.2-2.48 15.985-11.371 16.468c-8.134.447-13.104-5.06-13.435-13.107c-.34-8.247 4.002-15.878 10.805-16.609c7.18-.769 13.054 5.048 14.001 13.248\"/><path fill=\"#2f2f2f\" d=\"M47.86 71.683c-.454 3.876-2.448 7.004-6.777 6.55c-3.071-.328-5.133-3.989-4.68-7.875c.453-3.876 1.802-6.664 5.428-6.596c5.632.102 6.482 4.035 6.029 7.921m43.785-1.087c.182 3.898-1.36 7.23-5.858 7.558c-3.91.283-5.916-3.105-6.086-7.003c-.18-3.898 1.757-7.026 5.485-7.49c4.839-.624 6.278 3.036 6.46 6.935M74.849 90.245c.181 3.899-2.448 7.548-10.641 7.446c-7.978-.102-10.879-3.332-11.06-7.23s4.351-7.4 10.845-7.547c8.94-.227 10.674 3.422 10.856 7.331\"/><path fill=\"#e94b8c\" d=\"M56.677 105.986s.963 9.258 1.915 12.023c2.017 5.847 10.517 4.873 12.024-.635c1.28-4.68.43-12.76.43-12.76L63.5 103.55z\"/><path fill=\"#ef87b2\" d=\"M64.383 109.068c-1.326.057-1.28 1.28-1.28 4.09c0 2.823.158 4.522 1.439 4.466c1.28-.057 1.122-2.233 1.122-4.25s.102-4.363-1.281-4.306\"/><path fill=\"#2f2f30\" d=\"M46.077 97.203c-1.53 2.255 1.44 4.25 3.887 5.904c2.448 1.643 5.417 4.148 8.93 4.091c3.932-.057 4.997-2.708 4.997-2.708s1.28 3.139 6.856 2.55c2.98-.318 6.652-3.66 7.763-4.409c2.13-1.439 4.68-3.24 3.558-4.736c-1.28-1.712-3.989.589-6.754 2.017c-2.765 1.439-3.717 2.13-5.79 2.13s-3.514-.85-3.616-4.306c-.09-2.822-.056-3.354-.056-3.354h-4.737s.159 2.98.159 3.83c0 2.232-1.168 3.195-3.4 3.297s-4.624-1.756-5.802-2.447c-1.156-.68-4.77-3.66-5.995-1.859\"/><path fill=\"#d27856\" d=\"M96.826 23.799s26.84 29.054 26.84 30.959c0 5.606-1.533 10.72-4.806 15.128c-2.166 2.917-7.903 4.916-11.888 3.599c-4.096-1.355-7.975-3.804-11.398-19.62c-2.636-12.181-6.156-19.362-9.59-24.044c-3.79-5.17-9.237-9.074-9.237-9.074z\"/><path fill=\"#865b51\" d=\"M101.857 17.351c13.207 3.814 18.53 10.51 20.582 17.427c2.053 6.918 1.979 18.415.376 23.593s-3.205 11.197-10.432 11.515c-6.34.279-9.728-5.313-11.95-14.158C97.316 43.32 92.755 31.31 87.13 26.364c-4.6-4.043-10.382-5.617-10.382-5.617s10.08-7.736 25.11-3.396\"/><path fill=\"#d27856\" d=\"M31.174 23.799S4.334 52.853 4.334 54.758c0 5.606 1.533 10.72 4.806 15.128c2.166 2.917 7.903 4.916 11.888 3.599c4.096-1.355 7.975-3.804 11.398-19.62c2.636-12.181 6.156-19.362 9.59-24.044c3.79-5.17 9.237-9.074 9.237-9.074z\"/><path fill=\"#865b51\" d=\"M26.143 17.351c-13.207 3.814-18.53 10.51-20.582 17.427s-1.979 18.415-.376 23.593S8.39 69.568 15.617 69.886c6.34.279 9.728-5.313 11.95-14.158C30.684 43.32 35.245 31.31 40.87 26.364c4.6-4.043 10.382-5.617 10.382-5.617s-10.08-7.736-25.11-3.396\"/></svg>", "door": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#b06542\" d=\"m33.28 123.87l61.43.13c1.22 0 2.2-.89 2.2-1.99V6.12c0-1.1-.98-1.99-2.19-1.99L33.29 4c-1.22 0-2.2.89-2.2 1.99v115.88c0 1.1.98 2 2.19 2\"/><path fill=\"#874d36\" d=\"M78.72 20.72v30.32H49.28V20.72zm4.91-5H44.37v40.32h39.26z\"/><path fill=\"#c87d5e\" d=\"m83.63 15.9l-5.1 4.82h.19v30.32H49.65l-5.28 5h39.26z\"/><path fill=\"#874d36\" d=\"M78.72 78.96v28.32H49.28V78.96zm4.91-5H44.37v38.32h39.26z\"/><path fill=\"#c87d5e\" d=\"m83.63 74.14l-5.1 4.82h.19v28.32H49.65l-5.28 5h39.26z\"/><circle cx=\"84.65\" cy=\"66\" r=\"5.25\" fill=\"#874d36\"/><circle cx=\"82.61\" cy=\"64.45\" r=\"5.25\" fill=\"#bdbdbd\"/><path fill=\"#eee\" d=\"M83.85 61.11c.13.65-.25.97-.79 1.36s-1.21.7-1.7 1.53c-.35.59-.46 1.37-1.03 1.76c-.56.38-1.2.31-1.5-.36c-.43-.95-.44-2.6.77-3.95c1.16-1.29 3.93-1.98 4.25-.34\"/></svg>", "fork-and-knife-with-plate": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#d4d4d4\" d=\"m27.622 50.52l75.07-2.5s12.03 22.02-4.2 44.22c-15.85 21.69-49.16 19.19-63.98 1.41c-16.61-19.94-6.89-43.13-6.89-43.13\"/><path fill=\"#f6f6f6\" d=\"M64.582 23.89c-23.96.17-38.29 16.61-38.64 38.29c-.35 21.86 16.43 42.13 40.56 42.13c25.18 0 39.34-20.45 39.51-41.96c.16-19.07-16.61-38.64-41.43-38.46\"/><path fill=\"#d5d5d5\" d=\"m37.502 62.84l2.25-6.33s6.17-18.36 25.72-18.26c18.22.1 24.97 17.4 24.97 17.4l2.07 6.71l1.1-3.78l-2.6-9.02l-8.8-10.23l-14.83-4.6l-12.38 1.74l-10.13 6.43l-6.75 10.44z\"/><path fill=\"#fff\" d=\"M65.292 92.46c-16.01 0-28.32-11.86-29.41-28.45c-.52-7.91 2.23-15.48 7.75-21.3c5.61-5.94 13.49-9.31 21.66-9.22c8.59.08 15.97 3.18 21.36 8.96c5.5 5.9 8.36 14.02 7.85 22.26c-.97 15.74-12.95 27.4-28.49 27.75c-.25-.01-.49 0-.72 0m-.27-56.48c-7.37 0-14.5 3.07-19.58 8.44c-5.03 5.32-7.54 12.22-7.07 19.42c1.01 15.45 12.58 26.42 27.57 26.1c14.21-.31 25.16-10.99 26.05-25.4c.46-7.45-2.23-15.08-7.18-20.41c-4.91-5.27-11.67-8.09-19.55-8.16c-.08.01-.16.01-.24.01\"/><path fill=\"#9c9c9c\" d=\"M23.36 38.15c-.361-4.412-1.87-22.86-2.083-24.205c-.099-.615-.304-1.476-1.124-1.476c-.352 0-.787.566-.762 1.353c.04 1.254.758 29.83.758 29.85c0 .72-.583 1.265-1.302 1.265a1.294 1.294 0 0 1-1.302-1.241v-.012c-.058-1.05-.796-28.813-.878-29.985c-.041-.55-.426-1.157-.968-1.173c-.64-.016-1 .59-1 1.255c0 1.262.118 28.344.118 29.853a1.303 1.303 0 0 1-2.606 0c0-1.509.119-28.59.119-29.853c0-.665-.361-1.271-1-1.255c-.542.016-.927.623-.968 1.173c-.082 1.172-.82 28.936-.878 29.985v.012c-.027.696-.6 1.24-1.302 1.24c-.72 0-1.302-.545-1.302-1.264c0-.02.717-28.596.758-29.85c.025-.787-.41-1.353-.763-1.353c-.82 0-1.025.86-1.123 1.476c-.213 1.344-1.722 19.793-2.083 24.205c-.36 4.41-1.033 12.397.287 15.111c1.607 3.288 5.666 4.043 5.666 4.043s-.541 39.046-.869 41.44c-.467 3.444-2.673 9.397-2.46 10.767s.992 2.173 2.435 2.246c1.27.065 3.67.365 4.786.285c1.117.08 3.516-.22 4.786-.285c1.443-.073 2.222-.877 2.436-2.246c.213-1.37-1.993-7.323-2.46-10.766c-.328-2.395-.87-41.441-.87-41.441s4.06-.755 5.666-4.043c1.32-2.714.648-10.7.287-15.111\"/><path fill=\"#c8c8c8\" d=\"M20.736 109.51c.213-1.369-1.993-7.322-2.46-10.765c-.328-2.395-.87-41.441-.87-41.441s4.06-.755 5.666-4.043c.463-.95.677-2.554.75-4.418l-16.764-.214s-1.515.998-.417 3.548c1.41 3.264 5.747 3.708 5.747 3.708s-.385 40.99-.484 44.016s-2.238 7.396-2.099 9.774c.123 2.093.915 2.28 3.495 2.373c.071-.002.151-.002.214-.006c1.117.08 3.516-.22 4.786-.285c1.443-.073 2.222-.877 2.436-2.246\"/><path fill=\"#e0e0e0\" d=\"M6.113 49.932c.04.287 6.477.829 9.003.87c1.71.027 5.99-.099 8.58-.183c.133-1.211.172-2.63.151-4.119l-17.734.103s-.041 3.042 0 3.33\"/><path fill=\"#fdfdfd\" d=\"M7.564 52.802c2.042.476 6.486-1.402 5.83-2.132c-.705-.795-7.2-1.435-7.281-.828c-.082.607.369 2.706 1.451 2.96m10.471 56.594c.525-.976.123-3.928-.123-5.486s-.451-2.763-1.123-2.664c-.55.082-.55.696-.55 1.984s.099 3.378-.385 3.845c-.492.468-2.271 1.476-2.091 2.436s1.451.918 2.378.877c.59-.008 1.468-.188 1.894-.992\"/><path fill=\"#9c9c9c\" d=\"M121.8 12.488s-.443-.812-2.296-.484c-2.041.352-7.232 3.673-8.626 11.84c-1.17 6.86-2.02 25.775-2.097 32.642c-.027 2.494.33 3.203 2.11 4.921c1.847 1.783 3.537 3.539 3.595 4.78c.058 1.295-.336 31.38-.623 33.52s-1.82 7.994-2.017 9.479c-.197 1.467.672 2.599 1.582 2.689c1.493.14 6.79.18 6.79.18z\"/><path fill=\"#c8c8c8\" d=\"m119.398 62.177l-5.847-1.09s3.379 2.837 3.444 5.026c.066 2.19.197 33.126-.14 34.98c-.335 1.853-2.984 8.962-1.77 10.249c.828.87 4.378.689 5.904.689s2.787-.066 3.443-.992c.665-.927.361-3.411.009-5.273c-.402-2.164-.87-4.108-.87-5.067c0-1.722-1.123-41.834-1.123-41.834z\"/><path fill=\"#e0e0e0\" d=\"M121.275 12.283c-1.393.04-5.55 1.517-7.338 7.97c-1.394 5.042-1.714 11.094-2.058 21.835c-.256 8.077-.265 12.668-.146 15.125c.07 1.446.282 1.885.814 2.577c.315.411 7.318 2.518 7.318 2.518l2.583-3.443s-.402-41.835-.402-43.565s.246-3.05-.77-3.017\"/><path fill=\"#fdfdfd\" d=\"M122.104 104.012c-.59-.041-.632 1-.632 2.107s-.328 1.927-.82 2.255s-1.779 1.025-1.697 1.656s.713.78 2.542.697c1.82-.082 1.78-1.37 1.722-2.681c-.074-1.312-.254-3.977-1.115-4.034m-9.7-44.967c-.492.213 1.008 2.066 2.714 3.534c1.763 1.517 3.32 1.984 5.116 1.886c1.804-.098 2.722-4.985 1.6-5.42c-1.124-.426-1.452 1.361-2.912 1.607s-5.625-2-6.518-1.607\"/></svg>", "house": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#ab5832\" d=\"M19.16 48.94V28.58l-1.64.1V16.14l15.82-.1v12.35H31.7v11.96z\"/><path fill=\"#fff3e1\" d=\"M64.11 23.33L18.67 68.99l.35 42.21l89.75-.85l.13-45z\"/><path fill=\"#5f4e47\" d=\"m16.97 103.79l3.14-1.73V67.98l-2.92 1.95c-.01 0 .32 33.86-.22 33.86m90.23-33.97v32.03l3.14 1.73V71.01z\"/><path fill=\"#bcaa93\" d=\"M64.42 28.21L17.18 72.42V61.27l47.29-44.79l45.87 47.5v9.41z\"/><path fill=\"#ab5832\" d=\"m12.55 59.36l-2.77 5.11l7.43-.11s46.35-45.08 47.35-45.12c1.21-.05 45.76 45.91 45.76 45.91l6.59-.1l-49.44-53.26l-7.26-.48z\"/><path fill=\"#ed6c31\" d=\"M4 63.19c-.78.95-.01 1.45.62 1.45s7.89-.21 7.89-.21l50.04-48.69s1.15-1.18 1.97-1.14c.89.04 2.04 1.17 2.04 1.17l50.28 49.29s5.73.02 6.64-.21c.99-.24.49-1.18-.73-2.49c-.9-.97-51.73-51.25-52.57-52.12c-2.5-2.58-3.72-4.08-6.08-3.98c-2.37.1-3.77 1.85-6.14 4.03c-.7.66-53.63 52.5-53.96 52.9\"/><path fill=\"#a6cfd5\" d=\"M93.5 80.83h10.25V72.3a2.87 2.87 0 0 0-2.87-2.87H93.5zm-3.08 0v-11.4h-8a2.87 2.87 0 0 0-2.87 2.87v8.54h10.87zm0 3.24H79.55v8a2.87 2.87 0 0 0 2.87 2.87h8zm3.08 0v10.87h7.38a2.87 2.87 0 0 0 2.87-2.87v-8zm-56.75-3.24H47V72.3a2.87 2.87 0 0 0-2.87-2.87h-7.38zm-3.09 0v-11.4h-8a2.87 2.87 0 0 0-2.87 2.87v8.54h10.87zm0 3.24H22.8v8a2.87 2.87 0 0 0 2.87 2.87h8V84.07zm3.09 0v10.87h7.38A2.87 2.87 0 0 0 47 92.07v-8z\"/><path fill=\"#d27857\" d=\"M50.34 106.73s-.15-24.74 0-30.99c.15-6.24 6.01-11.64 12.8-11.41c8.4.29 12.72 5.01 13.03 11.1s.31 31.68.31 31.68z\"/><path fill=\"#ab5932\" d=\"M53.47 108.07s-.12-26.36 0-31.24c.15-6.05 4.71-9.23 10.01-8.93c6.17.35 9.22 3.63 9.46 8.4c.24 4.76.24 31.79.24 31.79z\"/><path fill=\"#d27857\" d=\"M69.99 86.58c-.02-4.34-.06-8.17-.12-9.34c-.16-3.15-2.4-5.6-6.75-5.75c-3.51-.12-6.4 2.62-6.48 5.85c-.03 1.19-.02 4.93 0 9.19zm-13.32 4.87c.04 5.81.09 11.16.09 11.16l13.27.04s0-5.33-.02-11.14z\"/><path fill=\"#ffba02\" d=\"M70.03 88.81c-.05 1.41.52 2.55 2.19 2.55s2.28-.78 2.4-2.29c.1-1.35-.83-2.55-2.4-2.45c-1.56.11-2.15 1.2-2.19 2.19\"/><path fill=\"#728037\" d=\"M79.61 116.31s10.88.11 18.74-.12s13.55.12 14.72-1.06c1.17-1.17 1.15-11.14-4.3-13.84c-5.01-2.48-8.25.04-9.97.21c-2.27.23-5.08-1.18-7.14-1.22c-8.51-.18-11.49 6.51-11.49 6.51zm-65.08-.82c.91.85 7.86.88 16.25.82s15.14.02 15.14.02l1.4-8.47l-1.7-1.41s.19-4.24-5.16-5.69c-3.7-1-6.92.65-10.03.7c-3.11.06-5.98-1.35-9.44-.53c-3.22.76-5.73 2.86-6.75 7.1c-.71 2.94-.53 6.69.29 7.46\"/><path fill=\"#b0b0b0\" d=\"m44.92 125.17l.07-8.85h.65l-.01-9.86h34.73l-.12 9.86H81v8.62c-.01-.01-36.08.28-36.08.23\"/><path fill=\"#9b9b9b\" d=\"M80.99 121.3v3.63l-36.08.24l.03-3.9zm-35.37-8.82l34.65.01v3.82H45.62z\"/></svg>", "litter-in-bin-sign": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#194fa5\" d=\"M116 4H12c-4.42 0-8 3.58-8 8v104c0 4.42 3.58 8 8 8h104c4.42 0 8-3.58 8-8V12c0-4.42-3.58-8-8-8\"/><path fill=\"#2262dd\" d=\"M109.7 4H11.5A7.555 7.555 0 0 0 4 11.5v97.9c-.01 4.14 3.34 7.49 7.48 7.5h98.12c4.14.01 7.49-3.34 7.5-7.48V11.5c.09-4.05-3.13-7.41-7.18-7.5z\"/><path fill=\"#68abe6\" d=\"M39.7 12.9c0-2.3-1.6-3-10.8-2.7c-7.7.3-11.5 1.2-13.8 4c-1.9 2.3-2.3 5.6-2.6 8.4c-.2 2.2-2.2 15.9 3.5 12.2c.68-.45 1.23-1.07 1.6-1.8c1.2-2.1 1.9-4.5 3.3-6.6c5.3-8.6 18.8-10.5 18.8-13.5\"/><path fill=\"#fff\" d=\"M43 70h-2c-1.1 0-2-.9-2-2v-2c0-1.1.9-2 2-2h2c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2M33 82h-2c-1.1 0-2-.9-2-2v-2c0-1.1.9-2 2-2h2c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2m6 12h-2c-1.1 0-2-.9-2-2v-2c0-1.1.9-2 2-2h2c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2\"/><circle cx=\"83\" cy=\"26\" r=\"10\" fill=\"#fff\"/><path fill=\"#fff\" d=\"m108.8 71.3l-9.5-26.8C97.1 40 92.1 38 85 38c-5.7 0-10.6 1.8-13 4.5L61.8 52c-.69.61-1.58.97-2.5 1H46.8a3.786 3.786 0 0 0-3.8 3.2c-.2 1.99 1.25 3.78 3.24 3.98c.12.01.24.02.36.02h16.3c.98 0 1.92-.4 2.6-1.1l6.1-6.3a.459.459 0 0 1 .8.3v54.1a4.59 4.59 0 0 0 4.1 4.7c2.42.27 4.6-1.47 4.87-3.89c.02-.2.03-.41.03-.61V74.7c0-.99.81-1.8 1.8-1.8s1.8.81 1.8 1.8v32.6a4.59 4.59 0 0 0 4.1 4.7c2.42.27 4.6-1.47 4.87-3.89c.02-.2.03-.41.03-.61V53.1c.02-.26.25-.47.51-.45c.16.01.31.1.39.25l7.1 21a3.745 3.745 0 0 0 4.8 2.2a3.904 3.904 0 0 0 2-4.8\"/><path fill=\"#fff\" d=\"M44.3 112H26.7a6.53 6.53 0 0 1-6.4-5.1L13.1 74a2.5 2.5 0 0 1 1.88-3H15c1.35-.29 2.69.55 3 1.9l7.3 32.9c.17.69.79 1.18 1.5 1.2h17.6a1.59 1.59 0 0 0 1.5-1.2L53 73a2.53 2.53 0 0 1 3-1.9a2.46 2.46 0 0 1 1.92 2.9c-.01.03-.01.07-.02.1L50.6 107a6.35 6.35 0 0 1-6.3 5\"/></svg>", "monkey": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#845a54\" d=\"M71.45 84.59L62.06 67.6l-23.18 8.87s-1.13 1.45-.89 3.99c.1 1.13.61 4.32.61 4.32l-4.32.66s-6.19 5.16-4.22 13.23c1.5 6.13 3.1 9.39 3.1 9.39l-.84 6.01s13.8 6 27.22 5.63c17.18-.47 23.65-9.57 23.65-9.57L78.5 88.92z\"/><path fill=\"#b5885e\" d=\"M31.66 86.57c-1.99 1.87-2.32 4.83-2.16 5.87c.38 2.44 4.13 9.15 8.26 8.87s2.16-8.54.84-11.54s-3.75-6.21-6.94-3.2m-11.17 32.37c-.14 2.05 2.16 1.97 6.48 1.97s14.73-.75 14.73-.75l-.84-5.73s-2.61.18-6.19-1.78c-1.45-.8-1.92-1.83-1.92-1.83s-11.98 4-12.26 8.12\"/><path fill=\"#ffcd88\" d=\"M51.61 80.46s-4.6-.18-8.03 3.81c-2.18 2.53-6.66 14.69-3.38 16.38s5.53-4.27 6.76-7.04c1.13-2.53 3.19-5.44 4.97-6.38s3.28-1.97 3.28-1.97zm-7.65 32.85s-1.6 0-3.19.56c-1.6.56-10.51 4.88-10.42 7.23s5.54 2.35 12.29 2.25c6.76-.09 8.54-1.41 9.1-1.97s2.72-3.47 1.97-3.85c-.74-.37-9.75-4.22-9.75-4.22\"/><path fill=\"#b5885d\" d=\"M69.01 70.23s5.26-4.6 7.32-9.01s1.97-8.63 1.97-8.63s9.97-2.63 7.46-14.96c-2.12-10.44-10.56-8.22-10.56-8.22s-5.73-11.92-21.12-15.2s-28.87 4.32-34.54 12.01c-6.57 8.92-5.44 20.37-5.44 20.37s-5.07-.47-7.41 4.04C4.26 55.3 5.09 62.92 9.6 66.4c4.5 3.47 11.54 2.53 11.54 2.53s4.88 5.26 10.51 7.6c5.78 2.41 11.26 2.72 17.93 2.06s12.01-4.13 12.01-4.13s-.28 1.88.94 4.32c.76 1.51 3.38 4.41 3.38 4.41s-4.27-2.25-7.7-2.86c-3.72-.66-6.1-.42-7.51.42c-1.07.64.31 5.73 1.88 6.01c1.6.28 4.22-.47 8.82 1.31s10.51 6.01 12.01 6.95s4.55 2.53 4.79 4.6c.18 1.59-2.39 3.66-6.9-.94c-4.32-4.41-8.49-8.63-13.19-9.2c-4.69-.56-7.6.66-9.76 5.35c-2.77 6.03-5.07 13.33-5.54 15.2c-.47 1.88-1.78 2.91-.75 4.69c.72 1.24 8.67 5.87 10.51 5.73c2.35-.19 4.22-4.97 4.79-5.82c.56-.84 1.78-2.63 1.78-2.63s4.13 9.76 12.86 8.92s9.95-6.29 9.95-6.29s6.79.34 13.98-1.71c9.64-2.75 16.23-11.56 18.3-25.69c1.5-10.23-.38-25.15-5.16-37.64c-1.76-4.58-3.83-10.01-5.16-13.8c-3.41-9.66-4.6-16.64.94-18.68c2.82-1.04 4.63.19 5.45 1.8c1.12 2.21 1.31 4.95 4.87 6.36c2.54 1 5.73.19 7.13-2.16c1.76-2.94 1.14-7.24-2.63-12.11c-6.48-8.35-17.27-7.56-23.18-3.1c-6.32 4.76-9.01 11.1-5.91 22.99c2.91 11.17 9.31 25.39 10.7 32.29c1.88 9.29 3.58 32.13-7.98 36.79c-5.35 2.16-9.29 1.31-9.29 1.31s-.94-10.68-4.32-18.4c-3.85-8.81-10.68-12.65-10.68-12.65\"/><path fill=\"#ffcf8c\" d=\"M71.36 35.28c-.16.2.91 3.13 1.31 6.19c.45 3.39.59 6.67.88 6.77c.56.19 8.88-1.89 7.85-9.59s-9.66-3.84-10.04-3.37m-56.78 16c-.74-.56-5.55.79-4.97 6.29c.75 7.13 7.79 7.13 8.45 6.66c.34-.24-1-3.49-1.88-6.66c-.85-3.05-1.23-6.02-1.6-6.29m26.65-14.93c-4.5 1.5-10.79-5.73-16.24 0c-6.67 7.01 1.26 13.31 1.88 18.21c.38 3-1.31 5.26.38 10.32c1.41 4.22 9.24 10.5 23.48 7.61c13.33-2.71 16.46-11.15 16.11-16.46c-.39-5.92-3.17-6.26-3.73-9.26s2.59-14.82-6.57-17.27c-9.49-2.53-10.46 5.24-15.31 6.85\"/><path fill=\"#000504\" d=\"M56.88 43.58c.56 3.38.21 5.63-2.18 6.19c-2.86.67-4.72-1.27-5.28-4.72c-.69-4.21.16-6.19 2.35-6.6c2.7-.5 4.41.88 5.11 5.13m-19 3.31c.64 3.22.75 6.1-1.83 6.76c-2.47.63-4.52-.95-5.42-4.43c-1.06-4.08-.71-6.44 1.62-7.11c2.4-.7 4.64-.22 5.63 4.78m3.38 5.64c.06 1.62 2.81 3.58 4.42 3.33c1.74-.28 3.38-3.72 2.81-4.74c-.74-1.32-7.28-.07-7.23 1.41\"/><path fill=\"#ff6b19\" d=\"M34.68 62.87c.28 2.25 5.07 5.65 13.8 3.94c9.01-1.76 10.35-7.25 10.21-8.59s-4.72-2.04-12.53-.7c-6.13 1.05-11.71 3.55-11.48 5.35\"/></svg>", "musical-notes": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#546e7a\" d=\"M46.91 39.43c-.3-13.21-2.51-15.82-14.35-23.5c-5.54-3.6-6.02-7.02-7.47-7.37c-.85-.21-1.66.44-1.64 1.29l.97 42.2a.913.913 0 0 1-1.04.93c-4.8-.72-10.6 1.43-15.02 6.06C2.01 65.69.9 74.96 5.9 79.73s14.2 3.24 20.57-3.42c4.06-4.26 5.69-8.98 5.53-14.1l-.8-34.97c-.02-.68.65-1.06 1.3-.87c2.44.71 9.25 2.93 11.43 14.47c.41 2.16 3.06 2.01 2.98-1.41m78.03 7.22c-.72-13.19-3.01-15.73-15.07-23.05c-5.65-3.42-6.24-6.83-7.69-7.14c-.85-.18-1.65.49-1.6 1.34l2.29 42.15c.03.56-.45 1.03-1.01.96c-4.82-.57-10.55 1.76-14.82 6.53c-6.15 6.86-6.97 16.16-1.82 20.77c5.14 4.61 14.3 2.79 20.45-4.06c3.93-4.38 5.41-9.15 5.08-14.27l-1.88-34.92c-.04-.68.62-1.08 1.27-.91c2.46.63 9.34 2.64 11.87 14.11c.47 2.14 3.11 1.91 2.93-1.51M77.5 68.46c.61-13.2-1.42-15.96-12.69-24.44c-5.28-3.97-5.53-7.42-6.94-7.87c-.83-.27-1.69.32-1.73 1.18L54.21 79.5c-.03.56-.55.98-1.1.85c-4.74-1.05-10.67.7-15.4 5.01c-6.81 6.21-8.55 15.38-3.89 20.48s13.95 4.21 20.75-2c4.35-3.97 6.3-8.57 6.48-13.69l1.62-34.93c.03-.68.72-1.01 1.36-.77c2.38.88 9.03 3.56 10.4 15.22c.26 2.18 2.92 2.22 3.07-1.21\"/></svg>", "notebook": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#616161\" d=\"M106.02 121.68H36.18c-1.66 0-1.26-1.35-1.26-3.01V14.05c0-1.66 1.35-3.01 3.01-3.01h69.36c2.72 0 4.93 2.21 4.93 4.93v99.76c0 3.86-1.83 5.95-6.2 5.95\"/><path fill=\"#94c6d6\" d=\"M18.53 115.14c0 1.94 3.07 3.57 5.01 3.57l80.39-.05c2.98 0 4.54-1.58 4.54-3.52l-.25-21.32H18.53z\"/><path fill=\"#f5f5f5\" d=\"M101.47 105.88s-2.13 5.85.03 8.78c2.51 3.4 6.89 2.58 6.89.99V16.44c0-.66-.61-1.14-1.25-1c-1.39.3-3.89.31-7.21-1.89z\"/><path fill=\"#616161\" d=\"M94.16 110.85H23.64V6.45h72.25c2.27 0 3.87.61 4.62 1.62c.98 1.31 1.5 3.3 1.5 5.48V103a7.85 7.85 0 0 1-7.85 7.85\"/><path fill=\"#212121\" d=\"M92.01 107.78H25.54c-2.76 0-4.99-2.24-4.99-4.99V11.45c0-2.76 2.24-4.99 4.99-4.99h66.47c3.82 0 6.92 2.18 6.92 6.92v87.49c-.01 3.81-3.1 6.91-6.92 6.91\"/><path fill=\"#616161\" d=\"M34.43 109.75L34.38 6.46h-11.2s-2.31-.4-3.85 0c-2.79.73-3.56 2.76-3.56 6.07v94.41c0 6.7.41 9.6 2.44 11.72c-.12-1.54.87-6.83 1.68-8.28c.72-1.28 14.54-.63 14.54-.63\"/><path fill=\"none\" stroke=\"#424242\" stroke-miterlimit=\"10\" stroke-width=\"2\" d=\"M23.18 6.45v104.4\"/><path fill=\"none\" stroke=\"#424242\" stroke-miterlimit=\"10\" stroke-width=\"3\" d=\"m34.38 109.34l-11.3.22c-3.77 0-5.06 4.04-4.39 6.71c.84 3.37 4.32 3.92 5.18 3.92h12.65\"/><path fill=\"#f5f5f5\" d=\"M56.05 96.74c.71-1.95-1.02-1.16-1.88-2.01c-.43-.65-.43-1.66.09-2.25c.43-.48 1.3-.55 1.69-.05c.41.53.21 1.36.68 1.86c.34.37.9.33 1.33.53c1.03.48 1.4 1.91.47 2.73c-.72.72-2.75.46-2.38-.81m-4.31-17.12c.61.18 1.15.84.94 1.41c-.52.82-1.49 1.21-1.41 2.41c.24 1.75 2 1.83 2.84.4c.37-.53.73-1.14 1.35-1.35s1.53.32 1.37.95c-.09.37-.5.58-.65.93c-.14.34-.03.73.07 1.1c.24 1.02.66 2.45 1.9 2.53c.56.01 1.08-.53.9-1.07c-.17-.49-.82-.8-.81-1.31c.02-.86 1.64-.54 2.01-1.3c.33-.68-.64-1.34-.91-2.08c-.26-1.55-.6-1.67-2.12-1.32c-.94.14-1.99-.38-2.47-1.23c-.41-.73-.59-1.8-1.4-1.98c-.52-.12-.88.24-1.34.35c-.69.16-.89.01-1.54-.25c-.77-.31-1.27-.39-1.95.19c-.42.36-.82.94-.35 1.45c.77.81 2.61-.12 3.57.17m-2.62 9.71c.58.05 1.17-.21 1.72.01c.45.18.74.62 1.18.83c.57.27 1.3.01 1.58-.52c.64-1.2-.69-2.57-1.93-2.46c-.56.02-1.08.23-1.62.36c-.57.13-2.12-.47-2.43-.03c-.55.74.89 1.75 1.5 1.81m-5.51-8.84c.53.23.83.87.71 1.41c-.12.47-.53 1.08-.08 1.5c.35.3.84.03 1.28-.04c2.03-.16 2.41 2.67-.01 2.3c-.67-.1-1.34-.37-2-.25c-.64.27-1.12-.24-1.26-.88c-.24-.89-.61-4.88 1.36-4.04m26.8 9.27c-1.11.74-1.17 2.69.22 3.15c.46.14 1.03.06 1.33.44c.22.28.19.72.48.95c.82.42 1.2-.58.84-1.4c-.18-.39.04-.74.49-.62c.67.16 1.04.94 1.68 1.2c.87.36 2.81-.3 2.13-1.46c-.36-.44-1.07-.23-1.56-.51c-.27-.15-.44-.42-.6-.68c-.32-.61-.89-1.17-.98-1.86c-.01-.35.23-.67.18-1.02c-.06-.4-.53-.69-.93-.62c-1.29.26-.14 1.88-.9 2.36c-.37.23-.82-.27-1.2-.31c-.44-.04-.84.12-1.18.38m-6.51-2.11c.68.36 1.64.41 1.93 1.11c.17.41-.04.92-.45 1.07c-.77.15-1.83-.17-2.37.57c-.33.43-.22 1.21.31 1.44c.51.21 1.17-.12 1.56.26c.38.49.32 1.34.99 1.62c.37.17.88 0 .93-.39c-.12-.76-.47-1.38.1-2.09c.44-.56 1.29-.89 1.29-1.61c0-.83-1.14-1.33-1.28-2.16c-.13-.73.58-1.47.22-2.13c-.45-.83-1.17-.21-1.67-.01c-.48.19-.86.16-1.36.26c-1.06.23-1.41 1.42-.2 2.06m-.3-4.84c.91.64 1.81-.43 2.71-.5c.48-.03 1.05.17 1.39-.16c.25-.25.21-.7-.02-.99c-.48-.62-1.35-.59-2.01-.88c-1.12-.79-2.59-1.28-3.92-.71c-.61.26-.81.37-.34.86c.45.47 1.11.31 1.52.98c.27.45.2 1.04.67 1.4m-2.99-6.99c1.08 1.11 2.74.59 4.11.75c.61.08 1.22.29 1.83.21c.54-.07 1.02-.38 1.56-.43c.68-.04 1.89.31 2.08-.62c.05-.51-.54-.87-.77-1.34c-.34-.67.25-1.94-.6-2.31c-1.04-.45-.89 1.03-.92 1.6c-.83-.13-1.76-.24-2.42.27c-.22.17-.39.39-.61.55c-1.35.92-2.81-.82-4.18-.37c-.59.32-.45 1.29-.08 1.69m1.08-8.16c.71-.03 1.67-.28 2.14.43c.35.56-.08 1.22-.17 1.84c-.14.89.53 1.87 1.43 2.09c.33.08.76.01.82-.31c.08-.43-.57-.71-.65-1.15c-.09-.48.53-.76.65-1.22c.08-.31-.08-.63-.19-.94c-.52-1.28.05-2.86-.75-4.03c-.23-.26-.63-.39-.91-.23c-.2.12-.3.36-.45.54c-.38.45-1.06.49-1.66.56c-1.56.2-2.32 2.45-.26 2.42m-1.53 2.99c.93.43 1.08 1.58.14 2.08c-1.21.54-3.15-1.15-3.41-2.35c-.14-.68.34-1.21 1.04-1.25c1-.05 1.52.99 2.23 1.52M49.91 96.36c-.1 1.19 1.32 1.76 1.86.6c.21-.5.21-2.53-.72-2.83c-.93-.31-1.1 1.72-1.14 2.23M42.2 69.53c-1.02.39-1.04 1.5-.79 2.4c.16 1.27-1.03 1.77-1.95 2.24c-1.69 1.39.7 2.45 1.9 1.54c1.23-.82 1.34-3.02 2.98-3.28c.78-.11 1.73.37 2.29-.15c.85-.96-.45-2.13-.79-3.05c-.51-1.43.57-3.11-.28-4.39c-.58-.88-2.02-1.01-2.66-.25c-.52.53-.15 1.38.54 1.56c.29.08.64.07.83.31c.12.16.12.36.11.55c-.02.91.44 2.68-.15 2.98c-.58.32-1.16-.69-2.03-.46m7.27 2.38c-2.12 1.79 1.17 2.65 2.52 1.79c.37-.19.73-.58.57-.98c-.4-.55-.96-1.05-.78-1.82c.08-.43.34-.82.32-1.26c-.09-1.34-2.27-2.14-2.9-.86c-.68 1.35 1.87 1.71.27 3.13m6.98 1.93c.2.41.3.87.52 1.28c.23.5.96 1.2.47 1.72c-.17.11-.41.03-.61-.07c-1.04-.52-2.55-1.52-2.45-2.84c.11-1.32 1.54-1.17 2.07-.09m-8.06-10.56c.7.17 1.31-.66 2.01-.48c.7.24 1.01 1.05 1.54 1.52c2.66 2.23 3.46-3.22.82-3.65c-.6-.11-1.18.13-1.77.21c-1.48.2-1.58-1.92-2.69-1.01c-.74.6-1.31 3.08.09 3.41m9.34-2.88c.43 1.53-1.8 2.84-.67 4.34c.31.4.89.61 1.33.4c.38-.18.56-.6.86-.89c.67-.66 1.97-.64 2.41-1.57c.2-.44 0-1.11-.49-1.23c-.24-.06-.49.02-.72-.04c-.8-.24-.71-1.24-.72-1.91c-.02-1.53-1.76-2.98-3.21-2.21c-.86.46.26 1.01.55 1.48c.24.4.54 1.19.66 1.63m11.19-.97c-1.5-.09-2.14.88-1.48 2.16c.23.89.09 2.33 1.22 2.59c1.98-.13 1.12.84.36 1.81c-.75.93-.16 1.97.76 2.48c.55.27 1.28 0 1.48-.55c.21-.55-.07-1.19-.02-1.78c.05-.53.4-1 .88-1.21c.3-.13.66-.17.88-.4c.66-.72-.63-2.69-1.56-2.42c-.32.1-.49.44-.69.7c-.31.47-.96.55-1.15-.05c-.34-.83.13-1.85.97-2.1c.6-.17.71-.8.09-1.15c-.35-.16-1.33-.03-1.74-.08m2.52 11.47c-.37 1.42 1.23 2.42 2.26 1.28c.62-.46 1.56-.66 2.2-.16c.4.31.62.85 1.07 1.08c.57.29 1.33-.17 1.31-.79c-.02-.72-.85-1.28-.82-1.99c.02-.47.42-.83.5-1.28c.18-.96-1.01-1.77-1.08-2.75c-.05-.74.53-1.42.33-2.13c-.17-.58-.84-.94-1.43-.86c-2.59.37-.93 4.13-1 5.71c-.08 2.09-2.75-.25-3.34 1.89m3.53 5.49c.19.08.39.19.47.38c.26.56-.63 1.18-.28 1.7c.16.24.5.29.69.52c.46.65-.44 1.18-.59 1.76c-.19.79.83 1.56.47 2.29c-1.15-.15-2.87-2.34-3.17-3.48c-.41-1.61.29-4 2.41-3.17m2.77.92c.32.5 1.01.57 1.59.53c.74-.05 1.55-.06 1.67-.91c.08-.58-.32-1.2-.82-1.49c-1.11-.64-3.32.52-2.44 1.87m1.46 4.39c.34.46-.04.82-.2 1c-.35.43-.75.56-.84 1.12s.14 1.22.66 1.51c.58.32 1.3.08 1.91.31c.89.32 1.16 1.48 1.94 2.01c.75-.08.12-1.12 0-1.52c-.25-1.01 1.03-2.27.06-3.13c-.55-.43-1.32-.35-1.85-.89c-.35-.35-.36-.83-.64-1.19c-.27-.34-.65-.69-1.13-.5c-.9.37-.24.83.09 1.28m8.23-1.09c1.18-.84 2.09-.41 2.44 1.02c.28 1.46-.57 2.31-1.92 1.7c-1.06-.4-2.74-.1-2.68 1.27c.05.59.72 1.12 1.27.92c.27-.1.47-.35.74-.44c1.12-.37 2.05 1.83 3.17 1.18c.43-.3.36-.97.65-1.41c.48-.71 1.79-.55 2.16-1.33c.41-.86-.71-1.77-.84-2.74c-.07-.5.14-.98.17-1.47c.12-2.11-1.96-.33-2.84-.45c-1.33-.18-2.48-.94-3.88-.94c-3.4 0-.71 3.78 1.56 2.69m-5.77-8.62c.31.05.64-.01.93.13c.47.24.51.88.62 1.39c.3 1.47 2.14 2.92 3.61 2.16c.36-.23.56-.73.38-1.14c-.14-.3-.45-.5-.67-.76c-.46-.54-.52-1.35-1.03-1.85c-.55-.54-1.4-.54-2.15-.5c-.11.01-.65-2.63-2.11-2.08c-1.11.42-.78 2.44.42 2.65m1.41-7.42c.73-.26 1.63-.03 2.26-.45c.34-.18.24-.58-.06-.78c-1.06-.81-4.02-1.38-4.93-.21c-.42.54-.32 1.31.25 1.79c.92.76 1.65-.07 2.48-.35m-5.97-7.3c1.76-1.22-1.63 3.92 3.23 3.34c.56-.08 1.16-.05 1.71-.2c.44-.19.47-.85.17-1.24c-.93-1.19-3.31-.09-3.8-1.79c.31-.78 1.45-.27 2.01-.64c.52-.33.44-1.1.59-1.7c.14-.56.52-1.11.35-1.68c-.65-1.39-2.44-.59-2.07.86c-1.35-.41-1.81.38-2.71 1.04c-.67.49-1.49.36-2.21.68c-.68.31-.95.96-.42 1.69c.87 1.22 2.41.41 3.15-.36m-32.87 18.1c1.07-.45 3.92.02 2.7 1.63c-.95 1.34-1.72 3.43-3.36 1.36c-.89-1.17-.93-2.41.66-2.99m-4.28-8.86c-.14-.53-.6-.96-1.14-1.07c-.5-.1-1.03.05-1.52-.1c-1.01-.47-1.54-1.6-2.87-1.44v3.61c.3.07.6.14.85.31c.86.57 1.09 2.72 2.49 2.05c.92-.77-.45-2.05-.09-2.96c.5.26 2.53.54 2.28-.4m-5.52 7.51v4.5c.56-.24 1.19-1.23 1.63-1.7c1.48-1.58-.33-3.51-1.63-2.8m5.95 14.57c-.6-.17-.75-.58-.6-1.17c.19-1.23-.33-2.55-1.32-3.31c-.52-.4-1.26-.87-1.09-1.51c.1-.37.46-.58.76-.81c1.63-1.48-1.52-1.98-2.49-1.29c-.45.22-.84.52-1.21.85v4.61c.78-.11 1.42-.56 2.07-.95c.85-.18 1.1.89 1.1 1.54c.06.63.21 1.27.56 1.8s1.24.49 1.59.92s-.25.94-.21 1.42s.29.97.72 1.18c.79.37 1.75-.5 1.71-1.37s-.78-1.57-1.59-1.91m4.39 6.5c2.74 1.98 3.73-4.93.7-3.98c-.85.27-.68.83-.91 1.54c-.34 1.02-.99 1.69.21 2.44m-5.41.4c-1.08-1.14-2.96.04-1.88-2.37c.25-2-2.18-2.38-3.04-.71v4.37c1.06.34 1.75-.54 2.53-1.03c.2-.03.39.14.47.33c.2 2.49 3.42 1.36 1.92-.59m2.1 3.86c-.33.65-1.2.41-1.78.52c-1.31.29-1 1.56-1.37 2.49c-.43.79-2.17 1.27-1.59 2.39c.83.87 2.23-.38 3.13-.71c.79-.31 1.33-.9 1.73-1.63c.93-1.24 2.25-.28 3.15-1.03c1.1-1.09.01-4.94-1.83-4.67c-.5.04-1.04.36-1.29.78c-.37.65.11 1.27-.15 1.86m-.34 8.41c-.33-.7.6-1.5 1.22-1.96c.4-.3.94-.42 1.28-.79c.23-.25.35-.6.64-.77c.48-.29 1.1.09 1.45.54c.6.78.72 2.03.56 2.99m5.06-7.28c-.94-.47-2.65-.25-2.47 1.08c.13.54.74.84.92 1.36c.29.82-.6 1.74-.26 2.53c.26.61 1.19.72 1.67.27c.49-.45.53-1.25.21-1.83c-.09-.17-.21-.35-.14-.53c.21-.37 1.12-.44 1.45-.22c.56.37.25 1.22.32 1.89c.13 1.42 2.18 1.71 2.48.25c.06-.46-.15-.97.11-1.35c.24-.35.75-.37 1.1-.61c.43-.3.62-.96 1.14-1.05c.34-.06.66.17 1.01.16c.77-.09 1.58-1.03 1.58-1.8c-.05-.92-1.14-1.21-1.86-.89c-.74.33-.86 1.34-1.66 1.48c-.65.11-1.51-.38-2.22-.34c-1.32.07-2.12.06-3.38-.4m10.02-8.14c-.39-.81-1.06-1.83-2.09-1.72c-2.24.23-.56 1.87.25 2.53c.26.21.48.47.77.64c1.1.63 1.62-.58 1.07-1.45m-3.55 15.44c-.17-2.16 2.53-2.85 4.12-1.87c.35.18.78.39 1.09.16c.61-.62-.46-1.73-.23-2.54c.01-.94 1.3-1.66 1.88-.76c.22.39.06.88.05 1.33c0 1.22 1.26 2.45 1.11 3.66m-.7-11.94c-1.22.3-1.72 1.72-.39 2.29c.94.43 1.82 1.34 2.88 1.34c1.25-.16 1.79-2.06 1.09-3c-.68-.92-2.62-.9-3.58-.63m7.49 2.04c-.23.49-.27 1.06-.5 1.56c-.68 1.38-3.48 2.26-2.59 4.14c.25.42.73.63 1.06.99c.41.44.65 1.13 1.24 1.25c.48.1.98-.31 1.07-.8c.08-.49-.18-.99-.58-1.29c-.73-.43-.79-.85-.07-1.34c.61-.5.22-1.83.76-2.12c.54-.3.45.47.51.75c.15.54.98.7 1.33.27c.28-.61 1-.73 1.57-.36c.87.7 1.8 2 3.08 1.44c.65-.29.96-1.27.45-1.77c-.81-.56-1.91-.62-2.83-.97c-.4-.07-.68-.36-.61-.78c.42-2.54-2.87-2.79-3.89-.97m10.26-5.56c.17-1.09-.48-2.52-1.73-2.49c-.28.01-.56.07-.79.23c-.84.59-.14 2.25.4 2.83c.76.9 1.97.64 2.12-.57m-1.39 6.12c.69.51 1.41 1.02 2.24 1.26c2.37.67 4.31-2.03 1.64-3.15c-1.62-.86-6.83-.77-3.88 1.89m-.1 9.33c-.72-.69.04-1.78.51-2.45c.39-.71.18-1.65.64-2.31c.55-.83 1.89-.72 2.31.18c.13.26.18.57.39.76c.39.35 1.04.08 1.33-.36c.29-.43.37-.98.63-1.43c.5-.89 1.8-1.3 2.62-.69c.55.34.42 1.03-.01 1.44c-.43.52-.76 0-1.49.51s-.43.98-.56 1.22c-.43.83-1.85.52-2.39.85c-.54.34.67 1.4.89 2.14m2.97-17.52c2.6.37 4.69 3.41 3.9 5.94c-.39.75-1.34.49-1.46-.31c-.11-.46.12-.95.05-1.41c-.9-.99-1.48 1.16-2.36 1.24c-.51.07-.95-.43-1.02-.94s.13-1.01.35-1.48c.05-.11.1-.26.01-.34c-1.07-.9-1.63.49-2.35.87c-1.64.77-1.46-1.52-.86-2.34c.73-1.02 2.59-1.41 3.74-1.23m9.71-4.1c-.32-.57-1.38-.6-1.93-.36c-.6.36-.39 1.31-.79 1.88c-.26.36-.72.5-1.11.7c-.89.41-.98 1.42.05 1.67c.34.09.69.1 1.02.22c.89.43 1.61 1.55 2.75 1.17m-4.36 10.04c.98.08 1.69 1.35 1.62 2.28c-.25.9-.92 1.71-1.62 2.31c-1.54 1.06-2.68.8-1.92-1.26c.27-1.03.43-3.38 1.92-3.33m4.37-6c-1.23.33-1.44-.28-2.23.43c-1.5 1.36 1.09 3.22 2.22 4.08M69.19 83.58c0 2.51 3.83 1.97 2.7-.74c0 0-2.7-1.86-2.7.74m-10.87-32.6c-.27.03-.6.15-.79-.06c-.12-.13-.1-.32-.11-.5c-.05-1.07-1.48-2.36-2.59-2.06c-.33.15-.45.7-.13.91c.21.14.54.09.66.32c.12.22-.09.45-.21.67c-.19.34-.11.82.19 1.1c.26.25.67.36.84.68c.11.2.09.44.12.66c.21 1.36 1.96 1.61 2.75.78c.66-.7.65-2.64-.73-2.5m1.95-36.03c-.37.52-.39 1.37.13 1.69c.91.32 1.94.05 2.6 1.03c.39.56.38 1.44-.13 1.9c-1.11.94-2.55-.49-3.76-.07c-.62.22-1.01 1.19-.49 1.59c.3.24.75.15 1.08.34c.32.18.47.56.61.91c.44.95.99 2.34.06 3.17c-.43.36-1.18.25-1.37-.29c-.17-.49.15-1.14-.17-1.53c-.54-.67-1.63.59-2.39.21c-.68-.34-.32-1.45-.56-2.2c-.75-1.38-.56-1.69.86-2.34c.83-.47 1.33-1.52 1.19-2.49c-.13-.83-.64-1.78-.11-2.43c.34-.42.84-.35 1.27-.55c.64-.3.7-.54 1.06-1.15c.42-.71.76-1.09 1.65-1.05c.55.03 1.23.24 1.17.93c-.1 1.12-2.13 1.52-2.7 2.33m8.04 6.04c-.43.4-1.05.56-1.35 1.07c-.24.41-.2.95-.42 1.38c-.29.57-1.01.81-1.57.57c-1.24-.56-1.04-2.45.01-3.13c.45-.33 1-.48 1.5-.72c.53-.25 1.38-1.67 1.9-1.52c.88.26.37 1.94-.07 2.35m-1.09-10.36c-.28.5-.12 1.2.31 1.55c.38.3 1.08.53.99 1.13c-.09.45-.64.54-1.03.75c-1.7 1.12-.26 3.59 1.42 1.81c.47-.49.83-1.12 1.42-1.42c.67-.18.74-.88.45-1.46c-.37-.85-2.52-4.23-3.56-2.36m.51 40.73c1.34-.1 2.57 1.4 1.76 2.62c-.27.39-.77.68-.78 1.16c0 .36.29.69.21 1.04c-.09.37-.58.5-.9.32c-.51-.23-.49-.98-.89-1.29c-1.02-.05-.67 1.56-1.09 2.18c-.22.39-.62.61-1.02.76c-.58.28-1.53.19-1.56-.6c.02-.56.7-.84.92-1.36c.22-.69-.05-1.46-.08-2.18c-.03-.28-.07-.58-.23-.8c-.21-.28-.6-.38-.77-.69c-.2-.35-.01-.87.35-1.05c1.17-.59 1.27 1.4 2.16 1.3c.44-.05.48-.71.76-.98c.32-.31.74-.43 1.16-.43m19.08-28c-.31.7-1.04 1.33-.84 2.07c.12.43.6.7 1.01.57c.7-.35 1.34-1.26 2.22-1c.53.14.92.82.64 1.32c-.27.48-1 .62-1.07 1.17c0 .62.58 1.25.22 1.88c-.18.36-.69.54-.97.27c-.38-.67-.47-1.37-1.37-1.59c-.69-.17-1.56.09-2.01-.48c-.52-.65.08-1.75-.31-2.49c-.35-.65-1.36-.8-1.48-1.54c-.16-.93.79-.88 1.31-1.03c.5-.14.78-.41 1.23-.63c.97-.49 1.98.22 1.42 1.48m-33.93 1.4c-.32 1.06-1.69.77-2.44 1.27c-.4.27-.73.78-1.19.73c-.35-.04-.59-.42-.59-.8c0-.79.7-1.29 1.04-1.93c.42-1.33 1.22-2.57 2.65-2.97c.64-.17.87-.21.8.46c-.07.65-.68.93-.6 1.71c.05.54.48.96.33 1.53m-2.41-8.33c.35.13.5.59.46.98c-.17 1.54-1.8 2.15-2.78 3.12c-.44.44-.79.98-1.31 1.29c-.47.28-1.04.33-1.5.62c-.34.22-.6.55-.93.77s-.81.31-1.09.02c-.35-.37-.11-1.01-.21-1.53c-.09-.47-.46-.8-.75-1.17s-.51-.9-.27-1.31c.24-.43.89-.45 1.22-.1c.26.27.34.64.64.85c.81.51 1.56-.19 2.16-.67c.69-.41 1.66-.2 2.29-.71c.75-.59.79-2.39 2.07-2.16m-5.4-4.79c-.58.41-1.49.81-1.42 1.66c.07.65.81.91 1.27 1.35c.65.62.73 1.8.16 2.53c-.21.27-.6.47-.84.26c-.33-.29.02-.91-.19-1.31c-.23-.43-.88-.27-1.26-.56c-.25-.2-.33-.55-.43-.86c-.38-1.33-1.79-2.23-1.89-3.64c.02-.34.26-.7.58-.74c.23-.03.45.1.69.15c.58.12 1.13-.27 1.65-.58c1.34-.82 3.32.5 1.68 1.74m3.04 1.41c-.47.91.11 1.91 1.17 1.73c1.29-.31 1.78-2.85 1.24-3.94c-.3-.63-1.01-.74-1.59-.34c-.82.56-.58 1.7-.82 2.55m.41 24.6c.81.88.04 2.2-1.1 1.62c-.93-.34-2.25-2.67-.49-2.66c.69.06 1.16.57 1.59 1.04M61.31 47c.81.88.04 2.2-1.1 1.62c-.78-.38-1.4-1.61-.74-2.33c.45-.36 1.53.36 1.84.71M53.86 7.29c.25.37.7.51 1.02.8c.61.5.48 1.23.5 1.91c.12.41.64.5 1.05.43c1.59-.15 3.66-2.84.89-2.96c-1-.06-1.14-.5-1.15-1.02h-2.54c-.01.3.06.59.23.84M53 13.3c.09.45.29.87.38 1.33c.13.54-.02 1.54.69 1.65c.21-.02.34-.23.43-.43c.5-1.05 1.08-2.77.18-3.75c-.89-.98-1.93.02-1.68 1.2m-13.82 1.07c-.37-.97-1.58-.88-2.38-1.26c-.75-.42.13-.95.49-1.25c.34-.38.3-.99.09-1.46c-.59-.99-.68-1.34-1.1-2.28c-.42-.56-1.25-.48-1.85-.07v2.16c1.4.2 2.01 2.51 0 1.76v2.81c.67-.29 1.5-.39 2.04.22c.41.43.58 1.11 1.08 1.41c1.32.63 1.95-.97 1.63-2.04m.93 4.9c-1.79-1.33-2.45 2.17-3.82.55c-.56-.65-1.11-2.13-1.86-3.13v5.45c1.14.3.65 1.67 1.15 2.44c.37.5 1.25.4 1.52-.18c.22-.46.06-1.01.18-1.51c.2-.79 1.06-1.21 1.83-1.23c1.53.26 2.17-1.48 1-2.39m-.15 7.42c-.11.18-.19.39-.14.59c.14.61 1.22.54 1.27 1.17c.02.29-.22.54-.22.83c-.01.35.32.59.63.69s.66.13.92.33c.64.51.31 1.74 1.04 2.09c.82-.83.83-3.61.35-4.69c-.66-1.51-2.69-2.97-3.85-1.01m-1.61 2.43c.05.59-.45 1.07-.93 1.39c-.62.41-1.26.9-1.88.31c-.42-.41-.48-1.14-.27-1.68c.48-1.18 2.94-1.62 3.08-.02m2.79 4.03c.1.23.37.3.6.35c.55.12 1.1.3 1.52.69s.64 1.05.41 1.59c-.26.61-.97.86-1.31 1.42c-.5.8-.01 1.88-.3 2.78c-.64.4-.78-.81-.93-1.2c-.42-.95-2.21-1.16-1.97-2.43c.17-.68.82-1.09.91-1.84c.06-.49-.23-.87-.23-1.33c0-.44.09-.94.59-1.09c.94-.27.49.55.71 1.06m-6.71.75v3.35c2.31-.52 2.26-4.63 0-3.35m4.16 5.17c-.8-1.11-2.31-.32-2.9.65c-.3.44-.66.99-1.25.92v2.37c1.08.96 1.78.62 2.05-.8c.1-.6.26-1.33.81-1.52c.27-.1.58-.02.86-.11c.54-.18.75-1.01.43-1.51M63.57 6.98c-1.12.3-3.08 2.43-1.13 2.95c1.58.47 3.47 1.65 3.49-1c-.01-1.47-.74-2.47-2.36-1.95m7.89.43c-.32 1.32 1.43.63 1.98 1.07c.53.4.23 1.22.07 1.86c-.31 1.21.08 2.57.99 3.42c.48.37.62.77.25 1.29c-.43.77-.58 1.78-.08 2.5s1.79.82 2.19.03c.22-.43.11-.97-.16-1.37s-.66-.7-1.04-.99c.51-.39.73-1.06.69-1.7c-.04-.63-.32-1.23-.66-1.77c-.4-.51-.86-1.51-.08-1.89c1-.21 2.25.32 2.86-.92c.52-1.05-1.76-2.47-1.76-2.47h-4.58c-.31.24-.55.56-.67.94m3.82 15.45c-.95 3.24-5.97-1.6-3-2.71c.83-.31 1.05.24 1.67.66c.88.59 1.81.72 1.33 2.05M83 14.94c-.94-.56-2.27-1.13-3.24-.34c-.64.55-.62 1.7.05 2.22c.22.17.49.28.72.45c.47.34.43.87-.01 1.2c-.37.37-.68.85-.73 1.38c.02 2.47 3.25 1.37 1.89-.72c-.12-.4.17-.68.56-.58c.67.07 1.4.02 1.94-.39s.76-1.28.31-1.78M86.3 53.4c-.03-.73-.93-.86-1.41-1.2c-1.08-.8-.28-1.83-.23-2.83c-.07-.89-1.46-2.04-.48-2.83c1.11-.46 1.88 1.26 2.57 1.92c.6.61.85 1.36.92 2.19c.35 1.51 1.94 1.17 2.46 2.22c.56 1.44-2 4.52-3.57 3.52c-.43-.24-.81-.75-.86-1.24c-.1-.73.6-1.1.6-1.75m1.44 7.53c-.63-.84-.73-2.56.61-2.62c.55.03.96.57 1.5.65c.86.13 1.6-.9 2.44-.72c.65.14.93 1.03.58 1.6c-.35.56-1.13.75-1.76.54c-.18-.06-.39-.14-.55-.04c-.32.28-.23 1.18.05 1.47c.47.48 1.25.02 1.92-.03c1.42-.13 2.09 1.83.7 2.39c-.44.14-.98.03-1.31.35c-.3.3-.22.8-.4 1.19c-.22.48-.83.79-.82 1.31c.01.34.29.62.35.96c.05.78-.72 1.74-1.48 1.89c-.92.12-1.4-.9-1.22-1.67c.19-.79 1.16-1.09 1.15-1.9c-.01-.66-.65-1.41-.74-2.12c-.18-1.31-.34-2.1-1.02-3.25m-15.62-8.48c-.25-.98-.46-2.21.47-2.92c.47-.28 1.39-.09 1.67.39c.35.61-.04 1.35-.19 2.04c-.07.33-.09.66-.22.98c-.47 1.16-1.63.53-1.73-.49m7.26-5.62c1.17-.5 2.41.27 1.71 1.57c-.47.92-.61 2.17-1.45 2.83c-1.08.64-2.68-.52-2.71-1.69c-.02-1.15 1.52-2.33 2.45-2.71M92.8 14.79c-.19.51-.57.94-.76 1.45c-.51 1.45.83 4.06-1.14 4.75c-.47.11-.96-.08-1.45-.07c-.6.01-1.26.32-1.77-.01c-.95-.77.1-2.06 1.14-1.8c.82.22 1.16-.04 1.01-.89c-.07-.79 1.17-1.26.98-2.03c-.24-.99-.65.01-.89.17c-.49.27-1.19-.21-1.13-.76c.24-.63-.18-1.23-.84-1.37c-1.11-.13-2.69.12-3.18-1.19c-.25-.67.23-1.58.95-1.56c.97.19 1.78.92 2.68 1.35c.33.24.73.24.98-.11c1.53-2.09 4.01.08 3.42 2.07m-48.03 29.7c-1.07.35-2.27-1.34-2.24-2.26c.05-1.39 1.5-2 2.42-.91c.72.81.99 2.65-.18 3.17m4.38 2.83c-.23.83-.48 1.68-.99 2.37c-1.46 1.99-4.65 1.05-3.23-1.47c.54-.96 1.46-1.87 2.4-2.44c1.4-.84 2.25-.01 1.82 1.54m3.14 6.43c-.74-.32-1.16-1.19-1.93-1.42c-.94-.31-1.94.6-1.71 1.56c.06.28.21.55.16.84c-.09.52-.77.7-1.27.54s-.89-.54-1.38-.74c-1.08-.49-2.78.35-2.49 1.63c.55.96 1.94.56 2.82.39c.27.01.5.17.74.28c1.14.52 1.15-.44 2.08-.58c1.45-.14 1.46 2.33 2.77 2.48c.95.07 1.43-.97 1.53-1.78c.29-1.57.09-2.59-1.32-3.2m-15.13-7.49c-1.82 1.89-1.6 5.57.58 7.09c.77.35 1.36-.44.96-1.14c-.2-.43-.68-.67-.9-1.08c.1-1.34 1.88.01 2.62-.48c1-.77-.07-1.98-.95-2.32c-.11-.06-.23-.14-.22-.26c.47-.84 1.59-.61 2.38-.76c1.77-.4.22-2.1-.76-2.38c-1.21-.35-2.91.49-3.71 1.33m2.69 12.14c-.73.67-.5 2.1.13 2.79c.75.56 1.77.78 2.7.82c1.86-.11 2.61-1.01.74-2.17c-.85-.64-2.42-2.39-3.57-1.44m-4.47-2.83c-.26-.23-.63-.32-.95-.16v6.09c1.19-1.3 2.64-4.53.95-5.93m10.13-24.43c.29-1.28 1.65-1.86 2.55-.74c1.16 2.23-1.82 3.9-2.59 1.07m48.25 37.06c-.15.56.08 1.23-.27 1.69c-.63.64-1.75.58-2.36 1.32c-1.01.94-.57 2.18.85 2.07c.48-.02.98-.12 1.44.03c.75.25 1.32 1.14 2.09.96c1.09-.33.8-1.76 1.09-2.61c.3-.82 1.14-1.34 1.48-2.14c.54-1.28-3.73-3.51-4.32-1.32m4.35 10.95c-.12-.83-.49-2.01-1.56-1.91c-.45.04-.86.35-1.08.74c-.48.87-.07 2.25.84 2.69c1.07.51 2.11-.41 1.8-1.52M87.23 40.03c.1.3.27.61.17.91c-.14.42-.67.51-1.01.78c-.65.48-.49 1.58.27 1.85c.69.28 1.44-.2 2.03-.66c.31-.24.63-.49.78-.85c.17-.42.06-.88.09-1.33c-.01-.16.11-.27.27-.24c.85.12 1.86.48 2.41-.38c2.8-3.69-6.38-4.28-5.01-.08m1.65 5.21c-.8.61-.64 1.78-.23 2.57c.29.62.88 1.26 1.54 1.1c1.72-.61 1.15-5.56-1.31-3.67m6.11 4.01c.17.29.22.64.41.92c.25.38.7.57 1.08.82c1.17.79 1.68 2.44 1.14 3.75s-2.06 2.13-3.45 1.86c-.56-.11-1.18-.54-1.08-1.1c.2-.83 1.26-.75 1.9-.52c-.73-.81-.72-1.93-.31-2.87c-1-.33-2.36-1.01-2.04-2.29c.26-1.05 1.72-1.61 2.35-.57m1.76 9.63c-1.68-.21-1.47 3.27-.24 3.55c1.6.15 2.1-2.95.66-3.49m-4.26-14.87c.77.7 2.13.1 3.09.14c.77.03 1.21-.58 1.37-1.29c.42-1.75 2.1-5.13-.3-6.14c-1.17-.36-1.52.55-1.48 1.47c.04 1.03.42 2.01-.2 2.97c-.48.74-3.39 1.66-2.48 2.85M79.1 25.46c-.66.26-1.51.62-2.2.39c-.1-.1-.06-.27-.01-.41c.27-.74 1.33-1.93 2.78-2.4c1.44-.47 1.63 1.54-.57 2.42m7.07 7.69c.69-.74 2-1.27 2.92-.7c1.01 1.26-1.11 2.49-2.03 3.07c-1.4.84-1.73-1.14-1.24-1.94zM92.41 29c.22.53.79.88.91 1.43c.16.72-.47 1.48-.2 2.17c.45 1.04 1.95.66 2.72 1.28c.3.24.54.64.92.64c.41 0 .67-.51.55-.91c-.16-.74-1.16-.88-1.42-1.53c-.17-.61.66-1.12.62-1.76c-.03-.56-.73-.98-.6-1.52c.06-.25.29-.42.48-.6c1.44-1.3.79-3.89-1.1-4.35c-1.79-.48-.94 1.32-1.38 2.16c-.51 1.01-2.13 1.49-1.5 2.99m2.83-11.37c-1.04.52-1.51 1.49-.62 2.41c.48.39 1.18 1.14 1.72 1.32c.43.05.73-.41.91-.81c.64-1.43 1.19-2.97.99-4.52c-.04-.35-.2-.78-.56-.82c-.71-.08-.6.87-.84 1.24c-.34.57-1.03.84-1.6 1.18m-9.99-9.74c-.3.12-.64.11-.95.15c-.52.06-1.75.39-1.52 1.16c.08.27.4.38.67.45c1.24.28 2.52.33 3.79.37c.59.06 1.27-.13 1.3-.81c.13-1.2-1.21-2.07-2.31-1.75c-.35.09-.64.3-.98.43m9.25 3.39c.16.36.15.77.21 1.16c.08.93 1.04 1.38 1.64.56c.81-1.15-.76-2.58-1.65-3.11c-1.97-1.15-.57.55-.2 1.39M47.1 7.39c-1.06.13-1.45 1.17-.36 1.62c.77.18 1.63.11 2.43.09c.72-.1 1.58-1.07.73-1.65c-.66-.44-2.1-.2-2.8-.06m-6.64.13c.52 1.05-.39 2.34-1.24 2.96c-.12.11-.29.11-.41 0c-1.91-1.45.48-4.6 1.65-2.96m32.99 100.26c1.23-.61 1.35-2.75 2.86-2.92c1.74.04 1.29 1.82 1.01 2.96M98.9 51.01c-.64-1.06-1.45-2.02-2.39-2.82c-.4-.35-.88-.78-.78-1.3c.42-1.13 2-1.48 3.06-1.13m-31.96.43c-.11.14-.25.28-.38.39c-.67.54-1.24 1.56-.67 2.35c.27.36.82.5 1.2.25c.37-.25.45-.76.65-1.16c.41-.8 1.35-1.21 1.98-1.83zm4.23-19.81c-.38-1.4-2.08-2.53-2.94-.62c-.1.18-.22.4-.34.62z\"/><path fill=\"#fff\" d=\"M79.67 45.45H53.69a3.93 3.93 0 0 1-3.93-3.93V30.78a3.93 3.93 0 0 1 3.93-3.93h25.98a3.93 3.93 0 0 1 3.93 3.93v10.74a3.93 3.93 0 0 1-3.93 3.93\"/></svg>", "person-running": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#ffca28\" d=\"M67.4 36.19s1.12 4.32-3.68 5.44c-4.2.99-5.08-3.25-5.08-3.25s-.93-4.28-2.85-4.7c-.73-.16-.89.02-2.98-.29c-3.57-.54-4.51-2.27-4.81-3.84c-.1-.48-.14-.95-.17-1.36c-.05-.57-.1-1.03-.3-1.29c-.16-.21-2.38-1.06-2.08-2.13c.4-1.42 3.02-2.55 2.91-3.87c.01-.34-.21-1.45-.24-1.6c-.21-1.26-.14-3.02.26-4.76c1.1-4.8 4.23-8.43 9.6-8.94c4.81-.44 10.31 3.14 12.56 7.41c1.44 2.74-.65 9.81-3.11 13.55c-3.2 4.88-.03 9.63-.03 9.63\"/><path fill=\"#795548\" d=\"M50.48 29.02c-.76.49-1.62.63-2.48.53c-.1-.48-.14-.95-.17-1.36c.68.14 1.54.1 2.05-.07c.94-.32 1.44.38.6.9\"/><ellipse cx=\"52.17\" cy=\"21.9\" fill=\"#404040\" rx=\"1.76\" ry=\"1.14\" transform=\"rotate(-87.8 52.171 21.9)\"/><path fill=\"#6d4c41\" d=\"M51.54 19.45c-1.1.36-1.39-.36-1.03-.97c.26-.44.92-.83 2.23-.62c1.23.2 1.76.89 2.1 1.31s.32.85.04.89c-.39.08-1.98-1.05-3.34-.61\"/><path fill=\"#616161\" d=\"m98.86 82.64l-18.57 3.71l-5.17-17.87l-12.43 8.33l9.06 18.2l.04-.03a6 6 0 0 0 3.49 2.8c.45.14.9.22 1.36.25v.02l.15-.01c.56.03 1.11-.01 1.64-.12l22.92-8.71z\"/><path fill=\"#325599\" d=\"M102.84 78.83c-.32-.54-1.01-.71-1.55-.39l-2.37 1.42c-1.61.96-2.48 3.69-2.48 3.69l3.52 5.91l4.93 4.28c1.27.99 3.02 1.1 4.41.29l1.07-.63c.47-.28.63-.89.35-1.36z\"/><path fill=\"#7c7c7c\" d=\"M44.86 113.8L56.27 92s14.21-11.76 15.45-12.59c4.63-3.1 5.55-7.41 5.09-10.54c-.36-2.43-1.97-5.66-1.97-5.66l-18.65 5.56l.88 3.42s-5.71 7.38-7.04 8.92s-3.61 3.69-5.38 9.76c-1.87 6.4-6.56 21.83-6.56 21.83z\"/><path fill=\"#4568ad\" d=\"M44.85 120.59c.62.1 1.2-.32 1.3-.93l.44-2.73c.31-1.85-1.22-4.27-1.22-4.27l-6.79-1.12l-6.45 1.01c-1.58.34-2.79 1.6-3.06 3.19l-.21 1.23c-.09.54.27 1.05.81 1.14z\"/><linearGradient id=\"SVGiUaJ07vU\" x1=\"36.943\" x2=\"53.687\" y1=\"79.836\" y2=\"78.906\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".598\" stop-color=\"#ffca28\"/><stop offset=\"1\" stop-color=\"#ffb300\"/></linearGradient><path fill=\"url(#SVGiUaJ07vU)\" d=\"M50.06 49.02L41.1 42.2l-4.36 4.66l9.04 8.76l.01-.01c1.77 1.85 5.92 3.11 9.37-.03c3.28-2.99 7.33-9.36 7.33-9.36l-7.01-5.62z\"/><path fill=\"#ed6d23\" d=\"M50.27 44.94c2.57 7.19 8.87 7.41 8.87 7.41l5.02-8.6a4.86 4.86 0 0 0-1.74-6.64l-.83-.49c-2.31-1.35-4.27-.69-7.38 3.85c-2.79 4.09-3.94 4.47-3.94 4.47\"/><linearGradient id=\"SVGST9NQdfy\" x1=\"5.48\" x2=\"32.063\" y1=\"-286.838\" y2=\"-286.838\" gradientTransform=\"rotate(15.747 889.506 338.874)scale(1 -1)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#f78c1f\"/><stop offset=\".482\" stop-color=\"#f47f12\"/><stop offset=\"1\" stop-color=\"#ef6c00\"/></linearGradient><path fill=\"url(#SVGST9NQdfy)\" d=\"M56.19 68.76c-2.48-9.84-2.94-16.75-2.38-22.29c.72-6.98 4.05-11.15 7.79-12.47c4.62-1.63 7.82.72 9.11 4.9c.88 2.85.71 5.04.64 6.4c0 0-.64 7.47 5.3 16.82c0 0-.57 4.06-10.05 6.29c-4.22.99-10.41.35-10.41.35\"/><path fill=\"#eda600\" d=\"M71.46 59.61s-4.34-2.16-4.39-2.18a1.12 1.12 0 0 0-1.52.46l-.93 1.74c-.15.29-.16.61-.06.9c-.5.29-1.73 1.05-1.99 1.56c-.3.58.04 1.19.36 1.33c.37.16.54.68.43 1.07c-.12.4-.11.81.08 1.14s.43.46.89.55c.22.04.45.32.45.54c-.01.34-.01.93.16 1.15c.34.45.9.31 1.19.64c.11.13.12.7.35.91c.68.64 2.89-.54 2.89-.54l4.22-3.91z\"/><linearGradient id=\"SVGYlbvHA6a\" x1=\"73.447\" x2=\"66.936\" y1=\"66.506\" y2=\"63.344\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".598\" stop-color=\"#ffca28\"/><stop offset=\"1\" stop-color=\"#ffb300\"/></linearGradient><path fill=\"url(#SVGYlbvHA6a)\" d=\"m70.06 58.93l2.67.75l1.83 5.05s-5.71 5.62-6.68 4.05c-.31-.49.26-1.02-.57-1.33c-.59-.22-1.03-.5-.86-1.41c.07-.34-.2-.76-.44-.79c-1.08-.13-1.36-.73-1.04-1.49c.18-.42.14-1.13-.47-1.45c-.22-.12-.53-.61-.39-1.31c.23-1.09 5.95-2.07 5.95-2.07\"/><linearGradient id=\"SVG0Z8q3dwZ\" x1=\"81.307\" x2=\"73.121\" y1=\"67.685\" y2=\"76.615\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".598\" stop-color=\"#ffca28\"/><stop offset=\"1\" stop-color=\"#ffb300\"/></linearGradient><path fill=\"url(#SVG0Z8q3dwZ)\" d=\"m73.73 65.36l9.89-6.67v-.01c1.19-1.18 1.61-2 1.85-2.99c.76-3.1-1.26-5.26-1.26-5.26L75.06 40.2l-5.64 5.83l8.04 8.04l-6.01 5.55z\"/><path fill=\"#ed6d23\" d=\"M73.93 52.01s6.06-5.99 5.9-10.6c0 0-2.89-.01-7.19-3.26c-2.71-2.04-6.31-2.21-7.76.17c-1.29 2.1-1.08 4.69 1.4 7.66c1.86 2.21 7.65 6.03 7.65 6.03\"/><linearGradient id=\"SVG8vbGEefO\" x1=\"1928.841\" x2=\"1931.691\" y1=\"888.073\" y2=\"888.073\" gradientTransform=\"rotate(134.725 1158.75 69.736)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".5\" stop-color=\"#ffca28\"/><stop offset=\"1\" stop-color=\"#ffb300\"/></linearGradient><path fill=\"url(#SVG8vbGEefO)\" d=\"m36.29 43.39l-.03.02c-.43.54-1.17.69-1.65.32l-1.95-1.47c-.48-.36-.52-1.1-.09-1.64s1.17-.69 1.65-.32l1.95 1.47c.49.37.56 1.08.12 1.62\"/><linearGradient id=\"SVGzlQ0PdKN\" x1=\"769.989\" x2=\"779.394\" y1=\"881.72\" y2=\"881.72\" gradientTransform=\"rotate(-48.324 1436.57 402.487)scale(1 -1)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#ffb300\"/><stop offset=\".138\" stop-color=\"#ffca28\"/><stop offset=\".831\" stop-color=\"#ffca28\"/></linearGradient><path fill=\"url(#SVGzlQ0PdKN)\" d=\"M37.93 37.24c.03.02.04.04.04.04c.89.95 1.68 1.74 2.02 1.95c.9.57 1.74 1.29 2.26 2.3c.97 1.89-.27 3.75-1.72 5.12c-1.44 1.38-2.35 1.68-3.92 1.42c-1.28-.21-3.99-3.08-3.99-3.08c-.28-.33-.6-.67-.92-.99c-.12-.12-.25-.24-.37-.37l-.01-.01c-.37-.36-.42-.84-.01-1.34c.54-.66 1.07-.32 1.13-.27l.01.01c.25.23.52.54.72.69c.58.43.9.51.9.51l2.74-3.48l-.93-1.24s-.01-.02-.04-.05c-.1-.16-.49-.73.25-1.4c.82-.7 1.67.03 1.84.19\"/><linearGradient id=\"SVG6kAHMdqG\" x1=\"1945.174\" x2=\"1947.892\" y1=\"847.046\" y2=\"847.046\" gradientTransform=\"rotate(136.013 1154.177 57.847)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".5\" stop-color=\"#ffca28\"/><stop offset=\"1\" stop-color=\"#ffb300\"/></linearGradient><path fill=\"url(#SVG6kAHMdqG)\" d=\"M37.84 41.96c-.48.51-1.23.59-1.68.19l-2.07-1.85c-.45-.4-.43-1.14.05-1.65s1.23-.59 1.68-.19l2.07 1.85c.44.41.42 1.14-.05 1.65\"/><linearGradient id=\"SVGrOx0Db8j\" x1=\"1927.804\" x2=\"1927.001\" y1=\"886.903\" y2=\"880.72\" gradientTransform=\"rotate(134.725 1158.75 69.736)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".5\" stop-color=\"#ffca28\"/><stop offset=\"1\" stop-color=\"#ffb300\"/></linearGradient><path fill=\"url(#SVGrOx0Db8j)\" d=\"M35.15 42.26c.45-.65 1-1.45 1.61-2.14c.09-.1.17-.19.26-.28c.84-.87 1.94-1.02 3.32-.27c.05.03.09.05.14.08c.08.05.16.1.25.15l.01.01c.12.08.24.16.36.25c.41.3.72.67.91 1.03c.76 1.21.54 2.36.54 2.36s-.88 2.68-2.18 2.21s-1.97-2.32-1.97-2.32l.34-1.34c-.39-.04-.73.13-1.19.65c-.15.17-.32.38-.52.63c-.02.03-.27.34-.29.36c-.3.33-.64.49-1.05.46c-.53-.03-.98-.54-1.23-.74c.19-.24.44-.75.69-1.1\"/><radialGradient id=\"SVG41BAfK9o\" cx=\"37.335\" cy=\"84.46\" r=\"3.107\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#ffb300\"/><stop offset=\"1\" stop-color=\"#ffca28\"/></radialGradient><path fill=\"url(#SVG41BAfK9o)\" d=\"m34.56 45.35l1.62-1.33l.86-.98l1.12-.98l.39.17l-.24 1.28l.84 1.26l.53.45l-2.75 1.95z\"/><path fill=\"#eda600\" d=\"M34.67 44.62c-.03.62-.63.96-.59.97c.17.07 1.01-.14 1.94-1.18c.72-.81 1.41-1.86 2.25-2.11c-.29 1.42.34 2.51 1.5 2.94c-.89-.83-1.61-2.23-.8-3.35c-.66-.4-1.43.26-1.82.74c-.45.54-.85 1.38-1.68 1.27c-.57-.07-.78-.43-.58-.97c.5-1.32 1.67-2.67 2.87-3.42c.44-.27 1.34-.34 2.5-.11c-.85-.66-2.3-.45-2.85-.19c-.47.22-.35.13-.77-.14c-.21-.14-.42-.28-.62-.41c.17.28.47.62.52.95c.06.41-.33.76-.57 1.05c-.62.74-1.16.1-1.8-.3c.43.51.53.67.75 1.03c.29.49-.15.89-.47 1.27c-.65.78-1.99-.81-2.08-.71c-.1.12 2.33 1.99 2.3 2.67\"/><path fill=\"#543930\" d=\"M73.59 12.82c-1.26-3.34-3.93-4.39-4.8-4.65c-.39-1.21-2.38-5.8-9.93-4.7c-1.84.27-3.19 1.12-4.39 1.87c-.51.32-1 .63-1.45.83c-.37.17-1.02.32-1.55.13c-1.21-.42-.78-2.25-.78-2.25s-4.46.8-2.62 5.13c-1.5.63-2.22 2.2-2.51 3.68c-.4 2.02.56 3.98 2.49 4.88c0 0-.33-3.27 4.38-2.99c1.46.09 2.98.34 4.35-.18c.52-.2 1.01-.52 1.52-.76h.18c1.77.99-.66 5.15 1.28 7.65c.38.49.72.32.72.32l.82-1.15c.62-.79 1.18-1.48 1.93-1.3c2.21.53 1.74 4.48-.91 5.31c-.26.08.27 4.51 5.73 4.61c2.82.05 3.86-2.27 3.86-2.27s-1.21.28-1.45-.75c-.13-.53.37-1.24 1.27-2.01c2.58-2.22 1.71-4.83 1.35-5.65c.38-.74 1.49-3.14.51-5.75\"/><radialGradient id=\"SVGE7eSKcvU\" cx=\"-2447.738\" cy=\"339.899\" r=\"7.129\" gradientTransform=\"matrix(.9316 .3634 .5233 -1.3417 2168.674 1369.204)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".45\" stop-color=\"#6d4c41\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#6d4c41\"/></radialGradient><path fill=\"url(#SVGE7eSKcvU)\" d=\"M73.06 18.58c.05-.09-.82 1.99-4.42 1.58c-1.48-.03-3.61 3.51-1.49 5.91c1.88 2.12 4.74.92 4.74.92s-.39.11-.96-.1c-.37-.14-.49-.62-.49-.64c-.13-.53.37-1.24 1.27-2.01c2.58-2.24 1.71-4.85 1.35-5.66\"/><radialGradient id=\"SVGtP34fe9O\" cx=\"-2446.895\" cy=\"347.088\" r=\"7.226\" gradientTransform=\"matrix(.9932 -.1163 -.1467 -1.2533 2548.352 166.945)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".45\" stop-color=\"#6d4c41\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#6d4c41\"/></radialGradient><path fill=\"url(#SVGtP34fe9O)\" d=\"M73.59 12.82c-.66-1.76-1.91-3.25-3.57-4.13c-.24-.13-.83-.43-1.24-.51c.18.78.15 1.61-.2 2.45c-.01.03-.41 1.29-1.52 2.29c.77 1.11 1.15 2.45 1.5 3.77c.31 1.15.6 2.41.08 3.48c.69-.03 1.79.18 3.01-.34c1.17-.5 1.8-1.83 2.11-3.02c.33-1.32.31-2.71-.17-3.99\"/><radialGradient id=\"SVGxLf8ncVd\" cx=\"-2454.956\" cy=\"349.582\" r=\"14.873\" gradientTransform=\"rotate(172.224 1265.495 56.853)scale(-1 .7516)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".45\" stop-color=\"#6d4c41\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#6d4c41\"/></radialGradient><path fill=\"url(#SVGxLf8ncVd)\" d=\"M68.57 10.63c.91-2.22-.28-4.3-2.11-5.71c-2.15-1.65-5.01-1.83-7.6-1.45c-1.84.27-3.19 1.12-4.39 1.87c-.51.32-1 .63-1.45.83c-.37.17-1.02.32-1.55.13c-1.21-.42-.78-2.25-.78-2.25s-4.46.8-2.62 5.13c-1.5.63-2.22 2.2-2.51 3.68c-.4 2.02.56 3.98 2.49 4.88c0 0-.33-3.27 4.38-2.99c1.46.09 2.98.34 4.35-.18c1.21-.46 1.63-1.1 2.97-1c1.45.11 3.37.69 4.86.49c3.02-.41 3.95-3.39 3.96-3.43\"/><radialGradient id=\"SVGPK08xd6R\" cx=\"-2446.095\" cy=\"339.029\" r=\"8.007\" gradientTransform=\"matrix(.9645 .2639 .1697 -.6201 2369.627 880.356)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".45\" stop-color=\"#6d4c41\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#6d4c41\"/></radialGradient><path fill=\"url(#SVGPK08xd6R)\" d=\"M67.15 26.07c-.95-1.05-1.18-2.75-2.68-3.69c-.3.98-1.03 1.91-2.16 2.26c-.26.08.27 4.51 5.73 4.61c2.82.05 3.86-2.27 3.86-2.27s-2.83 1.2-4.75-.91\"/></svg>", "prohibited": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#c33\" d=\"M64 4C30.9 4 4 30.9 4 64s26.9 60 60 60s60-26.9 60-60S97.1 4 64 4m50 60c0 12-4.2 23-11.3 31.6L32.4 25.3C41 18.2 52 14 64 14c27.6 0 50 22.4 50 50M14 64c0-12 4.2-23 11.3-31.6l70.3 70.3C87 109.8 76 114 64 114c-27.6 0-50-22.4-50-50\"/><path fill=\"#f44336\" d=\"M60.1 7C47 7 35 11.5 25.4 19l-.1-.1l-1.1 1.1C11.9 30.3 4 45.8 4 63.1c0 31 25.1 56.1 56.1 56.1s56.1-25.1 56.1-56.1S91.1 7 60.1 7M32.4 25.3C41 18.2 52 14 64 14c27.6 0 50 22.4 50 50c0 12-4.2 23-11.3 31.6l-70.6-70zM14 64c0-11.8 4.1-22.7 11-31.2l70.6 69.9C87 109.8 76 114 64 114c-27.6 0-50-22.4-50-50\"/><path fill=\"#ff8a80\" d=\"M45 10.9c1.7-.4 4.2-1.6 5.9-1.1c1 .3 1.9 1.5 1.5 2.5c-.3.8-1.1 1.3-2 1.5c-4.1 1.1-7.7 2.3-11.3 4.1C32 21.6 25.6 27.2 21 33.7c-1.9 2.7-3.4 5.5-5.8 7.8c-.2.2-.5.4-.8.4c-.2 0-.4 0-.5-.1c-1.2-.5-1.4-1.1-1.2-2.3c.2-1 .5-2 1-2.9c.9-1.8 2.2-3.4 3.3-5.1c1.9-2.9 4.1-5.6 6.6-8c6.8-6.3 15.6-11.1 21.4-12.6\"/><path fill=\"#c33\" d=\"m32.4 25.3l-2 2l71.1 71.1l1.8-2.2z\"/></svg>", "school": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#f8c778\" d=\"M6.064 66.37v57.72h116.06V66.15s-23.22-16.02-24.29-16.17s-32.26-28.7-32.26-28.7l-34.38 27.73z\"/><path fill=\"#f5b03f\" d=\"M6.064 66.31h27.4l-.03 57.72h4.55l.03-70.27l26.88-23.66l27.12 24.8l-.07 69.13h4.26l.07-58.05l25.85.18v-3.45l-23.58-12.64l-31.54-27.71l-34.82 27.14l-26.1 13.51z\"/><path fill=\"#a62714\" d=\"M12.834 42.57c-.18.29-7.15 19.51-7.28 19.91s.2.87 1 .94s28.39 0 28.39 0l-.08-11.78s29.62-26.66 29.95-26.66s30.18 27.35 30.25 27.76c.07.4.13 10.22.13 10.22s26.25.2 26.79.27s.67-.67.2-2.07s-5.95-18.3-6.35-18.57s-22.04-.27-22.04-.27s-27.11-24.96-27.58-25.36s-1.87-1.01-3.11.23c-1.09 1.09-28.13 25.33-28.13 25.33s-21.94-.29-22.14.05\"/><path fill=\"#cf6150\" d=\"m43.644 80.59l-.01 43.48h42.36V80.59s-42.35-.11-42.35 0\"/><path fill=\"#3e737c\" d=\"M11.304 69.63h18.69v15.05h-18.94s.12-14.93.25-15.05m-.25 22.08h18.61v14.56h-18.77c0 .01.08-14.64.16-14.56\"/><path fill=\"#a7d0d7\" d=\"M14.134 72.38h12.7v9.95h-12.86s-.09-9.87.16-9.95m-.57 21.76h13.43v9.63h-13.43z\"/><path fill=\"#3e737c\" d=\"M99.404 70.52h18.61v14.97h-18.69s.08-15.21.08-14.97\"/><path fill=\"#a7d0d7\" d=\"M101.994 73.11h13.35v9.71h-13.35z\"/><path fill=\"#3e737c\" d=\"M99.164 92.6h18.53v14.16h-18.53s-.12-14.03 0-14.16\"/><path fill=\"#a7d0d7\" d=\"M102.074 95.19v8.74h12.7v-8.82s-12.82-.04-12.7.08\"/><path fill=\"#3e737c\" d=\"m49.794 124.09l-.01-38.76h30.5v38.76z\"/><path fill=\"#a7d0d7\" d=\"M76.674 93.24v-5.1h-23.12v5.1zm-23.12 2.55h23.12v13.27h-23.12zm0 16h23.12v6.94h-23.12z\"/><path fill=\"#3e737c\" d=\"M64.014 94.65v26.11h2.64V94.38s-2.46.27-2.64.27m.132-54.59c-10.37.09-17.32 7.82-16.79 17.76c.51 9.66 8.18 15.72 17.05 15.47c9.32-.26 16-7.74 16.26-16.61s-6.94-16.7-16.52-16.62\"/><path fill=\"#fff\" d=\"M64.091 43.05c-8.44 0-14.07 6.42-13.71 14.15c.34 7.46 5.36 13.1 13.98 13.1c7.91 0 13.11-6.5 13.27-13.19c.17-7.3-5.28-14.06-13.54-14.06\"/><circle cx=\"64\" cy=\"56.675\" r=\"2.297\" fill=\"#2f2f2f\"/><path fill=\"#2f2f2f\" d=\"M73.843 52.244a1.09 1.09 0 0 0-1.09-1.887l-.089.05l-9.194 5.327l.545.944l.544.944l9.195-5.327z\"/><path fill=\"#2f2f2f\" d=\"M56.826 50.97c-.81-.255-1.336.055-1.692.568c-.267.566-.272 1.176.353 1.75c.693.637 7.75 4.667 7.75 4.667l.743-1.287l.743-1.287s-6.999-4.13-7.897-4.412\"/><path fill=\"#7db240\" d=\"M2.823 124.25c.37.56 4.69.3 16.2.36s14.86.04 15.46-.08c.59-.12 1.07-2.71.68-4.96c-.43-2.47-1.91-4.8-4.31-5.55c-3.21-1-5.19-.08-6.73-.62c-1.54-.53-6.05-2.79-10.62-2.49c-3.92.25-6.71 1.4-9.14 4.98c-2.61 3.85-1.78 8-1.54 8.36m122.45-.24c.59-.41.54-11.77-7.36-12.64c-5.93-.65-7.48 1.9-8.48 1.9c-1.01 0-4.85-1.87-10.15.18c-6.59 2.55-6.47 9.97-6.23 10.68s7.06.53 16.43.59s15.02-.17 15.79-.71\"/></svg>", "speaker-high-volume": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#728a96\" d=\"m24.198 59.28l-1.991 1.91l-.133 6.21l5.66 54.046s5.233 2.672 10.385 2.55c6.269-.142 9.653-4.166 9.653-4.166l13.026-12.62l8.484-2.357z\"/><path fill=\"#8baebe\" d=\"M22.146 66.525s3.749 9.328 11.207 18.189c8.617 10.232 16.654 15.099 16.654 15.099l-5.751 5.568l-13.646 13.555l-2.876 2.51s-7.387-2.957-14.185-10.771c-7.305-8.403-9.175-15.384-8.8-20.739c.428-6.056 3.862-9.246 3.862-9.246l13.524-14.165z\"/><path fill=\"#b0dfeb\" d=\"M22.237 79.826c.721-.538 1.32-1.463 3.17-.04c1.504 1.148 4.593 6.37 5.121 7.275c.986 1.707.386 3.373-.965 4.989c-.61.731-3.516 3.84-6.503 7.01c-3.577 3.79-7.255 7.662-7.255 7.662s-2.743 1.596-5.66-2.784c-2.652-3.993-2.702-6.452-1.564-8.413c1.199-2.063 3.78-5.142 6.38-8.027c3.618-4.024 7.276-7.672 7.276-7.672\"/><path fill=\"#2a4c56\" d=\"M32.794 119.515c6.087 2.672 11.025 3.241 12.63 2.723c2.785-.894 12.844-10.659 14.104-12.193c1.26-1.524 1.28-2.835 1.28-2.835s-3.8.59-7.57.071c-3.77-.518-7.224-2.083-8.27-2.611l-11.036.843l-1.138 13.992z\"/><path fill=\"#53636c\" d=\"m99.064 72.734l-17.06 2.459l-27.475 12.02l28.613 14.876l17.629-2.175z\"/><path fill=\"#2b3540\" d=\"m25.692 47.27l.914-19.346l11.675-3.435L70.217 38.45l26.785 33.532v1.575s-9.867 7.519-18.483 11.583c-13.667 6.453-25.443 7.448-25.443 7.448L25.692 47.26z\"/><path fill=\"#427586\" d=\"M32.794 119.515c-4.46-1.961-9.592-5.152-14.57-10.09C6.456 97.75 6.01 86.553 6.182 84.663s.812-3.16 5.12-8.546c4.309-5.385 8.84-9.856 9.735-8.423c0 0-1.423 3.11.142 8.87c1.514 5.558 5.67 12.935 11.228 18.676c3.72 3.841 8.027 7.194 12.549 9.44c0 0 1.22 2.449-4.511 7.834c-5.721 5.375-7.662 7-7.662 7z\"/><path fill=\"#728a96\" d=\"M38.129 66.922s16.166-12.153 18.808-12.397s16.613 15.262 16.38 17.243c-.234 1.982-14.409 23.147-14.409 23.147l-16.45-17.172z\"/><path fill=\"#b2d0e0\" d=\"M83.284 48.164C63.237 27.538 36.635 11.747 21.963 23.28c-9.897 7.773-10.852 32.678 18.9 64.279c27.85 29.578 52.887 27.018 62.073 18.462c11.065-10.303-.092-37.738-19.652-57.857m12.691 49.16c-5.568 6.38-25.24 2.214-45.297-19.57s-27.212-40.94-19.55-47.92c8.373-7.631 30.402 4.45 46.537 21.948c17.03 18.472 25.24 37.606 18.32 45.541z\"/><path fill=\"#b2d0e0\" d=\"M68.561 60.276c4.725 5 6.229 10.344 4.288 12.458c-1.951 2.113-7.54 1.91-12.681-3.668c-5.355-5.813-7.296-11.93-4.339-14.012c3.394-2.388 9.267 1.564 12.732 5.222\"/><path fill=\"#ddf8ff\" d=\"M54.529 56.67c-.955 1.696-.61 4.897 1.89 8.727c2.5 3.841 5.67 6.006 6.675 5c1.006-1.006-3.109-4.34-4.5-7.784c-1.393-3.444-.895-4.948-1.281-5.954c-.417-1.067-2.002-1.392-2.784 0zM20.926 27.853c-1.636-.112-5.913 8.525-.548 24.345C24.39 64.056 37.55 84.602 41.573 80.324c3.475-3.688-5.822-8.16-13.565-24.773c-8.525-18.28-2.936-27.424-7.082-27.709z\"/><path fill=\"#8baebe\" d=\"M15.734 106.763s3.76-3.912 7.326-7.702c2.987-3.17 5.914-6.3 6.523-7.032c0 0-2.011-2.56-3.993-5.72c-1.443-2.307-3.312-6.513-3.312-6.513s-3.699 3.688-7.326 7.712c-2.602 2.886-5.183 5.985-6.382 8.047c0 0 1.057 2.734 2.906 5.65a42 42 0 0 0 4.248 5.558z\"/><path fill=\"none\" stroke=\"#04d3ff\" stroke-miterlimit=\"10\" stroke-width=\"3\" d=\"M49.499 26.278c-7.235 5.12-2.307 22.831 14.754 39.699c14.774 14.601 30.94 20.26 37.24 13.178C107.386 72.541 99.268 56 85.479 41.6C72.493 28.046 55.77 21.847 49.5 26.278z\"/><path fill=\"none\" stroke=\"#04d3ff\" stroke-miterlimit=\"10\" stroke-width=\"3\" d=\"M56.723 5.752c-8.606 6.28-2.326 27.78 17.965 48.478c17.558 17.925 39.394 27.445 46.446 18.392c6.015-7.722-.569-25.433-19.194-45.186C83.203 7.56 64.182.306 56.723 5.752z\"/></svg>", "television": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><g fill=\"#455a64\"><path d=\"M62.034 31.16L34.912 9.345a.916.916 0 0 1-.167-1.243a.904.904 0 0 1 1.267-.202l28.2 20.31c.404.299.5.861.201 1.266l-1.08 1.493a.905.905 0 0 1-1.3.19\"/><path d=\"m64.551 30.97l-1.08-1.493a.904.904 0 0 1 .203-1.266l28.199-20.31a.904.904 0 0 1 1.266.202a.916.916 0 0 1-.166 1.243L65.85 31.16a.905.905 0 0 1-1.3-.19\"/><path d=\"M46.652 32.188c0-3.49 7.74-6.33 17.29-6.33s17.29 2.83 17.29 6.33z\"/></g><path fill=\"#82aec0\" d=\"M119.507 124H8.367c-2.45 0-4.43-2.06-4.43-4.59V34.838c0-2.54 1.98-4.59 4.43-4.59h111.15c2.44 0 4.43 2.06 4.43 4.59v84.572c-.01 2.53-1.99 4.59-4.44 4.59\"/><path fill=\"#212121\" d=\"M116.35 119.766H11.97a3.55 3.55 0 0 1-3.55-3.55V38.031a3.55 3.55 0 0 1 3.55-3.55h104.38a3.55 3.55 0 0 1 3.55 3.55v78.185a3.55 3.55 0 0 1-3.55 3.55\"/><path fill=\"#b9e4ea\" d=\"m96.685 114.96l-6.843-7.247H18.629l-6.843 7.248c-1.79 2.013-1.136 4.794.424 4.805h84.05c1.56-.011 2.214-2.792.425-4.805\"/><path fill=\"#2f7889\" stroke=\"#212121\" stroke-miterlimit=\"10\" stroke-width=\"4\" d=\"M95.45 103.709c-.77 3.914-3.34 6.938-6.64 7.761c-5.42 1.365-15.52 3.069-32.16 3.069c-17.47 0-29.19-1.873-35.5-3.26c-3.49-.768-6.23-3.994-6.91-8.157c-1.57-9.567-3.54-28.689.08-52.572c.67-4.422 3.66-7.818 7.39-8.393c6.73-1.05 18.75-2.448 34.94-2.448c15.36 0 25.65 1.263 31.48 2.279c3.59.631 6.46 3.914 7.19 8.167c4.33 25.158 1.94 44.325.13 53.554z\"/><path fill=\"#455a64\" d=\"M114.893 116.47h-11.39a2.09 2.09 0 0 1-2.09-2.09V82.673c0-1.16.94-2.09 2.09-2.09h11.39c1.16 0 2.09.94 2.09 2.09v31.707c0 1.15-.93 2.09-2.09 2.09\"/><linearGradient id=\"SVGAISsnbZU\" x1=\"32.434\" x2=\"31.132\" y1=\"106.226\" y2=\"58.998\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#fff\"/><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\"/></linearGradient><path fill=\"url(#SVGAISsnbZU)\" d=\"M34.59 47.48c2.093-.249 6.055-.074 7.45 4.174s-1.669 5.394-3.313 6.652c-4.722 3.6-7.064 4.971-9.905 8.895c-2.267 3.14-6.228 2.156-7.412.088c-.947-1.67-1.644-7.027.361-10.565c4.323-7.574 10.727-8.994 12.82-9.244\"/><circle cx=\"108.965\" cy=\"48.986\" r=\"7.552\" fill=\"#455a64\"/><path fill=\"#82aec0\" d=\"M108.965 42.048c-.581 0-1.085.394-1.217.953l-.986 4.056a8.15 8.15 0 0 0 0 3.847l.986 4.055c.143.559.636.954 1.217.954c.58 0 1.085-.395 1.217-.954l.986-4.055a8.15 8.15 0 0 0 0-3.847L110.182 43a1.264 1.264 0 0 0-1.217-.953\"/><circle cx=\"108.965\" cy=\"68.56\" r=\"7.552\" fill=\"#455a64\"/><path fill=\"#82aec0\" d=\"M103.627 64.132a1.25 1.25 0 0 0-.044 1.546l2.488 3.343a8.1 8.1 0 0 0 2.96 2.455l3.748 1.82a1.25 1.25 0 0 0 1.513-.33a1.25 1.25 0 0 0 .043-1.545l-2.488-3.343a8.1 8.1 0 0 0-2.959-2.455l-3.748-1.82a1.265 1.265 0 0 0-1.513.33\"/></svg>", "ticket": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#a65f3e\" d=\"M3.16 33.47v65.27c0 1.11.9 2.02 2.02 2.02h115.96c1.11 0 2.02-.9 2.02-2.02V33.47c0-1.11-.9-2.02-2.02-2.02H5.18c-1.12 0-2.02.91-2.02 2.02m83.01 62.81c-5.57 3.57-11.49-2.34-7.91-7.91c.24-.38.56-.7.94-.94c5.57-3.57 11.49 2.34 7.91 7.91c-.25.38-.57.7-.94.94m0-16.83c-5.57 3.57-11.49-2.34-7.91-7.91c.24-.38.56-.7.94-.94c5.57-3.57 11.49 2.34 7.91 7.91c-.25.37-.57.7-.94.94m0-17.83c-5.57 3.57-11.49-2.34-7.91-7.91c.24-.38.56-.7.94-.94c5.57-3.57 11.49 2.34 7.91 7.91c-.25.37-.57.7-.94.94m0-16.83c-5.57 3.57-11.49-2.34-7.91-7.91c.24-.38.56-.7.94-.94c5.57-3.57 11.49 2.34 7.91 7.91c-.25.37-.57.7-.94.94\"/><path fill=\"#ffd54f\" d=\"M3.16 30.47v65.27c0 1.11.9 2.02 2.02 2.02h115.96c1.11 0 2.02-.9 2.02-2.02V30.47c0-1.11-.9-2.02-2.02-2.02H5.18c-1.12 0-2.02.91-2.02 2.02m83.01 62.81c-5.57 3.57-11.49-2.34-7.91-7.91c.24-.38.56-.7.94-.94c5.57-3.57 11.49 2.34 7.91 7.91c-.25.38-.57.7-.94.94m0-16.83c-5.57 3.57-11.49-2.34-7.91-7.91c.24-.38.56-.7.94-.94c5.57-3.57 11.49 2.34 7.91 7.91c-.25.37-.57.7-.94.94m0-17.83c-5.57 3.57-11.49-2.34-7.91-7.91c.24-.38.56-.7.94-.94c5.57-3.57 11.49 2.34 7.91 7.91c-.25.37-.57.7-.94.94m0-16.83c-5.57 3.57-11.49-2.34-7.91-7.91c.24-.38.56-.7.94-.94c5.57-3.57 11.49 2.34 7.91 7.91c-.25.37-.57.7-.94.94\"/><path fill=\"none\" stroke=\"#4e342e\" stroke-linecap=\"round\" stroke-miterlimit=\"10\" stroke-width=\"8\" d=\"M15.06 51.03h32.56M15.06 66.51h23.07m15.96 0h4.84\" opacity=\".8\"/><path fill=\"#6d4c41\" d=\"M13.56 80.46h3v9.3h-3zm25.15 0h3v9.3h-3zm5.44 0h3v9.3h-3zm-24.68 0h6v9.3h-6zm30.19 0h7v9.3h-7zm-21.52 0h8v9.3h-8z\" opacity=\".5\"/><path fill=\"#e2a610\" d=\"M122.04 28.45H4.27c-.62 0-1.11.5-1.11 1.11v9.96h74.45c-.72-1.67-.64-3.77.76-5.82c.19-.28.44-.53.72-.72c4.42-2.93 9.1.17 9.1 4.36c0 .77-.16 1.51-.45 2.17h35.41v-9.96c.01-.6-.49-1.1-1.11-1.1\"/><path fill=\"#6d4c41\" d=\"M97.81 48.68h18.23v16.69H97.81z\" opacity=\".5\"/><path fill=\"none\" stroke=\"#4e342e\" stroke-linecap=\"round\" stroke-miterlimit=\"10\" stroke-width=\"3\" d=\"M98.98 74.14h9.07m-9.07 6.32h14.28\" opacity=\".8\"/></svg>", "toothbrush": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#e65100\" d=\"M116.59 13.85L85.34 37.56c-1.37 2.54-.8 4.99.11 6.88c.51 1.06-.12 2.33-1.27 2.6c-5.04 1.19-14.82 2.65-18.98 6.81c0 0-53.81 50.45-56.67 53.09s-4.42 6.41-2.86 10.18c.89 2.16 3.08 4.56 5.91 5.55c5.72 2 8.74.71 14.2-4.75c0 0 55.62-53.7 67.77-65.32c1.1-1.06 2.48-1.75 3.96-2.11s3.6-1.22 5.67-3.3l15.27-15.37c6.43-6.43 1.98-14.12-1.86-17.97\"/><path fill=\"#fb8c00\" d=\"M86.53 43.1c4.94 4.94 10.38 1.56 12.27-.33l17.74-17.74c1.89-1.89 4.36-6.86.04-11.18c-2.8-2.8-7.67-2.69-10.79.43L88.06 32.02c-1.9 1.89-4.85 7.75-1.53 11.08\"/><g fill=\"#69b6c9\"><path d=\"m105.78 6.14l-3.16 5.24s7.33 6.41 8.85 7.6c1.13.88 2.13.81 2.94 0s.81-2.13 0-2.94s-8.63-9.9-8.63-9.9\"/><path d=\"m91.356 42.018l-10.6-10.6l23.052-23.05l10.6 10.599z\"/><path d=\"M84.16 29.84L78.92 33s8.37 7.45 9.89 8.64c1.13.88 2.13.81 2.94 0s.81-2.13 0-2.94c-.81-.82-7.59-8.86-7.59-8.86\"/></g><path fill=\"#a5ceda\" d=\"m105.29 8.54l-3.13 5.23s8.54 7.62 10.07 8.81c1.13.88 2.13.81 2.94 0s.81-2.13 0-2.94s-9.88-11.1-9.88-11.1\"/><path fill=\"#a5ceda\" d=\"m102.18 13.04l-4.2 4.2s8.89 7.98 10.42 9.16c1.13.88 2.13.81 2.94 0s.81-2.13 0-2.94s-9.16-10.42-9.16-10.42\"/><path fill=\"#a5ceda\" d=\"m98.3 16.82l-4.2 4.2s8.95 8.03 10.47 9.21c1.13.88 2.13.81 2.94 0s.81-2.13 0-2.94s-9.21-10.47-9.21-10.47\"/><path fill=\"#a5ceda\" d=\"m93.99 20.17l-4.2 4.2s9.43 8.51 10.95 9.69c1.13.88 2.13.81 2.94 0s.81-2.13 0-2.94s-9.69-10.95-9.69-10.95\"/><path fill=\"#a5ceda\" d=\"m90.17 24l-4.2 4.2s9.43 8.51 10.95 9.69c1.13.88 2.13.81 2.94 0s.81-2.13 0-2.94S90.17 24 90.17 24\"/><path fill=\"#a5ceda\" d=\"m87.25 28.73l-5.65 3.01s9.97 8.78 11.49 9.97c1.13.88 2.13.81 2.94 0s.81-2.13 0-2.94s-8.78-10.04-8.78-10.04\"/><linearGradient id=\"SVGaxOYvdxt\" x1=\"28.935\" x2=\"40.103\" y1=\"26.259\" y2=\"15.091\" gradientTransform=\"matrix(-1 0 0 1 128 0)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#fafafa\"/><stop offset=\".73\" stop-color=\"#eee\"/></linearGradient><path fill=\"url(#SVGaxOYvdxt)\" d=\"M79.33 29.45c.21-.92-.71-2.58.07-3.62c.63-.84 1.15-.69 1.77-.69c.94 0 1.74-.8 1.74-1.74c0-.61.12-1.2.5-1.58s.97-.5 1.58-.5c.94 0 1.74-.8 1.74-1.74c0-.61.12-1.2.5-1.58s.97-.5 1.58-.5c.94 0 1.74-.8 1.74-1.74c0-.61.12-1.2.5-1.58s.97-.5 1.58-.5c.94 0 1.74-.8 1.74-1.74c0-.61.12-1.2.5-1.58s.97-.5 1.58-.5c.94 0 1.74-.8 1.74-1.74c0-.61.13-1.45.85-1.9c1.15-.7 2.38.2 3.29.2c.96 0 2.03-1.55 3.25-.41c1.16 1.08-.03 2.55.07 3.25c.09.62.91 1.97.28 3.17c-.49.93-1.58 1.23-2.19 1.24c-.94 0-1.74.8-1.74 1.74c0 .61-.12 1.2-.5 1.58s-.97.5-1.58.5c-.94 0-1.74.8-1.74 1.74c0 .61-.12 1.2-.5 1.58s-.97.5-1.58.5c-.94 0-1.74.8-1.74 1.74c0 .61-.12 1.2-.5 1.58s-.97.5-1.58.5c-.94 0-1.74.8-1.74 1.74c0 .61-.12 1.2-.5 1.58s-.97.5-1.58.5c-.94 0-1.74.8-1.74 1.74c0 .61-.24 1.49-.8 1.88c-1.79 1.25-3.02-.49-3.88-.17c-.59.22-2.15 1.6-3.29.37c-1.25-1.34.48-2.85.58-3.32\"/><path fill=\"#fb8c00\" d=\"M7.11 116.71c4.11 4.11 9.86.76 11.92-1.3c1.6-1.6 53.84-53.37 53.84-53.37c5.11-5.11 6.89-6.5 5.01-9.15s-9.38-2.33-13.54 1.84c0 0-52.56 48.89-54.83 51.16s-5.85 7.37-2.4 10.82\"/></svg>", "woman-teacher": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><linearGradient id=\"SVGLEr5UsId\" x1=\"63.999\" x2=\"63.999\" y1=\"116.605\" y2=\"39.511\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#26a69a\"/><stop offset=\"1\" stop-color=\"#00796b\"/></linearGradient><path fill=\"url(#SVGLEr5UsId)\" d=\"M6.36 10.9h115.29v77.52H6.36z\"/><linearGradient id=\"SVGlqVRqcbK\" x1=\"63.999\" x2=\"63.999\" y1=\"119.455\" y2=\"37.224\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#8d6e63\"/><stop offset=\".779\" stop-color=\"#795548\"/></linearGradient><path fill=\"url(#SVGlqVRqcbK)\" d=\"M119.29 13.26v72.81H8.71V13.26zM124 8.55H4v82.23h120z\"/><path fill=\"#543930\" d=\"M64.57 2.87c-41.01 0-40.68 37.92-40.68 38.52c0 24.56 1.88 59.25 11.71 72.9c3.9 5.41 11.43 5.71 11.43 5.71l16.97-.02l16.97.02s7.54-.3 11.43-5.71c9.83-13.65 11.71-48.34 11.71-72.9c-.01-.6 1.47-38.52-39.54-38.52\"/><radialGradient id=\"SVGqPQObcyK\" cx=\"64\" cy=\"69.561\" r=\"47.532\" gradientTransform=\"matrix(1 0 0 -1.1901 0 141.221)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".794\" stop-color=\"#6d4c41\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#6d4c41\"/></radialGradient><path fill=\"url(#SVGqPQObcyK)\" d=\"M64.57 2.87c-41.01 0-40.68 37.92-40.68 38.52c0 24.56 1.88 59.25 11.71 72.9c3.9 5.41 11.43 5.71 11.43 5.71l16.97-.02l16.97.02s7.54-.3 11.43-5.71c9.83-13.65 11.71-48.34 11.71-72.9c-.01-.6 1.47-38.52-39.54-38.52\"/><linearGradient id=\"SVGCy6SEdjI\" x1=\"64\" x2=\"64\" y1=\"18.343\" y2=\"4.85\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#b3e5fc\"/><stop offset=\"1\" stop-color=\"#70afe3\"/></linearGradient><path fill=\"url(#SVGCy6SEdjI)\" d=\"M114.5 123.94v-3.18c0-15.47-25.34-23.56-50.36-23.56H64c-25.14.03-50.5 7.32-50.5 23.56v3.18z\"/><path fill=\"#3488c1\" d=\"M15 123.94v-3.18c0-15.2 24.61-22.03 49-22.06h.13c12.9 0 25.42 2.19 34.36 6c6.62 2.83 14.51 7.91 14.51 16.05v3.18h3v-3.18C116 104 89.74 95.7 64.13 95.7H64c-25.49.03-52 7.28-52 25.06v3.18z\"/><linearGradient id=\"SVGlRYp0dKt\" x1=\"30.39\" x2=\"30.39\" y1=\"32.297\" y2=\"4.991\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#651fff\"/><stop offset=\".705\" stop-color=\"#5914f2\"/><stop offset=\"1\" stop-color=\"#530eeb\"/></linearGradient><path fill=\"url(#SVGlRYp0dKt)\" d=\"M12 120.75v3.18h32.6c.78-21.78 4.18-28.01 4.18-28.01C31.83 99.62 12.75 104 12 120.75\"/><linearGradient id=\"SVG8XNZL1QH\" x1=\"98\" x2=\"98\" y1=\"30.994\" y2=\"5.033\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#651fff\"/><stop offset=\".705\" stop-color=\"#5914f2\"/><stop offset=\"1\" stop-color=\"#530eeb\"/></linearGradient><path fill=\"url(#SVG8XNZL1QH)\" d=\"M79.61 95.93s3.39 6.23 4.18 28.01h32.6v-3.18c-.75-16.76-19.83-21.14-36.78-24.83\"/><linearGradient id=\"SVGy96TccvT\" x1=\"39.001\" x2=\"39.001\" y1=\"29\" y2=\"5.422\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#d1c4e9\" stop-opacity=\".2\"/><stop offset=\".785\" stop-color=\"#d1c4e9\" stop-opacity=\".6\"/></linearGradient><path fill=\"url(#SVGy96TccvT)\" d=\"M38.45 123.94c.03-4.94.58-15.24 4.12-26.67l-3.38.82c-3.22 11.18-3.74 20.96-3.75 25.85z\"/><linearGradient id=\"SVG7C1rgdfp\" x1=\"997.477\" x2=\"997.477\" y1=\"30.237\" y2=\"5.612\" gradientTransform=\"matrix(-1 0 0 -1 1086.477 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#d1c4e9\" stop-opacity=\".2\"/><stop offset=\".785\" stop-color=\"#d1c4e9\" stop-opacity=\".6\"/></linearGradient><path fill=\"url(#SVG7C1rgdfp)\" d=\"M92.56 123.94c-.01-4.89-.53-14.67-3.75-25.85l-3.38-.82c3.54 11.43 4.09 21.73 4.12 26.67z\"/><path fill=\"#e59600\" d=\"M64 92.33h-9.08v9.98c0 4.51 3.7 8.17 8.26 8.17h1.65c4.56 0 8.26-3.66 8.26-8.17v-9.98z\"/><linearGradient id=\"SVGAJYXsdPv\" x1=\"54.339\" x2=\"55.176\" y1=\"16.875\" y2=\"37.154\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#e1f5fe\"/><stop offset=\"1\" stop-color=\"#81d4fa\"/></linearGradient><path fill=\"url(#SVGAJYXsdPv)\" d=\"m54 91.88l9.98 12.81s.5-.38 0 0l-16.23 6.64l-2.41-14.54z\"/><linearGradient id=\"SVGa7xHtbnC\" x1=\"72.97\" x2=\"73.807\" y1=\"16.106\" y2=\"36.385\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#e1f5fe\"/><stop offset=\"1\" stop-color=\"#81d4fa\"/></linearGradient><path fill=\"url(#SVGa7xHtbnC)\" d=\"m74.21 91.88l-9.98 12.81s-.5-.38 0 0l16.23 6.64l2.41-14.54z\"/><linearGradient id=\"SVGAWn9ye5j\" x1=\"79.15\" x2=\"72.817\" y1=\"21.117\" y2=\"-5.55\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".002\" stop-color=\"#212121\" stop-opacity=\".2\"/><stop offset=\"1\" stop-color=\"#212121\" stop-opacity=\".6\"/></linearGradient><path fill=\"url(#SVGAWn9ye5j)\" d=\"m100.99 123.94l.76-2.65l.63-2.18l-.06-.02l.01-.05l-1.55-.44l1.64-5.72c.1-.35.09-.7 0-1.02c0-.01-.01-.03-.01-.04a.3.3 0 0 0-.04-.1c-.17-.54-.56-.97-1.09-1.13l-.15-.04h-.01l-3.75-1.08l-34.93-10.05c-.05-.01-.09-.01-.13-.03a6.177 6.177 0 0 0-7.51 4.27l-1.44 5.03q-.15.51-.33 1.11l-1.32 4.61l-2.74 9.53z\"/><path fill=\"#424242\" d=\"m102.29 123.94l3.46-12.06c.29-1.01-.29-2.06-1.3-2.34l-38.69-11.1a6.19 6.19 0 0 0-7.65 4.24l-6.1 21.27z\"/><linearGradient id=\"SVGNzyutduh\" x1=\"81.888\" x2=\"76.721\" y1=\"17.259\" y2=\"-.074\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#ef5350\"/><stop offset=\"1\" stop-color=\"#e53935\"/></linearGradient><path fill=\"url(#SVGNzyutduh)\" d=\"m104.04 123.94l1.04-3.63c.35-1.22-.38-2.5-1.62-2.85l-41.52-11.9c-4.53-1.3-5.32 2.35-6.59 6.78l-3.33 11.6z\"/><path fill=\"#424242\" d=\"M64.33 101.57c.18 0 .38.02.59.07l37.25 10.7l-.31 1.08c-11.79-3.29-34.29-9.62-38.94-11.16c.24-.33.71-.69 1.41-.69m0-3.33c-4.52 0-6.78 5.57-3.12 6.94c4.03 1.5 42.93 12.32 42.93 12.32l1.58-5.52c.31-1.06-.19-2.14-1.11-2.4L65.77 98.42q-.75-.18-1.44-.18\" opacity=\".2\"/><linearGradient id=\"SVGGzkFacME\" x1=\"-117.44\" x2=\"-73.995\" y1=\"-972.312\" y2=\"-972.312\" gradientTransform=\"matrix(.9612 .2758 -.3192 1.1123 -136.555 1216.41)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".01\" stop-color=\"#bdbdbd\"/><stop offset=\".987\" stop-color=\"#f5f5f5\"/></linearGradient><path fill=\"url(#SVGGzkFacME)\" d=\"m103.37 112.12l-39.8-11.42c-1.08-.31-2.26.46-2.62 1.71l-.06.22c-.36 1.25.23 2.53 1.31 2.84l39.8 11.42s-.34-.83.07-2.3c.41-1.48 1.3-2.47 1.3-2.47\"/><defs><path id=\"SVGfa9HKe7y\" d=\"m105.67 118.03l-44.5-12.66c-3.53-1-3.9.22-4.81 3.43l-4.34 15.18l51.97-.02z\"/></defs><clipPath id=\"SVGqACuHbTS\"><use href=\"#SVGfa9HKe7y\"/></clipPath><linearGradient id=\"SVG7NgeSbei\" x1=\"52.555\" x2=\"56.93\" y1=\"5.954\" y2=\"19.704\" gradientTransform=\"matrix(1 0 0 -1 0 128)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#212121\"/><stop offset=\"1\" stop-color=\"#424242\"/></linearGradient><path fill=\"url(#SVG7NgeSbei)\" d=\"m55.88 123.94l7.75-26.99l-6.43-1.85l-8.28 28.84z\" clip-path=\"url(#SVGqACuHbTS)\"/><path fill=\"#ffca28\" d=\"M64.31 16.04c-17.2 0-33.13 12.79-33.13 39.91c0 21.78 13.49 34.67 25.23 38.83c2.8.99 5.5 1.49 7.9 1.49c2.38 0 5.07-.49 7.85-1.47c11.76-4.14 25.28-17.03 25.28-38.84c0-27.13-15.93-39.92-33.13-39.92\"/><path fill=\"#e59600\" d=\"M68.37 68.06c-.11-.04-.21-.07-.32-.08h-6.99c-.11.01-.21.04-.32.08c-.63.26-.98.91-.68 1.61s1.69 2.66 4.49 2.66s4.19-1.96 4.5-2.66c.3-.7-.05-1.36-.68-1.61\"/><g fill=\"#404040\"><ellipse cx=\"49.31\" cy=\"58.87\" rx=\"4.87\" ry=\"5.04\"/><ellipse cx=\"79.8\" cy=\"58.87\" rx=\"4.87\" ry=\"5.04\"/></g><path fill=\"#6d4c41\" d=\"M55.54 49.82c-.93-1.23-3.07-3.01-7.23-3.01S42 48.6 41.08 49.82c-.41.54-.31 1.17-.02 1.55c.26.35 1.04.68 1.9.39s2.54-1.16 5.35-1.18c2.81.02 4.49.89 5.35 1.18s1.64-.03 1.9-.39c.29-.38.39-1.01-.02-1.55m32.5 0c-.93-1.23-3.07-3.01-7.23-3.01s-6.31 1.79-7.23 3.01c-.41.54-.31 1.17-.02 1.55c.26.35 1.04.68 1.9.39s2.54-1.16 5.35-1.18c2.81.02 4.49.89 5.35 1.18s1.64-.03 1.9-.39c.28-.38.38-1.01-.02-1.55\"/><path fill=\"#795548\" d=\"M72.62 76.14c-3.15 1.87-13.47 1.87-16.61 0c-1.81-1.07-3.65.57-2.9 2.21c.74 1.61 6.37 5.36 11.23 5.36s10.42-3.75 11.16-5.36c.75-1.64-1.07-3.29-2.88-2.21\"/><path fill=\"#212121\" stroke=\"#212121\" stroke-miterlimit=\"10\" stroke-width=\".55\" d=\"M93.93 52.93c-.07-1.19-.12-1.31-1.69-1.81c-1.23-.39-7.95-.94-13.01-.66c-.36.02-.71.04-1.04.07c-4.59.39-10.1 2.24-14.24 2.34c-1.76.04-9.01-1.86-14.14-2.26c-.33-.02-.66-.05-1-.06c-5.07-.26-11.82.33-13.05.73c-1.57.51-1.62.63-1.68 1.82c-.07 1.18.13 2.2 1.06 2.51c1.27.42 1.28 2 2.13 6.54c.77 4.14 2.62 7.41 10.57 7.98c.34.02.66.04.98.04c7.03.1 9.45-4.53 10.25-6.07c1.49-2.86 1.02-6.8 4.96-6.81c3.93-.01 3.56 3.86 5.07 6.71c.81 1.53 3.17 6.18 10.14 6.08c.34 0 .69-.02 1.05-.05c7.94-.62 9.78-3.9 10.52-8.04c.82-4.55.83-6.14 2.09-6.56c.91-.3 1.1-1.31 1.03-2.5zM53.37 68.17c-1.22.57-2.85.86-4.57.86c-3.59-.01-7.57-1.27-9.01-3.81c-2.04-3.62-2.57-10.94.03-12.47c1.14-.67 4.99-1.13 8.97-.96c4.13.18 8.4 1.04 9.94 3.06c2.56 3.33-1.5 11.5-5.36 13.32zm34.9-3.1c-1.43 2.56-5.44 3.85-9.05 3.86c-1.7.01-3.31-.27-4.51-.83c-3.87-1.8-7.97-9.94-5.45-13.29c1.53-2.04 5.82-2.92 9.96-3.12c3.97-.19 7.81.25 8.94.91c2.62 1.52 2.13 8.84.11 12.47z\"/><path fill=\"#543930\" d=\"M64.57 2.87c-41.01 0-40.68 37.92-40.68 38.52c0 7.76.19 16.53.75 25.32l6.72-.02c-.06-2.92 1.99-20.97 8.08-22.34c22.36-5.03 35.01-16.89 35.01-16.89c3.29 7.18 13.58 14.19 17.27 16.86c3.03 2.19 4.58 18.55 4.52 22.38h7.09c0-.05.02-.1.02-.16c.56-8.75.74-17.46.74-25.17c.01-.58 1.49-38.5-39.52-38.5\"/><radialGradient id=\"SVG1mFK2dRz\" cx=\"64.333\" cy=\"65.537\" r=\"49.788\" gradientTransform=\"matrix(1 0 0 -1.2135 0 141.995)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".794\" stop-color=\"#6d4c41\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#6d4c41\"/></radialGradient><path fill=\"url(#SVG1mFK2dRz)\" d=\"M64.57 2.87c-41.01 0-40.68 37.92-40.68 38.52c0 7.76.19 16.53.75 25.32l6.72-.02c-.06-2.92 1.99-20.97 8.08-22.34c22.36-5.03 35.01-16.89 35.01-16.89c3.29 7.18 13.58 14.19 17.27 16.86c3.03 2.19 4.58 18.55 4.52 22.38h7.09c0-.05.02-.1.02-.16c.56-8.75.74-17.46.74-25.17c.01-.58 1.49-38.5-39.52-38.5\"/></svg>"};
+// TITLE: Must or Mustn't?
+// EYEBROW: Spotlight 4 Grammar · Module 4 · Unit 8b
+// SUB: Правила в зоопарке и в школе: must, mustn't, have to, don't have to, can't, may. Знаки-картинки и задания с проверкой.
+// BOARD: Твои правила
+// LEAD: Каждый правильный ответ — одна точка. Все точки зелёные — правило усвоено. Красная рамка — повтори это правило.
+// HOME: index.html
+// HUB: You must feed dogs. You mustn't give dogs sweets. + have to, may
+const META = { ls: "s4g-m4-must", cards: false, boardLabel: "Правила" };
+const P = [
+  { id: "must", phrase: "You must …", ru: "ты должен, нужно" },
+  { id: "mustnt", phrase: "You mustn't …", ru: "нельзя, запрещено" },
+  { id: "verb", phrase: "must feed (без to)", ru: "после must — глагол без to" },
+  { id: "have", phrase: "have to / don't have to", ru: "приходится / не обязательно" },
+  { id: "may", phrase: "May I …?", ru: "можно мне…? (вежливо)" }
+];
+const DRILLS = [
+  { type: "rule", title: "Запомни!", short: "Правило", instr: "Прочитай правило. Жёлтым выделено самое важное.",
+    blocks: [
+      { h: "✅ must — нужно, обязательно", lines: [
+        ["You *must* feed dogs every day.", "Ты должен кормить собак каждый день."],
+        ["You *must* put your rubbish in the bin.", "Нужно выбрасывать мусор в урну."] ] },
+      { h: "🚫 mustn't — нельзя!", lines: [
+        ["You *mustn't* give dogs any sweets.", "Нельзя давать собакам сладкое."],
+        ["You *mustn't* feed the animals.", "Нельзя кормить животных."],
+        ["mustn't = must not", "читается [масnт]"] ] },
+      { h: "Ещё полезные слова (учебник, стр. 64)", lines: [
+        ["We *have to* wear a uniform.", "Нам приходится (надо) носить форму."],
+        ["You *don't have to* go to school on Sunday.", "Не обязательно — в воскресенье можно не идти."],
+        ["*May* I come in, please?", "Можно войти? (вежливая просьба)"] ] },
+      { h: "Ловушка!", warn: true, lines: [
+        ["✗ You must to feed.  ✓ You *must feed*.", "после must нет to"],
+        ["✗ He musts.  ✓ He *must*.", "must не меняется: I must, he must, they must"] ] }
+    ] },
+  { type: "sort", title: "Must или mustn't?", short: "Знаки", instr: "Посмотри на знак. Это нужно делать (must) или нельзя (mustn't)?",
+    buckets: ["✅ must", "🚫 mustn't"],
+    items: [
+      { id: "mustnt", img: "monkey banana !no", t: "You … feed the animals.", b: 1 },
+      { id: "mustnt", img: "bicycle !no", t: "You … ride bikes.", b: 1 },
+      { id: "mustnt", img: "speaker-high-volume musical-notes !no", t: "You … play loud music.", b: 1 },
+      { id: "must", img: "dog-face house !yes", t: "You … leave your pets at home.", b: 0 },
+      { id: "must", img: "litter-in-bin-sign !yes", t: "You … put your rubbish in the bin.", b: 0 },
+      { id: "mustnt", img: "person-running !no", t: "You … run.", b: 1 },
+      { id: "must", img: "dog-face fork-and-knife-with-plate !yes", t: "You … feed your dog every day.", b: 0 },
+      { id: "mustnt", img: "candy !no", t: "You … give dogs sweets.", b: 1 }
+    ] },
+  { type: "gaps", title: "Правила зоопарка", short: "Зоопарк", instr: "Посмотри на знак и выбери must или mustn't.",
+    items: [
+      { id: "mustnt", img: "monkey banana !no", t: "You {{*mustn't|must}} feed the animals." },
+      { id: "mustnt", img: "bicycle !no", t: "You {{*mustn't|must}} ride bikes." },
+      { id: "must", img: "litter-in-bin-sign !yes", t: "You {{*must|mustn't}} put your rubbish in the bin." },
+      { id: "must", img: "dog-face house !yes", t: "You {{*must|mustn't}} leave your pets at home." },
+      { id: "mustnt", img: "speaker-high-volume !no", t: "You {{*mustn't|must}} play loud music." },
+      { id: "mustnt", img: "person-running !no", t: "You {{*mustn't|must}} run." },
+      { id: "verb", img: "ticket !yes", t: "You must {{*buy|to buy|buys}} a ticket." }
+    ] },
+  { type: "gaps", title: "Правила школы", short: "Школа", instr: "Это задание 2 из учебника (стр. 64). Выбери правильный вариант.",
+    items: [
+      { id: "mustnt", img: "school person-running !no", t: "You {{*can't|don't have to}} run during the break." },
+      { id: "have", img: "school", t: "I {{*have to|can}} wear a uniform at school. All children wear one." },
+      { id: "must", img: "books", t: "You're in the library. You {{*must|may}} be quiet." },
+      { id: "may", img: "woman-teacher", t: "Mr Green, {{*may|must}} I ask you a question?" },
+      { id: "have", img: "calendar", t: "You {{*don't have to|mustn't}} go to school on Sunday." },
+      { id: "may", img: "door", t: "{{*May|Have}} I come in, please?" }
+    ] },
+  { type: "gaps", title: "Мои правила дома", short: "Дома", instr: "Напиши must или mustn't.",
+    items: [
+      { id: "must", img: "toothbrush", t: "I [[must]] clean my teeth every morning." },
+      { id: "mustnt", img: "television !no", t: "I [[mustn't/must not]] watch TV late at night." },
+      { id: "must", img: "dog-face fork-and-knife-with-plate", t: "I [[must]] feed my dog every day." },
+      { id: "mustnt", img: "candy !no", t: "You [[mustn't/must not]] give dogs sweets." },
+      { id: "must", img: "notebook", t: "I [[must]] do my homework." }
+    ] },
+  { type: "tf", title: "Найди ошибку", short: "Ошибки", instr: "Предложение верное или с ошибкой?",
+    items: [
+      { id: "verb", t: "You must to feed your cat.", ok: false, fix: "You must feed your cat." },
+      { id: "mustnt", t: "You mustn't feed the animals at the zoo.", ok: true },
+      { id: "verb", t: "He musts clean his room.", ok: false, fix: "He must clean his room." },
+      { id: "may", t: "May I come in, please?", ok: true },
+      { id: "have", t: "You don't have to go to school on Sunday.", ok: true },
+      { id: "mustnt", t: "You must run in the classroom.", ok: false, fix: "You mustn't run in the classroom." }
+    ] },
+  { type: "order", title: "Собери правило", short: "Порядок", instr: "Нажимай на слова по порядку.",
+    items: [
+      { id: "mustnt", img: "monkey banana !no", q: "Нельзя кормить животных.", s: "You mustn't feed the animals." },
+      { id: "must", img: "dog-face", q: "Ты должен кормить собаку каждый день.", s: "You must feed your dog every day." },
+      { id: "may", img: "door", q: "Можно мне войти?", s: "May I come in?" },
+      { id: "have", img: "school", q: "Нам надо носить форму.", s: "We have to wear a uniform." }
+    ] },
+  { type: "translate", title: "Скажи по-английски", short: "Перевод", instr: "Скажи вслух, потом напиши. Проверяется главная часть.",
+    items: [
+      { id: "mustnt", ru: "Нельзя бегать в зоопарке.", en: "You mustn't run at the zoo.", key: "mustn't run|must not run" },
+      { id: "must", ru: "Ты должен выбрасывать мусор в урну.", en: "You must put your rubbish in the bin.", key: "must put" },
+      { id: "verb", ru: "Я должен кормить кошку.", en: "I must feed my cat.", key: "must feed" },
+      { id: "may", ru: "Можно мне задать вопрос?", en: "May I ask a question?", key: "may i ask" }
+    ] }
+];
+
+/* ===== Drill engine (shared). Expects META, P, DRILLS defined before this script. ===== */
+const byId = Object.fromEntries(P.map(p => [p.id, p]));
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const norm = s => (s || "").toLowerCase().replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, " ").trim().replace(/[.!?,;:]+$/, "");
+
+let M = {};
+try { M = JSON.parse(localStorage.getItem(META.ls) || "{}") || {}; } catch (e) { M = {}; }
+const save = () => { try { localStorage.setItem(META.ls, JSON.stringify(M)); } catch (e) {} };
+const COUNT = {};
+let COUNTING = true;
+const reg = id => { if (COUNTING && id && byId[id]) COUNT[id] = (COUNT[id] || 0) + 1; };
+const goal = id => Math.max(1, Math.min(5, COUNT[id] || 5));
+function hit(id, ok) {
+  if (!id || !byId[id]) return;
+  const r = M[id] || (M[id] = { c: 0, m: 0 });
+  if (ok) r.c++; else r.m++;
+  save(); renderBoard();
+}
+function renderBoard() {
+  const b = document.getElementById("board");
+  b.innerHTML = "";
+  let learned = 0;
+  P.forEach(p => {
+    const r = M[p.id] || { c: 0, m: 0 };
+    const g = goal(p.id);
+    const n = Math.min(g, r.c);
+    if (n >= g) learned++;
+    const chip = el("div", "chip" + (n >= g ? " master" : r.m > r.c ? " weak" : ""));
+    if (p.img) { chip.classList.add("with-pic"); chip.append(picEl(p, "pic chip-pic")); }
+    chip.append(el("span", "ph", p.phrase));
+    if (p.past) chip.append(el("span", "past", `прош.: ${p.past}`));
+    chip.append(el("span", "ru", p.ru));
+    const dots = el("span", "dots");
+    dots.setAttribute("aria-label", `${n} of ${g}`);
+    for (let i = 0; i < g; i++) dots.append(el("i", i < n ? "on" : ""));
+    chip.append(dots);
+    b.append(chip);
+  });
+  document.getElementById("mastered").textContent = learned;
+  document.getElementById("ptotal").textContent = P.length;
+  document.getElementById("fill").style.width = `${(learned / P.length) * 100}%`;
+}
+
+function card(num, def) {
+  const sec = el("section");
+  sec.id = `d${num}`;
+  const ex = el("article", "ex");
+  const head = el("div", "ex-head");
+  const h3 = el("h3");
+  h3.append(el("span", "num", `Задание ${num}`), def.title);
+  const score = el("span", "score");
+  head.append(h3, score);
+  ex.append(head, el("p", "instr", def.instr));
+  if (def.pic || def.story) {
+    const st = el("div", "story-head");
+    if (def.pic) st.append(el("span", "pic", def.pic));
+    if (def.story) st.append(el("b", "story-t", def.story));
+    ex.append(st);
+  }
+  if (def.bank) {
+    const bank = el("div", "bank");
+    def.bank.forEach(w => bank.append(el("span", null, w)));
+    ex.append(bank);
+  }
+  const body = el("div");
+  const foot = el("div", "foot");
+  ex.append(body, foot);
+  if (def.note) ex.append(el("p", "note", def.note));
+  sec.append(ex);
+  document.getElementById("main").append(sec);
+  const a = el("a", null, `${num} · ${def.short}`);
+  a.href = `#d${num}`;
+  document.getElementById("nav").append(a);
+  return { body, foot, score, total: 0, ok: 0, def };
+}
+const setScore = d => { d.score.hidden = !d.total; d.score.textContent = `${d.ok} / ${d.total}`; d.score.classList.toggle("done", d.total > 0 && d.ok === d.total); };
+function resetBtn(d, build) {
+  const r = el("button", "btn", "Начать заново");
+  r.type = "button";
+  r.addEventListener("click", () => { d.body.innerHTML = ""; d.foot.innerHTML = ""; build(); });
+  d.foot.append(r);
+}
+function splitId(spec, fallback) {
+  const i = spec.lastIndexOf("#");
+  return i > -1 ? [spec.slice(0, i), spec.slice(i + 1)] : [spec, fallback];
+}
+function options(list, correctSet, id, d, shuf, onOk) {
+  reg(id);
+  const wrap = el("span", "choice");
+  let done = false;
+  (shuf ? shuffle(list) : list).forEach(o => {
+    const b = el("button", "opt", o);
+    b.type = "button";
+    b.addEventListener("click", () => {
+      if (done || b.disabled) return;
+      if (correctSet.includes(o)) {
+        done = true;
+        b.classList.add("ok");
+        wrap.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+        d.ok++; setScore(d); hit(id, true);
+        if (onOk) onOk();
+      } else {
+        b.classList.add("bad", "shake");
+        b.disabled = true;
+        hit(id, false);
+      }
+    });
+    wrap.append(b);
+  });
+  return wrap;
+}
+
+/* Inline text with {{*right|wrong#id}} choices, [[ans/alt#id]] typed gaps, ^CUE^ word-formation cues */
+const TOK = /\{\{(.+?)\}\}|\[\[(.+?)\]\]|\^(.+?)\^/g;
+function inline(text, id, d, gaps, shuf) {
+  const frag = document.createDocumentFragment();
+  let last = 0;
+  text.replace(TOK, (m, c, t, q, off) => {
+    frag.append(text.slice(last, off));
+    if (c) {
+      const [spec, gid] = splitId(c, id);
+      const raw = spec.split("|");
+      const right = raw.filter(o => o.startsWith("*")).map(o => o.slice(1));
+      frag.append(options(raw.map(o => o.replace(/^\*/, "")), right, gid, d, shuf));
+      d.total++;
+    } else if (t) {
+      const [spec, gid] = splitId(t, id);
+      const answers = spec.split("/");
+      const inp = el("input", "gap");
+      inp.type = "text"; inp.autocomplete = "off"; inp.spellcheck = false;
+      inp.id = `g${d.num}-${gaps.length}`;
+      inp.setAttribute("autocapitalize", "off"); inp.setAttribute("aria-label", "gap");
+      inp.style.width = `${Math.max(6, Math.max(...answers.map(a => a.length)) + 2)}ch`;
+      reg(gid);
+      const g = { inp, answers: answers.map(norm), show: answers[0], id: gid, ok: false };
+      gaps.push(g);
+      inp.addEventListener("input", () => inp.classList.remove("ok", "bad", "shown"));
+      inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); d.check(); } });
+      frag.append(inp);
+      d.total++;
+    } else {
+      frag.append(el("span", "cue", q));
+    }
+    last = off + m.length;
+    return m;
+  });
+  frag.append(text.slice(last));
+  return frag;
+}
+
+const RENDER = {
+  /* sentences with inline choices and/or typed gaps */
+  gaps(d) {
+    const def = d.def;
+    const gaps = [];
+    d.check = () => {
+      gaps.forEach(g => {
+        if (g.ok) return;
+        const v = norm(g.inp.value);
+        if (!v) return;
+        g.inp.classList.remove("ok", "bad", "shown");
+        if (g.answers.includes(v)) { g.ok = true; g.inp.classList.add("ok"); g.inp.readOnly = true; d.ok++; hit(g.id, true); }
+        else { g.inp.classList.add("bad"); hit(g.id, false); }
+      });
+      setScore(d);
+    };
+    const items = def.keepOrder ? def.items : shuffle(def.items);
+    const shuf = def.shuffleOptions !== false;
+    if (def.layout === "text") {
+      items.forEach(it => { const p = el("p", "text"); p.append(inline(it.t, it.id, d, gaps, shuf)); d.body.append(p); });
+    } else {
+      const ol = el("ol", "items");
+      items.forEach(it => { const li = el("li"); const ip = itemPic(it); if (ip) { li.classList.add("has-ip"); li.append(ip); } const tx = el("span", "gl"); tx.append(inline(it.t, it.id, d, gaps, shuf)); li.append(tx); ol.append(li); });
+      d.body.append(ol);
+    }
+    if (gaps.length) {
+      const c = el("button", "btn primary", "Проверить"); c.type = "button"; c.addEventListener("click", d.check);
+      const s = el("button", "btn", "Показать ответы"); s.type = "button";
+      s.addEventListener("click", () => gaps.forEach(g => { if (!g.ok) { g.inp.value = g.show; g.inp.classList.remove("bad"); g.inp.classList.add("shown"); } }));
+      d.foot.append(c, s);
+    }
+  },
+  /* question + option buttons; first option in o is the correct one */
+  mcq(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      li.append(el("p", "q", it.q));
+      const box = el("div", "mcq");
+      const why = el("p", "fix ok"); why.hidden = true;
+      if (it.why) why.append("✓ ", it.why);
+      box.append(options([...it.o], [it.o[0]], it.id, d, true, () => { if (it.why) why.hidden = false; }));
+      d.total++;
+      li.append(box, why);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* meaning -> phrase, built from P */
+  meaning(d) {
+    const ol = el("ol", "items");
+    const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+    shuffle(pool).forEach(p => {
+      const li = el("li");
+      li.append(el("p", "q", p.en));
+      const lab = x => x.opt || x.phrase;
+      const others = [...new Set(shuffle(pool.filter(x => x.id !== p.id)).map(lab))].filter(t => t !== lab(p)).slice(0, 3);
+      const box = el("div", "mcq");
+      box.append(options([lab(p), ...others], [lab(p)], p.id, d, true));
+      d.total++;
+      li.append(box);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* right or wrong */
+  tf(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      li.append(el("p", "tf-line", it.t));
+      const btns = el("div", "tf-btns");
+      const fb = el("p", "fix"); fb.hidden = true;
+      let done = false;
+      [["Верно", true], ["Неверно", false]].forEach(([label, val]) => {
+        const b = el("button", "opt", label);
+        b.type = "button";
+        b.addEventListener("click", () => {
+          if (done) return;
+          done = true;
+          const correct = val === it.ok;
+          b.classList.add(correct ? "ok" : "bad");
+          btns.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+          fb.hidden = false;
+          fb.className = "fix " + (correct ? "ok" : "bad");
+          fb.innerHTML = "";
+          if (it.ok) fb.append(correct ? "Да, верно." : "Это было верно.");
+          else fb.append(correct ? "Да! Правильно: " : "Здесь ошибка. Правильно: ", el("b", null, it.fix));
+          if (it.why) fb.append(el("span", "why", " " + it.why));
+          if (correct) { d.ok++; setScore(d); }
+          hit(it.id, correct);
+        });
+        btns.append(b);
+      });
+      li.append(btns, fb);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* word order */
+  order(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      if (it.q) li.append(el("p", "q", it.q));
+      const wrap = el("div", "uns");
+      const target = it.s.split(" ");
+      const line = el("div", "answer-line");
+      line.setAttribute("aria-label", "Your sentence");
+      const pool = el("div", "tiles");
+      const fb = el("p", "fix"); fb.hidden = true;
+      let solved = false;
+      const mk = w => {
+        const t = el("button", "tile", w);
+        t.type = "button";
+        t.addEventListener("click", () => {
+          if (solved) return;
+          (t.parentElement === pool ? line : pool).append(t);
+          line.classList.remove("bad"); fb.hidden = true;
+        });
+        return t;
+      };
+      let order = shuffle(target);
+      if (order.join(" ") === it.s && target.length > 1) order = [...order.slice(1), order[0]];
+      order.forEach(w => pool.append(mk(w)));
+      const controls = el("div", "line");
+      const c = el("button", "btn small primary", "Проверить"); c.type = "button";
+      const sh = el("button", "btn small", "Показать ответ"); sh.type = "button";
+      c.addEventListener("click", () => {
+        if (solved) return;
+        const built = [...line.children].map(x => x.textContent).join(" ");
+        if (!built) return;
+        fb.hidden = false;
+        const alts = [it.s, ...(it.alt || [])];
+        if (alts.includes(built)) {
+          solved = true; line.classList.add("ok"); fb.className = "fix ok"; fb.textContent = "Правильно!";
+          d.ok++; setScore(d); hit(it.id, true);
+        } else if (pool.children.length) {
+          fb.className = "fix bad"; fb.textContent = "Используй все карточки.";
+        } else {
+          line.classList.add("bad"); fb.className = "fix bad"; fb.textContent = "Не совсем. Нажимай на слова, чтобы переставить, и попробуй ещё раз.";
+          hit(it.id, false);
+        }
+      });
+      sh.addEventListener("click", () => { fb.hidden = false; fb.className = "fix"; fb.innerHTML = ""; fb.append("Ответ: ", el("b", null, it.s)); });
+      controls.append(c, sh);
+      wrap.append(line, pool, controls, fb);
+      li.append(wrap);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* translation; key = regex the answer must contain */
+  translate(d) {
+    const ol = el("ol", "items tr");
+    shuffle(d.def.items).forEach((it, i) => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      li.append(el("p", "ru-line", it.ru));
+      const ta = el("textarea");
+      ta.id = `t${d.num}-${i}`; ta.rows = 1; ta.placeholder = "Напиши по-английски…"; ta.setAttribute("aria-label", "Your translation");
+      const line = el("div", "line");
+      const c = el("button", "btn small primary", "Проверить"); c.type = "button";
+      const sh = el("button", "btn small", "Показать ответ"); sh.type = "button";
+      const model = el("p", "model"); model.hidden = true;
+      let solved = false;
+      const re = new RegExp(`(^|[^a-z'])(${it.key})($|[^a-z'])`, "i");
+      const check = () => {
+        if (solved || !ta.value.trim()) return;
+        const v = norm(ta.value);
+        ta.classList.remove("ok", "bad");
+        model.hidden = false; model.innerHTML = "";
+        if (re.test(v)) {
+          solved = true; ta.classList.add("ok"); ta.readOnly = true;
+          model.append("Правильно! Ответ: ", el("b", null, it.en));
+          d.ok++; setScore(d); hit(it.id, true);
+        } else {
+          ta.classList.add("bad");
+          model.append("Нужно слово: ", el("b", null, it.hint || (byId[it.id] ? byId[it.id].phrase : "the target phrase")), ". Попробуй ещё раз.");
+          hit(it.id, false);
+        }
+      };
+      c.addEventListener("click", check);
+      ta.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); check(); } });
+      sh.addEventListener("click", () => { model.hidden = false; model.innerHTML = ""; model.append("Ответ: ", el("b", null, it.en)); });
+      line.append(c, sh);
+      li.append(ta, line, model);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  }
+};
+
+
+/* ===== Flashcards (auto Drill 1) ===== */
+const sayText = p => (p.say || p.phrase)
+  .replace(/\([^)]*\)/g, " ").replace(/→/g, ", ").replace(/…|\.\.\./g, " ")
+  .replace(/\bsb\b/g, "someone").replace(/\bsth\b/g, "something")
+  .replace(/\s\/\s/g, " or ").replace(/^-/, "").replace(/\s+/g, " ").trim();
+let VOICE = null;
+function pickVoice() {
+  try {
+    const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+    VOICE = vs.find(v => /en[-_]GB/i.test(v.lang) && /google|natural|online|serena|daniel|kate/i.test(v.name))
+      || vs.find(v => /en[-_]GB/i.test(v.lang)) || vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0] || null;
+  } catch (e) { VOICE = null; }
+}
+try { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } catch (e) {}
+function speak(text) {
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if (VOICE) u.voice = VOICE;
+    u.lang = VOICE ? VOICE.lang : "en-GB";
+    u.rate = 0.9;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+const HAS_TTS = typeof window !== "undefined" && "speechSynthesis" in window;
+
+RENDER.cards = function (d) {
+  let deck = P.map(p => p.id), pos = 0, flipped = false, ruFirst = false, known = 0, auto = false;
+  d.total = deck.length;
+  const box = el("div", "fc");
+  const tools = el("div", "fc-tools");
+  const mk = (txt, title) => { const b = el("button", "btn ghost", txt); b.type = "button"; if (title) b.title = title; return b; };
+  const bShuf = mk("Перемешать"), bDir = mk("Сначала русский"), bAuto = mk("Автозвук: выкл");
+  tools.append(bShuf, bDir);
+  if (HAS_TTS) tools.append(bAuto);
+  const flip = el("div", "flip" + (P.some(hasPic) ? " has-pic" : "")); flip.tabIndex = 0; flip.setAttribute("role", "button");
+  const inner = el("div", "flip-in");
+  const front = el("div", "face front"), back = el("div", "face back");
+  inner.append(front, back); flip.append(inner);
+  const nav = el("div", "fc-nav");
+  const bPrev = mk("‹"), bNext = mk("›"), count = el("span", "fc-count");
+  bPrev.setAttribute("aria-label", "previous"); bNext.setAttribute("aria-label", "next");
+  nav.append(bPrev, count, bNext);
+  const rate = el("div", "fc-rate");
+  const bAgain = el("button", "btn again", "Ещё раз"), bKnow = el("button", "btn know", "Знаю ✓");
+  bAgain.type = bKnow.type = "button";
+  rate.append(bAgain, bKnow);
+  const done = el("div", "fc-done");
+  box.append(tools, flip, nav, rate, done);
+  d.body.append(box);
+
+  const face = (node, p, en) => {
+    node.innerHTML = "";
+    if (hasPic(p)) node.append(picEl(p, "pic fc-pic"));
+    if (en) {
+      node.append(el("div", "fc-word", p.phrase));
+      if (p.past) node.append(el("div", "fc-past", `прошедшее время: ${p.past}`));
+      if (HAS_TTS) {
+        const s = el("button", "speak", "🔊"); s.type = "button"; s.setAttribute("aria-label", "listen");
+        s.addEventListener("click", e => { e.stopPropagation(); speak(sayText(p)); });
+        node.append(s);
+      }
+    } else {
+      node.append(el("div", "fc-ru", p.ru));
+      if (p.en) node.append(el("div", "fc-def", p.en));
+    }
+    node.append(el("div", "fc-hint", "нажми, чтобы перевернуть"));
+  };
+  function show() {
+    done.innerHTML = "";
+    const left = deck.length > 0;
+    [flip, nav, rate].forEach(x => x.hidden = !left);
+    if (!left) {
+      done.append(el("p", null, `Все ${P.length} карточек пройдены! Теперь переходи к заданию 2.`));
+      const r = mk("Пройти карточки ещё раз"); r.addEventListener("click", () => { deck = P.map(p => p.id); known = 0; d.ok = 0; setScore(d); pos = 0; show(); });
+      done.append(r);
+      return;
+    }
+    pos = (pos + deck.length) % deck.length;
+    const p = byId[deck[pos]];
+    flipped = false; flip.classList.remove("on");
+    face(front, p, !ruFirst); face(back, p, ruFirst);
+    count.textContent = `${pos + 1} / ${deck.length}`;
+    if (auto && !ruFirst) speak(sayText(p));
+  }
+  function turn() {
+    flipped = !flipped; flip.classList.toggle("on", flipped);
+    if (auto && ruFirst && flipped) speak(sayText(byId[deck[pos]]));
+  }
+  flip.addEventListener("click", turn);
+  flip.addEventListener("keydown", e => {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); turn(); }
+    else if (e.key === "ArrowRight") { pos++; show(); }
+    else if (e.key === "ArrowLeft") { pos--; show(); }
+  });
+  bPrev.addEventListener("click", () => { pos--; show(); });
+  bNext.addEventListener("click", () => { pos++; show(); });
+  bShuf.addEventListener("click", () => { deck = shuffle(deck); pos = 0; show(); });
+  bDir.addEventListener("click", () => { ruFirst = !ruFirst; bDir.textContent = ruFirst ? "Сначала английский" : "Сначала русский"; show(); });
+  bAuto.addEventListener("click", () => { auto = !auto; bAuto.textContent = `Автозвук: ${auto ? "вкл" : "выкл"}`; if (auto) show(); });
+  bKnow.addEventListener("click", () => { deck.splice(pos, 1); known++; d.ok = known; setScore(d); show(); });
+  bAgain.addEventListener("click", () => { const id = deck.splice(pos, 1)[0]; deck.push(id); if (pos >= deck.length - 1 && deck.length > 1) pos = deck.length - 1; show(); });
+  show();
+};
+
+
+/* ===== Beginner drills: match pairs, listen and choose ===== */
+RENDER.match = function (d) {
+  const ids = d.def.ids || P.map(p => p.id);
+  const size = d.def.size || 6;
+  const groups = [];
+  const sh = shuffle(ids);
+  for (let i = 0; i < sh.length; i += size) groups.push(sh.slice(i, i + size));
+  if (groups.length > 1 && groups[groups.length - 1].length < 3) { const last = groups.pop(); groups[groups.length - 1].push(...last); }
+  groups.forEach((g, gi) => {
+    const box = el("div", "match");
+    if (groups.length > 1) box.append(el("p", "match-n", `Часть ${gi + 1} из ${groups.length}`));
+    const cols = el("div", "match-cols");
+    const L = el("div", "match-col"), Rc = el("div", "match-col");
+    let sel = null;
+    const mkb = (id, txt, side) => {
+      const b = el("button", "opt pair", txt); b.type = "button"; b.dataset.id = id; b.dataset.side = side;
+      b.addEventListener("click", () => {
+        if (b.disabled) return;
+        if (!sel || sel.dataset.side === side) { if (sel) sel.classList.remove("sel"); sel = b; b.classList.add("sel"); return; }
+        const a = sel; sel = null; a.classList.remove("sel");
+        if (a.dataset.id === b.dataset.id) {
+          [a, b].forEach(x => { x.classList.add("ok"); x.disabled = true; });
+          d.ok++; setScore(d); hit(id, true);
+        } else {
+          [a, b].forEach(x => { x.classList.remove("shake"); void x.offsetWidth; x.classList.add("shake", "wrong"); setTimeout(() => x.classList.remove("wrong"), 600); });
+          hit(a.dataset.side === "en" ? a.dataset.id : b.dataset.id, false);
+        }
+      });
+      return b;
+    };
+    shuffle(g).forEach(id => { reg(id); d.total++; L.append(mkb(id, byId[id].phrase, "en")); });
+    shuffle(g).forEach(id => Rc.append(mkb(id, byId[id].ru, "ru")));
+    cols.append(L, Rc); box.append(cols); d.body.append(box);
+  });
+};
+RENDER.listen = function (d) {
+  const ol = el("ol", "items");
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    const q = el("div", "listen-q");
+    if (HAS_TTS) {
+      const s = el("button", "speak", "🔊"); s.type = "button"; s.setAttribute("aria-label", "слушать");
+      s.addEventListener("click", () => speak(sayText(p)));
+      q.append(s);
+      const w = el("button", "btn small ghost", "показать слово"); w.type = "button";
+      w.addEventListener("click", () => { w.replaceWith(el("b", "listen-word", p.phrase)); });
+      q.append(w);
+    } else q.append(el("b", "listen-word", p.phrase));
+    li.append(q);
+    const others = [...new Set(shuffle(pool.filter(x => x.id !== p.id)).map(x => x.ru))].filter(t => t !== p.ru).slice(0, 3);
+    const box = el("div", "mcq");
+    box.append(options([p.ru, ...others], [p.ru], p.id, d, true));
+    d.total++;
+    li.append(box); ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* ===== Grammar: rule sheet and sort-into-baskets ===== */
+RENDER.rule = function (d) {
+  const box = el("div", "rule");
+  d.def.blocks.forEach(bl => {
+    const b = el("div", "rule-b" + (bl.warn ? " warn" : ""));
+    b.append(el("h4", null, bl.h));
+    bl.lines.forEach(ln => {
+      const row = el("p", "rule-l");
+      if (Array.isArray(ln)) {
+        const en = el("span", "rule-en"); en.innerHTML = ln[0].replace(/\*(.+?)\*/g, "<mark>$1</mark>");
+        row.append(en);
+        if (ln[1]) row.append(el("span", "rule-ru", ln[1]));
+      } else row.append(ln);
+      b.append(row);
+    });
+    box.append(b);
+  });
+  d.body.append(box);
+  d.foot.hidden = true;
+};
+RENDER.sort = function (d) {
+  const bk = d.def.buckets;
+  const ol = el("ol", "items");
+  shuffle(d.def.items).forEach(it => {
+    d.total++; reg(it.id);
+    const li = el("li");
+    const ip = itemPic(it); if (ip) li.append(ip);
+    li.append(el("p", "tf-line", it.t));
+    const btns = el("div", "tf-btns sort-btns");
+    const fb = el("p", "fix"); fb.hidden = true;
+    let done = false;
+    bk.forEach((label, i) => {
+      const b = el("button", "opt", label); b.type = "button";
+      b.addEventListener("click", () => {
+        if (done || b.disabled) return;
+        if (i === it.b) {
+          done = true; b.classList.add("ok");
+          btns.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+          d.ok++; setScore(d); hit(it.id, true);
+          if (it.why) { fb.hidden = false; fb.className = "fix ok"; fb.textContent = "✓ " + it.why; }
+        } else {
+          b.classList.add("bad", "shake"); b.disabled = true; hit(it.id, false);
+          if (it.why) { fb.hidden = false; fb.className = "fix bad"; fb.textContent = "Подсказка: " + it.why; }
+        }
+      });
+      btns.append(b);
+    });
+    li.append(btns, fb); ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* ===== Pictures (Noto Emoji, Apache 2.0). p.img / it.img = "giraffe" or "bicycle !no" or "mouse elephant" =====
+   PICS = { name: "<svg…>" } is injected by build.py with only the pictures a page uses. */
+const hasPic = p => !!(p && p.img);
+function picHTML(spec) {
+  const parts = spec.split(/\s+/).filter(Boolean);
+  const no = parts.includes("!no"), yes = parts.includes("!yes");
+  const names = parts.filter(x => x[0] !== "!");
+  const imgs = names.map(n => `<span class="pi">${PICS[n] || ""}</span>`).join("");
+  return `<span class="pics n${names.length}">${imgs}</span>` +
+    (no ? `<span class="pic-no">${PICS["prohibited"] || ""}</span>` : "") +
+    (yes ? `<span class="pic-yes">${PICS["check-mark-button"] || ""}</span>` : "");
+}
+const picEl = (p, cls) => { const d = el("div", (cls || "pic") + " has-img"); d.innerHTML = picHTML(p.img); return d; };
+const itemPic = (it, cls) => it && it.img ? picEl(it, cls || "pic i-pic") : null;
+
+/* picture → choose the word */
+RENDER.pic = function (d) {
+  const ol = el("ol", "items pic-items");
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(hasPic);
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    li.append(picEl(p, "pic q-pic"));
+    const others = shuffle(pool.filter(x => x.id !== p.id)).map(x => x.phrase).slice(0, (d.def.n || 4) - 1);
+    const box = el("div", "mcq");
+    box.append(options([p.phrase, ...others], [p.phrase], p.id, d, true));
+    d.total++;
+    li.append(box); ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* buttons with pictures; first is correct */
+function picOptions(right, pool, d, n) {
+  const wrap = el("div", "pic-opts");
+  let done = false;
+  const others = shuffle(pool.filter(x => x.id !== right.id && x.img !== right.img)).slice(0, (n || 4) - 1);
+  reg(right.id);
+  shuffle([right, ...others]).forEach(p => {
+    const b = el("button", "popt"); b.type = "button";
+    b.innerHTML = picHTML(p.img);
+    b.setAttribute("aria-label", p.phrase);
+    b.addEventListener("click", () => {
+      if (done || b.disabled) return;
+      if (p.id === right.id) {
+        done = true; b.classList.add("ok");
+        wrap.querySelectorAll(".popt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+        d.ok++; setScore(d); hit(right.id, true);
+      } else { b.classList.add("bad", "shake"); b.disabled = true; hit(right.id, false); }
+    });
+    wrap.append(b);
+  });
+  return wrap;
+}
+/* read the word → tap the picture */
+RENDER.pick = function (d) {
+  const ol = el("ol", "items");
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(hasPic);
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    const q = el("p", "q big-q", p.phrase);
+    li.append(q, picOptions(p, pool, d, d.def.n)); d.total++;
+    ol.append(li);
+  });
+  d.body.append(ol);
+};
+/* listen → tap the picture */
+RENDER.listenpic = function (d) {
+  const ol = el("ol", "items");
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(hasPic);
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    const q = el("div", "listen-q");
+    if (HAS_TTS) {
+      const s = el("button", "speak", "🔊"); s.type = "button"; s.setAttribute("aria-label", "слушать");
+      s.addEventListener("click", () => speak(sayText(p)));
+      const w = el("button", "btn small ghost", "показать слово"); w.type = "button";
+      w.addEventListener("click", () => { w.replaceWith(el("b", "listen-word", p.phrase)); });
+      q.append(s, w);
+    } else q.append(el("b", "listen-word", p.phrase));
+    li.append(q, picOptions(p, pool, d, d.def.n)); d.total++;
+    ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* auto drills built from P (pictures carried into each item) */
+RENDER.ru2en = function (d) {
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, img: p.img, q: p.ru, o: [p.phrase, ...shuffle(pool.filter(x => x.id !== p.id)).slice(0, 3).map(x => x.phrase)] })) });
+  RENDER.mcq(d);
+};
+RENDER.en2ru = function (d) {
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, q: p.phrase, o: [p.ru, ...shuffle(pool.filter(x => x.id !== p.id)).slice(0, 3).map(x => x.ru)] })) });
+  RENDER.mcq(d);
+};
+RENDER.letters = function (d) {
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(p => !/\s/.test(p.spell || p.phrase));
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, img: p.img, q: p.ru, s: (p.spell || p.phrase).split("").join(" ") })) });
+  RENDER.order(d);
+};
+RENDER.write = function (d) {
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, img: p.img, t: `${p.ru} — [[${p.ans || p.phrase}]]` })) });
+  RENDER.gaps(d);
+};
+
+function startDrill(num, def) {
+  const d = card(num, def);
+  d.num = num;
+  const build = () => {
+    d.ok = 0; d.total = 0;
+    RENDER[def.type](d);
+    setScore(d);
+    resetBtn(d, build);
+  };
+  build();
+}
+
+document.getElementById("reset-all").addEventListener("click", e => {
+  const b = e.currentTarget;
+  if (b.dataset.armed) { M = {}; save(); renderBoard(); b.textContent = "Сбросить прогресс"; delete b.dataset.armed; }
+  else { b.dataset.armed = "1"; b.textContent = "Нажми ещё раз для сброса"; setTimeout(() => { if (b.dataset.armed) { delete b.dataset.armed; b.textContent = "Сбросить прогресс"; } }, 3000); }
+});
+const boardLink = el("a", null, META.boardLabel || "Слова"); boardLink.href = "#board-sec";
+document.getElementById("nav").append(boardLink);
+const CARDS = { type: "cards", title: "Карточки", short: "Карточки",
+  instr: "Посмотри на слово и вспомни перевод. Нажми на карточку, чтобы перевернуть, 🔊 — послушать. Потом нажми «Знаю» или «Ещё раз» — эти карточки вернутся в конце." };
+(META.cards === false ? DRILLS : [CARDS, ...DRILLS]).forEach((def, i) => startDrill(i + 1, def));
+COUNTING = false;
+renderBoard();
+
+</script>
+</body>
+</html>
