@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Can You Count It?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column — mastery board of the 20 phrases, then five drills in a fixed ladder */
+:root {
+  --paper: #F1F4F0; --card: #FFFFFF; --ink: #1B2733; --muted: #5B6977; --line: #D6DCD5;
+  --accent: #2A55C9; --accent-soft: #E4EBFB; --on-accent: #FFFFFF;
+  --ok: #1D8455; --ok-soft: #DCF1E5; --bad: #BF3F2D; --bad-soft: #F8E2DD;
+  --mark: #FFE892; --mark-ink: #4A3C00; --dot: #CBD3CC;
+  --font-display: "Young Serif", Georgia, "Times New Roman", serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11171D; --card: #19212A; --ink: #E4EAF0; --muted: #9AA7B4; --line: #2B3642;
+    --accent: #8AA8FF; --accent-soft: #1F2C4A; --on-accent: #0E1730;
+    --ok: #62D39F; --ok-soft: #163327; --bad: #FF8E7C; --bad-soft: #3B201B;
+    --mark: #5B4C14; --mark-ink: #FFF1BF; --dot: #34404C; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11171D; --card: #19212A; --ink: #E4EAF0; --muted: #9AA7B4; --line: #2B3642;
+  --accent: #8AA8FF; --accent-soft: #1F2C4A; --on-accent: #0E1730;
+  --ok: #62D39F; --ok-soft: #163327; --bad: #FF8E7C; --bad-soft: #3B201B;
+  --mark: #5B4C14; --mark-ink: #FFF1BF; --dot: #34404C; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.55; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.wrap { max-width: 760px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+.hero { padding-block: 40px 16px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(32px, 6vw, 46px); line-height: 1.1; margin: 0 0 12px; text-wrap: balance; }
+.sub { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); border-bottom: 1px solid var(--line); }
+.bar .wrap { display: flex; flex-direction: column; gap: 8px; padding-block: 10px; }
+.nav { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.nav::-webkit-scrollbar { display: none; }
+.nav a { flex: none; text-decoration: none; color: var(--ink); font-size: 14px; font-weight: 600; padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); }
+.nav a:hover { border-color: var(--accent); color: var(--accent); }
+.progress { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.track { flex: 1; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.fill { height: 100%; width: 0; background: var(--ok); transition: width .4s ease; }
+.progress b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+main { padding-block: 8px 64px; }
+section { padding-top: 26px; scroll-margin-top: 110px; }
+h2 { font-family: var(--font-display); font-weight: 400; font-size: 26px; line-height: 1.2; margin: 0 0 4px; }
+.lead { margin: 0 0 14px; color: var(--muted); }
+
+/* Mastery board */
+.board { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; }
+.chip { min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; display: flex; flex-direction: column; gap: 4px; }
+.chip .ph { font-weight: 600; font-size: 15px; line-height: 1.3; }
+.chip .ru { font-size: 12.5px; color: var(--muted); line-height: 1.3; }
+.dots { display: flex; gap: 3px; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--dot); }
+.dots i.on { background: var(--ok); }
+.chip.weak { border-color: var(--bad); }
+.chip.master { border-color: var(--ok); background: var(--ok-soft); }
+.board-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; font-size: 13px; color: var(--muted); }
+
+/* Exercise card */
+.ex { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 18px 16px; }
+.ex-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+h3 { margin: 0; font-size: 18px; font-weight: 700; }
+h3 .num { font-family: var(--font-mono); font-size: 13px; color: var(--accent); margin-right: 8px; }
+.score { flex: none; font-family: var(--font-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); }
+.score.done { color: var(--ok); border-color: var(--ok); background: var(--ok-soft); }
+.instr { margin: 6px 0 14px; color: var(--muted); font-size: 15px; }
+ol.items { margin: 0; padding-left: 1.6em; display: flex; flex-direction: column; gap: 10px; }
+ol.items li { line-height: 2; padding-left: 4px; }
+ol.items li::marker { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+
+.choice { display: inline-flex; flex-wrap: wrap; gap: 4px; vertical-align: baseline; }
+.opt { font: inherit; font-size: 16px; line-height: 1.4; color: var(--ink); cursor: pointer; background: var(--card); border: 1.5px solid var(--line); border-radius: 999px; padding: 1px 11px; text-align: left; }
+.opt:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.opt.ok { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); font-weight: 600; cursor: default; }
+.opt.bad { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); text-decoration: line-through; cursor: default; }
+.opt.dim { opacity: .4; cursor: default; }
+.shake { animation: shake .3s; }
+@keyframes shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+
+/* MCQ */
+.q { margin: 0 0 6px; line-height: 1.5; }
+.mcq { display: flex; flex-wrap: wrap; gap: 6px; }
+.mcq .opt { border-radius: 8px; padding: 4px 12px; }
+
+/* Right or wrong */
+.tf-line { line-height: 1.5; margin: 0 0 6px; }
+.tf-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.fix { margin: 6px 0 0; font-size: 15px; line-height: 1.5; }
+.fix.ok { color: var(--ok); }
+.fix.bad { color: var(--bad); }
+.fix b { color: var(--ink); }
+
+.gap { font: inherit; font-size: 16px; color: var(--ink); background: var(--accent-soft); border: none; border-bottom: 2px dashed var(--accent); border-radius: 4px 4px 0 0; padding: 1px 6px; max-width: 100%; }
+.gap:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.gap.ok { background: var(--ok-soft); border-bottom: 2px solid var(--ok); }
+.gap.bad { background: var(--bad-soft); border-bottom: 2px solid var(--bad); }
+.gap.shown { background: var(--mark); color: var(--mark-ink); border-bottom: 2px solid var(--mark-ink); }
+
+/* Translate */
+.tr li { line-height: 1.5 !important; }
+.tr .ru-line { margin: 0 0 6px; font-weight: 500; }
+.tr textarea { width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; resize: vertical; min-height: 44px; }
+.tr textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.tr textarea.ok { border-color: var(--ok); background: var(--ok-soft); }
+.tr textarea.bad { border-color: var(--bad); background: var(--bad-soft); }
+.tr .line { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; align-items: center; }
+.model { margin: 8px 0 2px; font-size: 15px; color: var(--muted); }
+.model b { color: var(--ink); }
+
+.foot { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.btn { font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.primary:hover { filter: brightness(1.08); color: var(--on-accent); }
+.btn.small { font-size: 13px; padding: 4px 10px; }
+.btn:focus-visible, .opt:focus-visible, .nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.note { margin: 14px 0 0; padding: 10px 12px; border-radius: 8px; font-size: 15px; background: var(--accent-soft); }
+
+@media (max-width: 480px) { body { font-size: 16px; } .ex { padding: 14px; } ol.items { padding-left: 1.3em; } }
+@media (prefers-reduced-motion: reduce) { .shake { animation: none; } .fill { transition: none; } html { scroll-behavior: auto; } }
+
+/* Word order */
+.uns { display: flex; flex-direction: column; gap: 6px; }
+.answer-line { min-height: 42px; display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; border: 1.5px dashed var(--line); border-radius: 8px; background: var(--paper); }
+.answer-line.ok { border: 1.5px solid var(--ok); background: var(--ok-soft); }
+.answer-line.bad { border: 1.5px solid var(--bad); background: var(--bad-soft); }
+.tiles { display: flex; flex-wrap: wrap; gap: 6px; }
+.tile { font: inherit; font-size: 16px; padding: 3px 10px; border-radius: 6px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+.tile:hover { border-color: var(--accent); color: var(--accent); }
+.tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.uns .line { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.uns .fix { margin: 0; }
+
+.cue { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .06em; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin: 0 3px; white-space: nowrap; }
+.bank { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; padding: 10px; border: 1px dashed var(--line); border-radius: 8px; }
+.bank span { font-size: 14px; padding: 2px 9px; border-radius: 6px; background: var(--accent-soft); }
+p.text { margin: 0 0 10px; line-height: 2.2; }
+
+/* flashcards */
+.fc-tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.btn.ghost { background: transparent; border: 1px solid var(--line); color: inherit; }
+.flip { perspective: 1200px; cursor: pointer; outline: none; margin: 0 auto; max-width: 560px; }
+.flip-in { position: relative; min-height: 220px; transition: transform .45s; transform-style: preserve-3d; }
+.flip.on .flip-in { transform: rotateY(180deg); }
+.flip:focus-visible .flip-in { box-shadow: 0 0 0 3px var(--accent-soft); border-radius: 14px; }
+.face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 22px 18px 30px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+.face.back { transform: rotateY(180deg); background: var(--accent-soft); }
+.fc-word { font-size: clamp(22px, 5vw, 30px); font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.fc-ru { font-size: clamp(19px, 4.4vw, 25px); font-weight: 600; line-height: 1.3; }
+.fc-def { font-size: 14px; opacity: .75; max-width: 42ch; }
+.fc-hint { position: absolute; bottom: 8px; font-size: 12px; opacity: .45; }
+.speak { font-size: 22px; line-height: 1; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+.fc-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 12px 0 6px; }
+.fc-nav .btn { font-size: 20px; padding: 4px 16px; }
+.fc-count { font-variant-numeric: tabular-nums; min-width: 5ch; text-align: center; }
+.fc-rate { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.btn.again { background: transparent; border: 1px solid #d9822b; color: #d9822b; }
+.btn.know { background: #2e9e5b; border: 1px solid #2e9e5b; color: #fff; }
+.fc-done { text-align: center; }
+.fc-done p { font-weight: 600; margin: 8px 0 10px; }
+.btn.know:hover { color: #fff; filter: brightness(1.08); border-color: #2e9e5b; }
+.btn.again:hover { color: #d9822b; border-color: #d9822b; background: rgba(217,130,43,.08); }
+.match { margin-bottom: 14px; }
+.match-n { margin: 0 0 6px; font-size: 13px; color: var(--muted); }
+.match-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.match-col { display: flex; flex-direction: column; gap: 6px; }
+.opt.pair { border-radius: 8px; padding: 8px 10px; text-align: center; min-height: 44px; }
+.opt.sel { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.listen-q { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.listen-word { font-size: 18px; }
+.match-cols { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+.board { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+/* Grammar additions */
+.story-head { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; padding: 10px 14px; background: var(--accent-soft); border-radius: 10px; }
+.story-head .pic { font-size: 30px; line-height: 1; letter-spacing: 2px; }
+.story-t { font-family: var(--font-display); font-weight: 400; font-size: 20px; }
+.rule { display: flex; flex-direction: column; gap: 10px; }
+.rule-b { border: 1px solid var(--line); border-left: 4px solid var(--ok); border-radius: 10px; padding: 10px 14px; background: var(--card); }
+.rule-b.warn { border-left-color: var(--bad); }
+.rule-b h4 { margin: 0 0 6px; font-size: 16px; }
+.rule-l { margin: 2px 0; display: flex; flex-wrap: wrap; column-gap: 10px; }
+.rule-en { font-weight: 600; }
+.rule-en mark { background: var(--mark); color: var(--mark-ink); border-radius: 3px; padding: 0 2px; }
+.rule-ru { color: var(--muted); font-size: 15px; }
+.why { color: var(--muted); }
+.sort-btns .opt { min-width: 9em; }
+
+[hidden] { display: none !important; }
+.home { display: inline-block; margin-bottom: 14px; font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.fc-past { font-size: 16px; color: var(--muted); margin-top: -4px; }
+.chip .past { font-size: 12.5px; color: var(--accent); line-height: 1.3; }
+.pic svg { display: block; width: 100%; height: 100%; }
+.fc-pic { width: 150px; height: 200px; }
+.flip.has-pic .flip-in { min-height: 380px; }
+.q-pic { width: 120px; height: 160px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 6px; padding: 2px; }
+/* ===== Spotlight 4: pictures ===== */
+.pic.has-img { position: relative; display: flex; align-items: center; justify-content: center; }
+.pics { display: flex; align-items: center; justify-content: center; gap: 6%; width: 100%; height: 100%; }
+.pics .pi { display: block; height: 100%; aspect-ratio: 1; }
+.pics.n2 .pi { height: 70%; } .pics.n3 .pi { height: 52%; }
+.pics .pi svg, .pic-no svg, .pic-yes svg { display: block; width: 100%; height: 100%; }
+.pic-no { position: absolute; inset: 4%; margin: auto; aspect-ratio: 1; height: 92%; opacity: .82; pointer-events: none; }
+.pic-yes { position: absolute; right: 2%; bottom: 2%; width: 34%; aspect-ratio: 1; pointer-events: none; }
+.fc-pic.has-img { width: 190px; height: 170px; }
+.flip.has-pic .flip-in { min-height: 340px; }
+.q-pic.has-img { width: 150px; height: 120px; padding: 10px; background: var(--card); }
+.i-pic { width: 128px; height: 84px; flex: none; margin-bottom: 8px; padding: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.i-pic .pics.n1 .pi { height: 100%; }
+ol.items li.has-ip { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+ol.items li.has-ip .i-pic { margin: 0; }
+ol.items li.has-ip .gl { flex: 1; min-width: 14em; }
+.chip.with-pic { display: grid; grid-template-columns: 40px minmax(0,1fr); column-gap: 8px; align-items: center; }
+.chip.with-pic .chip-pic { grid-row: span 3; width: 40px; height: 40px; }
+.chip.with-pic > :not(.chip-pic) { grid-column: 2; }
+.board { grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); }
+.big-q { font-size: 22px; font-weight: 700; margin: 0 0 8px; }
+.pic-opts { display: grid; grid-template-columns: repeat(4, minmax(0, 96px)); gap: 10px; margin: 2px 0 6px; }
+.popt { position: relative; aspect-ratio: 1; padding: 10px; border: 2px solid var(--line); border-radius: 14px; background: var(--card); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.popt:hover:not(:disabled) { border-color: var(--accent); }
+.popt.ok { border-color: var(--ok); background: var(--ok-soft); }
+.popt.bad { border-color: var(--bad); background: var(--bad-soft); opacity: .55; }
+.popt.dim { opacity: .35; }
+.popt .pics { pointer-events: none; }
+@media (max-width: 480px) { .pic-opts { grid-template-columns: repeat(2, minmax(0, 120px)); } }
+/* bigger, friendlier type for young learners */
+body { font-size: 18px; }
+.opt { font-size: 17px; padding: 3px 13px; }
+.tile { font-size: 18px; padding: 5px 12px; }
+.q { font-weight: 600; }
+.credits { padding-block: 0 40px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="hero wrap">
+  <a class="home" href="index.html">← Все темы</a>
+  <p class="eyebrow">Spotlight 4 Grammar · Module 3 · Unit 5a, 5b</p>
+  <h1>Can You Count It?</h1>
+  <p class="sub">Исчисляемые и неисчисляемые: a tomato / two tomatoes, но butter, sugar, flour. Плюс How many? How much? A lot of. Правило, картинки и задания с проверкой.</p>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <nav class="nav" id="nav" aria-label="Задания"></nav>
+    <div class="progress" aria-live="polite">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <span><b id="mastered">0</b> / <b id="ptotal">0</b> выучено</span>
+    </div>
+  </div>
+</div>
+
+<main class="wrap" id="main">
+  <section id="board-sec">
+    <h2>Твои правила</h2>
+    <p class="lead">Каждый правильный ответ — одна точка. Все точки зелёные — правило усвоено. Красная рамка — повтори это правило.</p>
+    <div class="board" id="board"></div>
+    <div class="board-foot">
+      <span>Прогресс сохраняется в этом браузере.</span>
+      <button class="btn small" type="button" id="reset-all">Сбросить прогресс</button>
+    </div>
+  </section>
+</main>
+<footer class="wrap credits">Картинки: Noto Emoji (Google), лицензия Apache 2.0.</footer>
+
+<script>
+const PICS = {"banana": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#ff8e00\" d=\"M119.22 95.12c-1.14 2.36-5.91 2.21-8.54 1.38c-6.72-2.12-10.9-7.9-10.9-7.9L65.14 73.9l-10.61-5.57s-2.06-3.5 2.06-6.17s7.01-2.87 7.01-2.87l11.94 7.6s7.71-6 15.54-6.91c7.48-.86 16.79 5.22 19.24 16.7c1.99 9.31 5.14 12.59 6.09 13.8c.95 1.22 3.79 2.62 2.81 4.64\"/><path fill=\"#ffe4b4\" d=\"M77.72 32.15C74.65 21.99 70.77 10.1 64.91 6.03c-5.19-3.6-10.24-2.95-12.64-1.38c0 0-4.33 1.77-5.47 6.24c-1.88 7.34.59 16.15 2.2 25.25s2.45 15.36 3.18 22.67c.07.66 12.16 22.18 12.16 22.18l9.65 5.17s7.37-15.94 7.26-18.19c-.1-2.26-1.29-28.4-3.53-35.82\"/><path fill=\"#ffe265\" d=\"M52.55 66.94c-.13 2.43 5.73 21.8 5.73 21.8L74 86.14s11.15-6.6 11.46-18.57c.48-18.05-2.61-26.55-4.85-33.97c-3.08-10.14-9.94-23.5-15.75-27.64c-3.41-2.43-7.19-2.79-8.74-2.49c0 0 10.32 8.08 15.54 21.9s6.45 29.79 6.45 29.79s-3.84 2.83-12.9 4.13c-7 1.01-13.04-.7-13.04-.7s.55 5.27.38 8.35\"/><path fill=\"#ffa726\" d=\"m85.33 83.75l-6.29-13.14l.34-4.68s1.34-3.93-7.03 2.42c-3.88 2.94-6.22 8.36-6.22 8.36s-1.18-2.92-5.32-6.78c-3.68-3.42-8.63-5.08-8.63-5.08s-10.28-2-11.4-1.13c-7.25 5.66-12.55 12.55-12.55 12.55L22.9 96.42l-8.86 5.43s2.42 3.54 5.92 2.22c2.73-1.03 6.11-4.12 7.93-8.01c2.5-5.35 7.75-15.47 10.42-18.67c5.16-6.16 10.22-8.41 13.99-6.62c4.29 2.03.86 22.29.86 22.29l-27.58 23.21l-.47 3.16s4.01 3.85 15.06 3.49s25.83-4.45 35.18-17.2c8.25-11.24 9.98-21.97 9.98-21.97\"/><path fill=\"#ffb803\" d=\"M63.58 84.96c.24 5.55-3.22 13.96-11.22 20.97c-7.99 7.01-16.43 9.33-21.67 9.73c-3.8.29-4.93-1.88-4.93-1.88s7.66-7.05 13.35-12.7c5.4-5.37 11.28-16.65 12.56-21.84s.12-8.68.12-8.68s2.48.69 6.13 4.35c3.54 3.55 5.53 6.97 5.66 10.05\"/><path fill=\"#875b54\" d=\"M29.45 118.74c-.83 1.93-3.68 2.01-4.92.94c-1.17-1.01-2.31-3.02-1.13-5.27c.78-1.48 3.34-1.89 4.78-.74s2.02 3.32 1.27 5.07\"/><path fill=\"#fee4b4\" d=\"M23.76 97.84c-3.28 4.55-6.57 5.24-7.93 5.39c-1.19.14-2.49-1.38-2.34-2.78s2.45-3.37 2.73-7.67s-.06-20.07 8.69-29.13c6.17-6.38 13.73-4.18 18.61-2.49c5.5 1.9 8.67 3.7 8.67 3.7s-4.5-.31-12.26 5.81c-4.51 3.56-7.16 8.45-9.66 14.06c-1.8 4.06-4.2 9.91-6.51 13.11\"/><path fill=\"#feb804\" d=\"M111 109.58c-.92 1.84-3.17 2.98-5.16 2.89c-4.21-.18-8.05-2.35-12.3-7.83c-6.01-7.76-11.24-26.38-15.16-31.34c-2.65-3.35-5.95-5.01-5.95-5.01s1.82-1.54 3.64-2.49s6.22-.5 6.22-.5l18.78 30.18z\"/><path fill=\"#ffe4b4\" d=\"M100.39 68.46c4.12 5.89 4.66 11.06 5.28 16.34c.56 4.77 1.71 14.8 3.44 18.07c1.74 3.27 3.43 5.4 1.56 7.39s-7.37 1.28-11.32-3.02c-3.18-3.47-4.94-7.25-7.33-12.8s-5.91-18.65-10.48-24.57c-2.92-3.78-5.83-3.89-5.83-3.89s3.85-3.14 11.2-3.22c6.59-.07 10.05.8 13.48 5.7\"/></svg>", "bread": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#e07f14\" d=\"M12.71 56.61s-.71 25.48-.71 29s-.31 7.14 2.48 9.31c1.69 1.32 9.48 7.18 19.87 13.04s24.27 12.83 27.12 14s6.11.52 9.77-.84c3.35-1.24 10.84-5.03 21.73-10.56s15.9-8.32 18.94-10.73c2.3-1.82 4.52-4.19 4.19-8.38c-.34-4.19-.24-13.71-.57-17.73c-.34-4.02-.6-18.73-.6-18.73l8.96-16.45s-.22-3.43-1-5.55c-1.16-3.16-3.31-4.86-3.31-4.86L48.91 15.74s-36.07 8.52-38.07 9.68s-7.19 5.47-7.05 13.15C4 49.6 12.71 56.61 12.71 56.61\"/><path fill=\"#ffebca\" d=\"M17.39 55.09s-1.33 29.35-.62 33.58c.59 3.54 11.4 9.85 19.28 14.35c7.1 4.06 22.15 10.43 24.21 11.41s3.04-.87 3.04-2.5s.11-36.89.11-36.89s9.16-1.63 10.89-9.77s-7.57-21.02-32.49-30.7c-25.72-9.97-33.26-4.18-33.56 3c-.43 10.64 9.14 17.52 9.14 17.52\"/><path fill=\"#ac5811\" d=\"M81.46 57.13s2.9 10.21-2.45 15.86c-5.42 5.72-9.98 6.73-9.98 6.73s-.37 4.61-.15 5.15c.51 1.27 16.53-5.26 26.62-9.49l19.64-8.24s-.33-4.99 0-4.88s5.53-4.99 7.38-11.61c1.84-6.62 1.38-12.08 1.38-12.08s-16.63 6.94-22.42 9.58c-5.54 2.52-17.5 7.6-20.02 8.98\"/><path fill=\"#f5b03e\" d=\"M76.94 48.77c.66.72 44.61-18.42 44.61-18.42S106.58 6.8 68.93 6.16C30.42 5.5 8.62 26.29 8.16 27.55c-.36.98 6.96-8.59 31.48-.67s33.68 17.97 37.3 21.89\"/></svg>", "butter": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#6ca4ae\" d=\"M6.315 86.52c1.47 1.03 18.29 12.821 20.744 14.35s6.213 2.87 14.548-.187s74.588-29.725 77.505-31.16s4.584-2.27 4.862-4.91s-1.667-4.768-5.001-6.76S94.108 42.25 94.108 42.25S7.76 74.537 6.072 75.666C4.034 77.029 4 79.06 4 81.329c0 3.014.845 4.162 2.315 5.191\"/><path fill=\"#a8cfd7\" d=\"M7.24 84.088s17.852 12.68 20.333 14.093s6.263 2.624 14.542-.45s72.322-28.645 75.213-30.07s4.473-2.26 4.774-4.778c.251-2.1-.582-3.73-3.13-5.03c-3.418-1.744-26.115-16.411-26.115-16.411S10.048 73.85 8.176 74.598c-2.833 1.132-3.701 2.463-3.701 4.663c0 2.662 2.765 4.827 2.765 4.827\"/><path fill=\"#6ba3ac\" d=\"m10.76 82.213l57.047-21.485s42.106-.54 45.54-.082c1.547.207 4.41 1.008 4.41 2.391c0 1.216-.615 1.68-2.678 2.513L69.068 84.136l-9.928 3.947l-20.042 8.611l-7.408 1.407z\"/><path fill=\"#dcedf6\" d=\"M4.2 78.74c-.21 2.256 1.058 3.837 2.652 5.348c2.346 2.222 18.24 12.68 20.72 14.093s6.264 2.624 14.543-.45c3.434-1.274 20.822-8.164 20.822-8.164c-1.4-1.833-3.797-1.484-3.797-1.484s-18.002 7.144-20.62 7.964c-2.617.82-6.298 1.125-8.798 0S9.862 82.391 8.036 81.105s-2.103-2.29-1.49-3.57c.802-1.67 2.6-2.65 2.46-2.997c-.138-.348-1.196.211-1.196.211c-2.833 1.132-3.44 2.162-3.61 3.991\"/><path fill=\"#a8cfd7\" d=\"M29.722 96.047c-2.5-1.124-19.86-13.656-21.686-14.942c0 0-.98-.027-1.837.436s-.589 1.412.31 2.208q.168.17.343.339c2.346 2.222 18.24 12.68 20.72 14.093l.061.033c.696-.546 1.999-1.307 4.097-1.586l.005-.002a8 8 0 0 1-2.013-.579\"/><path fill=\"#ffe265\" d=\"m56.115 85.755l56.503-21.985a3.215 3.215 0 0 0 2.049-2.995V40.539c0-1.218-.326-1.68-1.181-2.547c-1.737-1.76-5.965-5.309-9.446-7.524a83 83 0 0 0-8.132-4.55a4.34 4.34 0 0 0-3.251-.225c-6.5 2.116-31.295 10.412-54.974 21.31c-1.075.495-3.104 1.374-3.13 3.22s21.562 35.532 21.562 35.532\"/><path fill=\"#feb502\" d=\"M53.425 86.277c.685.535 2.343.845 4.065.139l55.84-22.895c.48-.197 1.219-.446 1.337-1.407c.729-5.947.336-17.272 0-21.575c-.062-.786-.399-1.496-1.44-1.236c-4.112 1.026-16.219 5.543-26.829 9.293C73.058 53.31 57.832 59.819 55.23 60.94a1.26 1.26 0 0 0-.6.54z\"/><path fill=\"#ffebc9\" d=\"m35.185 73.567l-.656-22.95c-.026-.907.414-1.42 1.297-1.106c5.62 2 18.499 11.276 18.499 11.276c.323.2.525.548.538.928c0 0 1.252 11.26.828 23.256c-.054 1.538-1.075 2.099-2.266 1.306l-17.708-11.78a1.14 1.14 0 0 1-.532-.93\"/><linearGradient id=\"SVGubzgyeQz\" x1=\"37.227\" x2=\"44.172\" y1=\"82.224\" y2=\"69.537\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".106\" stop-color=\"#feb502\" stop-opacity=\".5\"/><stop offset=\".137\" stop-color=\"#feb502\" stop-opacity=\".482\"/><stop offset=\"1\" stop-color=\"#feb502\" stop-opacity=\"0\"/></linearGradient><path fill=\"url(#SVGubzgyeQz)\" d=\"m35.185 73.567l-.656-22.95c-.026-.907.414-1.42 1.297-1.106c5.62 2 18.499 11.276 18.499 11.276c.323.2.525.548.538.928c0 0 1.252 11.26.828 23.256c-.054 1.538-1.075 2.099-2.266 1.306l-17.708-11.78a1.14 1.14 0 0 1-.532-.93\"/><path fill=\"#ffe265\" d=\"M27.757 95.943c-.594.206-.989.108-1.29-.103l-18.7-13.112a1.22 1.22 0 0 1-.527-1.005v-3.006c0-.76 0-1.783.73-1.806l20.241 12.34z\"/><path fill=\"#feb502\" d=\"M50.837 84.89c0-.71-.732-1.142-.732-1.142l-23.046 2.945s-.227 8.086-.062 8.862c.094.442.332.507.646.42l22.532-6.285a.904.904 0 0 0 .662-.871z\"/><path fill=\"#ffebc9\" d=\"m7.774 78.057l17.829 12.305c.921.628 1.834.729 2.903.411c0 0 6.209-2.163 10.662-3.282c4.65-1.168 10.19-2.765 10.19-2.765c.608-.18 1.257-.602.747-.978L33.04 71.187a4.34 4.34 0 0 0-4.094-.572c-2.327.871-6.055 2.232-8.879 3.096c-3 .919-9.121 2.462-12.096 3.2c-.645.16-.746.772-.197 1.146\"/></svg>", "cheese-wedge": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#ffe265\" d=\"M48.18 68.45L6.7 69.95s-2.63-2.63-2.25-3.57S39.18 38.6 40.49 38.79s4.32 3.38 6.76 2.25s0-7.7.75-8.63c.75-.94 27.59-15.39 29.28-16.14s3.19-2.44 6.57-1.69s11.83 2.25 21.02 8.45s18.77 13.33 18.02 17.27s-74.71 28.15-74.71 28.15\"/><path fill=\"#feb502\" d=\"M19.46 115.57c9.2-1.13 94.98-19.52 98.55-20.08s5.82-3.94 5.82-7.7s-.94-47.49-.94-47.49s-4.13 1.31-9.01 2.44C109 43.86 69.01 53.62 53.25 57.19S12.33 67.33 9.51 67.33s-5.07-.94-5.07-.94s.75 39.04.94 41.86s1.5 6.19 4.69 7.13s5.27.69 9.39.19\"/><path fill=\"#ff8b0d\" d=\"M74.97 25.56c0 2.4 2.44 3.99 6.48 3.87c4.41-.13 5.63-2.75 5.49-4.43c-.14-1.69-2.17-3.17-6.19-3.1c-3.73.07-5.78 1.55-5.78 3.66\"/><path fill=\"#ed6b31\" d=\"M29.92 55.48c-6.5 2.19-5.77 7.88-3.87 9.15s4.43 1.2 7.39.14s4.84-2.27 5.14-4.25c.28-1.88-2.18-7.23-8.66-5.04m59.06-16.26c-4.36.2-9.18 3.33-10.98 6.34c-1.9 3.17-2.04 6.9 2.32 9.22s19.78-3.59 19.01-9.01c-.77-5.43-5.77-6.76-10.35-6.55M73.85 83.07s6.19-4.58 6.19-7.81c0-3.24-2.67-10.89-14.01-11.47c-10.63-.55-17.18 13.94-10.21 21.4s11.19 4.08 13.8 3.38c2.61-.71 4.23-5.5 4.23-5.5M43.23 96.09s6.15-3.85 1.43-8.07c-3.32-2.97-7.76-1.63-10.02.68c-2.89 2.96-2.11 7.67.56 9.78c2.68 2.12 8.03-2.39 8.03-2.39M22.39 78.78s-.7-2.21-3.21-3.1c-2.82-1-7.03 2.51-5.23 6.26c1.62 3.38 5.21 2.39 5.21 2.39zm90.03 3.23c.61-.66 4.6-3.54 4.6-5.73c0-2.18-6.01-8.92-13.68-3.85s-3.66 12.74-1.55 14.01s7.96-1.54 10.63-4.43\"/><path fill=\"#ff8b0d\" d=\"M30.86 58.93c-4.27 1.48-5.88 4.5-4.81 5.7c1.13 1.27 3.59 2.11 7.88.56c3.32-1.2 5-3.21 4.72-5c-.2-1.3-3.92-2.6-7.79-1.26m-14.24 19.7c-1.87 2.34-.35 5 1.41 5.63s4.86-1.27 4.65-4.43c-.22-3.17-4.37-3.31-6.06-1.2m21.75 12.75c-4.02 3.26-4.13 6.45-2.58 7.53c1.08.76 5.06 2.34 8.7-.35c2.7-1.99 2.75-6.17 1.9-8.17c-.71-1.7-4.64-1.76-8.02.99m24.4-17.77c-5.38 5.23-6.66 13.72-1.38 15.72c4.65 1.76 11.33.7 15.27-4.15c4.14-5.1 4.58-10.73 1.92-14.05c-3.18-3.99-11.65-1.55-15.81 2.48m24.45-29.18c-7.04 2.39-11.19 7.46-7.6 10c3.59 2.53 7.32 2.16 11.4.77c4.63-1.57 8.17-5.21 8.31-8.66c.11-2.83-5.91-4.22-12.11-2.11m18.8 32.37c-4.79 3.9-6.19 7.81-4.22 9.64s6.69 2.67 11.05-.35c4.53-3.14 4.86-6.7 4.36-9.57c-.56-3.23-6.27-3.73-11.19.28\"/></svg>", "coconut": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#8e4d2f\" d=\"m107.44 37.94l8.01-.82s1.98 6.46 3.65 10.04c1.66 3.59 4.61 7.04 4.61 7.04s-.77 13.19-2.69 26.77s-7.06 18.26-8.69 20.65c-2.14 3.13-6.44 7.41-8.23 10.87s-3.05 4.98-3.82 5.11s-8.69 2.39-13.3 3.29s-15.31 3.46-15.31 3.46s-8.53-1.88-10.58-2.14s-4.74.64-5.38.13s-6.4-4.74-11.65-7.04s-9.48-2.82-9.99-3.84s-1.41-4.1-3.2-6.53s-3.52-4.06-3.52-4.06l7.37-21.17zM20.95 52.03s1.07-3.42-5.99-7.06c-4.44-2.29-8.56-1.71-8.56 0s3 .64 6.42 4.92s6.42 10.06 6.42 10.06zm6.29-13.62s1.41-2.72 1.31-5.06c-.09-2.34-1.87-4.12-1.03-5.16c.84-1.03 4.03 1.69 4.78 4.12c.92 3.01.84 4.41.84 4.41l-4.87 4.12zm52.4-22.57s-2.06-1.5-1.97-6.09c.06-3 .66-5.34 1.69-5.25s1.31 2.16 2.44 5.53c1.12 3.37 4.5 6.94 4.5 6.94zm25.87 10.12s-.28-6.47.37-9.84c.52-2.65 2.16-4.12 3.09-3.47c.58.41-.28 1.22.28 6.66c.29 2.82 1.78 13.31 1.78 13.31zM17.94 85.14s-1.5-1.12-6.09-2.53c-2.33-.71-7.89-1.43-7.78 0c.09 1.22 1.87 1.22 7.5 4.12c5.62 2.91 10.12 7.69 10.12 7.41s-3.75-9-3.75-9\"/><path fill=\"#532d1d\" d=\"M14.3 68.8c0 1.97-3.28 6.94-3.19 8.25s3.19 6.56 4.12 8.06c.94 1.5 1.69 5.06 1.69 5.06s3.09 4.41 5.44 6.56c2.34 2.16 4.97 4.12 4.97 4.12s3.47-.37 8.06.37c4.59.75 3.02 1.69 9.68 2.07s8.12-.66 16.08-1.79s16.91-2.61 16.91-2.61s12.25-6.88 22.68-17.32c6.18-6.18 11.47-17.95 13.06-20.48s2.52-6.49 2.61-7.42c.09-.94-1.65-7.86-1.65-10.86s.82-4.55.68-5.7c-.14-1.22-6.27-10.12-8.91-13.03c-2.62-2.89-9.56-9.09-11.16-8.44l-1.59.66s-7.03-2.91-12.75-2.91s-7.97 1.02-11.34 1.12c-3 .09-2.25-.94-4.5-.84c-1.87.08-8.15 3.44-12.15 5.49c-3.54 1.82-10.91 4.54-13.63 6.88s-8.62 7.78-9.19 8.72c-.56.94-1.03 2.91-1.03 2.91s-5.53-.84-6.66.19c-1.12 1.03-3.66 11.16-5.16 14.34s-5.81 12.65-5.16 13.4c.68.76 2.09 3.2 2.09 3.2\"/><path fill=\"#feffff\" d=\"M28.13 89.12s-2.99-3.54-4.73-7.53c-2.07-4.72-2.8-12.1-1.92-16.97c.92-5.05 1.28-7.62 3.84-13.72c1.98-4.72 4.72-8.26 8.26-11.51c1.29-1.18 3.12-1 6.9-4.62s11.3-10.8 23.49-12.94s16.15-1.02 21.6-.18c3.86.59 5.61 3.07 8.25 4.05c2.63.99 5.03 1.4 7.92 3.8c2.04 1.69 3.73 3.86 4.23 6.33c.49 2.47-.59 3.81-.68 4.65c-.14 1.41 3.09 2.44 2.54 9.92c-.49 6.75-4.61 21.9-24.37 35.24s-43.63 9.39-43.63 9.39s-.78-3.53-4.1-5.55c-4.32-2.6-7.6-.36-7.6-.36\"/><path fill=\"#e0e0e0\" d=\"M41.88 40.86c-15.12 12.18-13.7 26.29-13.7 26.29s-7.23 2.14-6.6 5.32c.59 3.05 7.59.77 7.59.77l.82 3.46s-7.84 2.49-5.93 6c1.38 2.54 13.65-3.54 13.65-3.54l57.82-32.55s11.57-6.35 9.05-10.07c-1.95-2.88-6.12.66-6.12.66s-1.2-1.4-3.04-2.54c-1.68-1.04-3.45-2.1-3.45-2.1s4.87-4.11 2.07-6.25s-6.92 3.79-6.92 3.79s-6.38-2.02-11.49-1.85c-5.1.16-10.58 1.18-10.58 1.18s-.3-7.55-4.23-6.52c-3.55.93-1.53 8.17-1.53 8.17s-7.85 2.08-17.41 9.78m5.9 39.63l-4.81 2.15s-3.35 9.13.11 10.94s7.07-10.55 7.07-10.55z\"/><path fill=\"#e1e1e1\" d=\"m75.77 72.42l-4.5 5.74s2.69 5.29 3.84 7.27s2.31 2.96 4.12 1.98c1.81-.99 1.98-2.63.82-4.94s-4.28-10.05-4.28-10.05\"/><path fill=\"#b1b1b1\" d=\"M51.23 40.97C34.51 51.46 29.5 68.96 35.43 78.68s32.39 6.78 44.7-2.11c13.37-9.65 20.06-21.24 17.26-31.4c-1.53-5.55-6.83-8.23-12.45-10.04c-9.11-2.92-22.51-1.18-33.71 5.84\"/><path fill=\"#532d1d\" d=\"M92.89 100.96c-1.87 1.12 0 4.12 1.32 7.41s2.25 6.51 4.28 5.27c1.91-1.17-.33-5.76-1.32-7.9s-2.23-6-4.28-4.78m14.16-17.45c-2.48 0-2.14 2.8-2.96 7.57c-.82 4.78-1.46 6.9 1.15 7.24c1.71.23 1.71-3.33 2.47-8.07c.55-3.42 1.32-6.74-.66-6.74m8.89-11.07c-1.64.09-1.28 3.93-1.23 9.02c.04 3.79-.53 8.52 1.74 8.31c1.88-.18 1.55-6.09 1.63-9.72c.13-5.28.46-7.75-2.14-7.61M70.5 109.19c-.95 1.29.49 3.41 3.95 5.93c3.17 2.31 5.85 4.5 7.08 3.13c1.79-1.99-1.03-3.68-4.12-6.26c-3.12-2.61-5.45-4.78-6.91-2.8m-24.53.5c-1.13 1.81 1.83 3.88 5.27 6.75c2.96 2.47 6.05 5.55 7.74 3.62c1.11-1.27-1.62-4.04-5.27-7.08c-2.97-2.47-5.9-6.26-7.74-3.29\"/></svg>", "cookie": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#ac5811\" d=\"m15.99 35.76l-4.26.98s-5.91 9.12-7.2 18.82c-.81 6.09-.84 14.04-.28 18c.57 3.96 2.61 12.39 5.82 18.33c3.09 5.72 6.1 7.97 9.39 9.96c1.41.85 2.67 3.76 4.87 5.17c2.06 1.32 4.78 1.58 4.78 1.58s7.52 11.81 23.79 13.86c19.09 2.4 28.43-6.22 28.43-6.22s7.64-.02 14.85-3.11c8.09-3.47 12.41-10.69 12.41-10.69s10.13-8.72 13.34-19.16c2.58-8.38 2.65-24.31.67-31.81s-5.81-13.85-8.85-17.92c-2.42-3.24-29.44-17.6-32.7-18.88c-3.25-1.27-33.52-3.25-34.65-2.4c-1.13.86-30.41 23.49-30.41 23.49\"/><radialGradient id=\"SVGVhLNQceK\" cx=\"64.164\" cy=\"57.596\" r=\"53.202\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".507\" stop-color=\"#f29f58\"/><stop offset=\".715\" stop-color=\"#f09d56\"/><stop offset=\".826\" stop-color=\"#eb9550\"/><stop offset=\".914\" stop-color=\"#e18745\"/><stop offset=\".99\" stop-color=\"#d47436\"/><stop offset=\"1\" stop-color=\"#d27133\"/></radialGradient><path fill=\"url(#SVGVhLNQceK)\" d=\"M26.53 19.75c-7.05 5.74-10.7 8.74-14.36 15.92S9.69 52.38 10.35 55.9c.65 3.52 1.83 10.31 2.48 13.7c.65 3.4 2.38 11.46 7.17 16.45c6.71 6.99 12.79 9.4 12.79 9.4s4.93 7.64 16.84 12.01c15.66 5.74 22.71-2.61 28.71-4.83s13.18-2.35 19.32-6.66c6.13-4.31 12.92-9.53 17.36-20.49s3.52-15.79 3.65-18.53s-.26-15.92-5.35-24.01s-11.21-12.95-13.57-14.49C94.53 15.06 75.89 6.95 71.2 6.04c-4.7-.91-21.46.51-28.11 3.25S26.53 19.75 26.53 19.75\"/><path fill=\"#ffc86e\" d=\"M56.28 71.46c-1.11-.35-2.28-2-2.56-5.53c-.39-5.03 3.32-6.42 3.32-6.42s4.42-1.17 7.53-2.28c2.89-1.03 4.97-2.35 4.97-2.35s.28-5.39 2.07-6.98c1.8-1.59 4.97-1.45 8.5-1.04c3.52.41 9.19 2.76 8.36 4.9s-1.8 4.28-5.18 6.22c-3.38 1.93-5.8 3.73-7.53 5.25c-1.73 1.53-4.9 3.45-10.15 5.39s-7.73 3.34-9.33 2.84M26.55 26.47c-3.32-.68-8.01 6.51-8.88 8.89c-.88 2.38-1.78 8.18-1.88 10.83c-.13 3.29-.19 6.38 1.19 8.89c1.06 1.94 3.63 3.03 5.94 1.03s6.32-7.48 7.38-8.25s4.16-1.79 2.94-6.83c-.5-2.06-5.57-6.32-5.82-6.9c-.24-.57 1.01-7.27-.87-7.66m23.47-9.03c.13 1.93 1.71 5.02 3.42 6.69c2.56 2.49 14.3 10.91 17.34 10.43s6.35-5.94 7.32-7.46s2.9-3.66 3.66-4.63s2.76-3.18 1.11-5.39c-1.66-2.21-5.8-3.66-8.56-3.87s-7.05-2-10.71-1.86s-13.92 1.11-13.58 6.09m48.32 25.75c.23 2.1 3.18 2.56 5.53 4.08s3.94 3.11 5.32 2.69c1.38-.41 3.26-2.62 2.83-6.49c-.55-4.97-3.66-11.33-8.01-11.12c-2.63.13-2.27 4.7-2.27 4.7s-3.54 4.9-3.4 6.14\"/><path fill=\"#cf701e\" d=\"M41.47 30.23s-9.43-.06-9.26.88c.18.94 1 4.04 3.46 4.16s5.63.35 7.15-.12s5.74-3.87 5.74-5.39s-1.7-3.75-1.7-3.75zm13.47 17.29s-.11.07-.27.2c-.47.39-1.37 1.3-1.02 2.32c.47 1.35 3.22 3.87 5.92 3.87s4.16-2.52 4.63-4.16s.23-2.64.23-2.64zM33.91 55.2s-1.64.59-1.58 1.64s.47 2.99 2.58 5.04c2.13 2.07 5.22 2.64 8.03 1.88s4.86-2.87 4.63-5.68s-2.93-4.98-2.93-4.98zM21.78 70.73s-1.76.41-1.58 1.58s2.17 4.86 5.33 4.45s8.15-4.04 8.15-5.45s-2.52-3.28-2.52-3.28zm21.56 14.65s-.65 3.78 4.45 5.16c8.5 2.29 9.38-2.87 9.38-2.87zm33.39 1.75s-2.28 2.28.31 4.07s5.54 2.4 8.32 2.09s4.68-2.53 4.68-2.53zm21.28-25.32s-4.3 2.17-.97 5.92c2.53 2.86 8.32 2.28 10.69.67c1.55-1.05 2.01-2.91 1.43-3.85c-.59-.94-11.15-2.74-11.15-2.74M81.37 36.97s-.23 4.91 6.39 4.75c9.26-.23 8.09-5.98 8.09-5.98z\"/><path fill=\"#593329\" d=\"M85.65 30.82s-4.34 2.7-4.81 3.81s-1.47 4.63 3.57 4.4s10.08-.41 11.78-2.46s1.29-3.93.59-5.45s-4.64-7.27-7.77-7.2c-2.05.04-3.36 6.9-3.36 6.9\"/><path fill=\"#925849\" d=\"M88.99 23.9s-2.75-.35-5.16 3.93c-2.4 4.28-3.02 6.83-3.02 6.83s4.89.02 7.82-.33s4.92-2.17 4.92-2.17s-2.39-7.73-4.56-8.26\"/><path fill=\"#593329\" d=\"M55.71 43.89s-2.4-.16-2.58.77c-.18.94.35 3.33 1.17 4.38s3.28 3.4 5.74 2.93s3.92-2.88 4.33-3.71c.37-.78.77-1.62.07-2.67c-.71-1.06-8.73-1.7-8.73-1.7\"/><path fill=\"#925849\" d=\"M59.28 40.14c-2.04-.22-6.96 3.69-6.08 5.03c.98 1.47 1.15.54 3.85 1.89c2.23 1.11 3.2 2.14 4.6 1.96s3.07-2.49 2.78-3.43s-2.39-5.16-5.15-5.45\"/><path fill=\"#593329\" d=\"m36.19 24.31l-4.8 3.32s-.18 2.25.82 3.48s1.29 1.99 5.98 1.99s9.08-.64 9.9-3.98s-.62-5.48-1.5-6.71s-10.4 1.9-10.4 1.9\"/><path fill=\"#925949\" d=\"M36.25 19.1c-1.08.46-3.63 3.93-4.22 5.45s-.72 3.14-.64 3.16c.97.24 6.68.77 9.2.36s4.57-1.52 5.39-2.99c.65-1.17.6-2.72.6-2.72s-1.71-3.08-4.06-4.02c-2.34-.94-5.86.58-6.27.76\"/><path fill=\"#593329\" d=\"M32.23 55.42s-.4.61.36 1.78s2.25 2.57 4.48 3.22c2.23.64 3.81 1.52 5.27 1.35c1.47-.18 4.34-1.35 4.45-5.39c.12-4.04-.7-5.92-2.46-7.68s-3.03-1.46-3.03-1.46z\"/><path fill=\"#925849\" d=\"M32.74 51.68c-.62 1.04-1.08 4.42-.32 5.18s5.33.81 6.53.68c1.21-.13 5.16-1.99 5.22-3.4s-.7-3.28-.7-3.98s.88-2.34-1.52-2.93s-7.93 2.28-9.21 4.45\"/><path fill=\"#593329\" d=\"M24.82 66.86s-3.77.93-4.01 2.22c-.23 1.29.31 2.59 1.6 3.82s2.23 2.52 3.22 2.4c1-.12 3.63-2.46 4.45-3.22s1.99-2.11 1.88-3.22s-.59-2.23-1.64-3.11c-1.04-.88-5.5 1.11-5.5 1.11\"/><path fill=\"#925849\" d=\"M25.76 63.52c-1.76.04-3.11 2.17-3.69 2.93c-.59.76-1.58 2.58-1.17 2.87s2.11.47 2.93 1s2.05 1.35 2.99.59s1.76-2.87 2.23-3.57s1.29-1.58 1.29-1.58s-1.77-2.3-4.58-2.24\"/><path fill=\"#593329\" d=\"M47.27 77.64c-.35.41-5.33 4.45-5.33 4.45s.18 3.52 1.29 4.34s4.57 1.99 6.8 2.46s6.21 1 7.21.59s2.05-2.58 2.11-5.39s-.94-4.91-2.05-6.2s-2-1.77-2-1.77z\"/><path fill=\"#925849\" d=\"M53.89 82.91c.65-.73 1.41-6.8 1.41-6.8s-4.51-3.46-6.39-3.69s-4.1-.06-4.75.64c-.64.7-3.16 3.22-2.93 4.86s.7 4.16.7 4.16s10.61 2.36 11.96.83\"/><path fill=\"#593329\" d=\"M75.75 85.8s-.57 3.8 3.61 4.52c4.18.71 7.65 1.66 9.46 1.28s3.61-2.8 3.8-4.56s.29-4.3 0-4.99c-.76-1.83-4.28-6.84-5.99-7.37c-.96-.29-1.87-.13-1.87-.13z\"/><path fill=\"#925849\" d=\"M78.46 79.14c-1.87 2.07-2.83 5.06-2.73 6.64c.1 1.49 7.19.84 8.03.33s2.67-2.79 2.73-3.55s-.52-3.14-.62-4.61s-.14-3.47-.95-3.42s-3.8 1.67-6.46 4.61\"/><path fill=\"#593329\" d=\"M102.44 53.34s1.65.24 3.68 1.46c2.37 1.42 4.85 5.04 4.66 7.99s-2.76 4.28-5.89 4.33s-6.19-.12-6.76-1.74s4.31-12.04 4.31-12.04\"/><path fill=\"#925849\" d=\"M99.94 54.33c-.49.68-1.76 2.76-2.19 5.42s-.14 5.7.81 6.23c.95.52 6.18-3.99 6.46-4.47c.29-.48-1.67-7.75-2.29-8.08s-2.17.05-2.79.9\"/></svg>", "egg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#f2a05b\" d=\"M63.43 4.51c31.68-.07 51.67 51.46 43.78 84.12c-6.98 28.92-27.03 34.91-43.08 34.91s-35.54-7.78-43.08-33.79C12.33 59.63 33.87 4.58 63.43 4.51\"/><path fill=\"#fecc88\" d=\"M39.26 29.03c-3.8 6.07-7.63 13.71-8.45 20.08c-1.5 11.73 7.13 13.05 10.14 7.23s6.09-11.71 10.98-19.52c6.76-10.79 17.83-18.02 12.39-22.71s-17.08 2.16-25.06 14.92\"/><ellipse cx=\"91.4\" cy=\"43.58\" fill=\"#d47858\" rx=\"2.02\" ry=\"2.06\"/><ellipse cx=\"91.66\" cy=\"94.05\" fill=\"#d47858\" rx=\"2.19\" ry=\"2.18\" transform=\"rotate(-67.641 91.663 94.055)\"/><circle cx=\"32.91\" cy=\"102.87\" r=\"2.04\" fill=\"#d47858\" transform=\"rotate(-67.641 32.915 102.874)\"/><ellipse cx=\"97.65\" cy=\"62.57\" fill=\"#d47858\" rx=\"3.07\" ry=\"2.7\" transform=\"rotate(-27.393 97.644 62.567)\"/><ellipse cx=\"68.52\" cy=\"89.41\" fill=\"#d47858\" rx=\"3.07\" ry=\"2.7\" transform=\"rotate(-27.393 68.517 89.407)\"/><ellipse cx=\"64.79\" cy=\"104.32\" fill=\"#d47858\" rx=\"3.23\" ry=\"2.7\" transform=\"rotate(-51.427 64.797 104.317)\"/><ellipse cx=\"52.39\" cy=\"107.01\" fill=\"#d47858\" rx=\"3.58\" ry=\"3.46\" transform=\"rotate(-48.356 52.394 107.013)\"/></svg>", "flour": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"18 18 92 104\" aria-hidden=\"true\"><ellipse cx=\"64\" cy=\"116\" rx=\"46\" ry=\"7\" fill=\"#e0d6c8\"/><path d=\"M30 46 Q26 80 28 106 Q30 116 64 117 Q98 116 100 106 Q102 80 98 46 Z\" fill=\"#d9b98a\"/><path d=\"M30 46 Q64 54 98 46 Q94 36 64 34 Q34 36 30 46Z\" fill=\"#c49a62\"/><path d=\"M36 44 Q50 22 64 26 Q80 20 92 44 Q64 52 36 44Z\" fill=\"#fafafa\"/><circle cx=\"54\" cy=\"31\" r=\"5\" fill=\"#fff\"/><circle cx=\"72\" cy=\"29\" r=\"6\" fill=\"#fff\"/><rect x=\"40\" y=\"66\" width=\"48\" height=\"30\" rx=\"5\" fill=\"#fff8e7\" stroke=\"#b08550\" stroke-width=\"2\"/><path d=\"M64 92 V72 M64 76 q-6-3 -8-8 M64 76 q6-3 8-8 M64 83 q-6-3 -8-8 M64 83 q6-3 8-8 M64 90 q-6-3 -8-8 M64 90 q6-3 8-8\" stroke=\"#e0a526\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M38 100 q26 8 52 0\" stroke=\"#b08550\" stroke-width=\"2\" fill=\"none\"/></svg>", "glass-of-milk": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#fff\" d=\"M72.9 72.09c.37.37 21.81-17.86 21.81-17.86l2.22-30.53l-18.51 7.97l-31.24-1.23l-15.68-7.11l2.45 29.96c-.01 0 38.59 18.44 38.95 18.8\" opacity=\".5\"/><path fill=\"#e0e0e0\" d=\"M62.69 5.93L46.82 7.46l-11.97 4.32l-6.68 6.96l7.24 84.08l-.14 10.58s8.49 11 28.54 11s29.79-10.02 29.79-10.02l-.14-10.86L100 19.57l-4.73-6.82l-17.96-5.71z\" opacity=\".7\"/><path fill=\"silver\" d=\"M33.88 53.25c0 2.73 3.48 50.39 5.01 52.9s9.54 10.35 25.13 10.07s25.12-7.15 25.95-9.52c.84-2.37 4.73-52.48 4.73-52.48s-.42-5.43-11.69-9.19s-25.34-2.97-32.43-1.53c-8.91 1.82-16.7 6.69-16.7 9.75\"/><path fill=\"#fcf9e9\" d=\"m38.95 62.63l-3.04-5.98s-.06-1.77.18-2.83s2.05-6.04 13.87-8.4c9.38-1.88 21.29-1.71 29.94.65c5.86 1.6 11.6 4.71 12.39 7.8c.9 3.51-.65 5.01-.65 5.01l-5.87 9.38l-42.91-.57z\"/><path fill=\"#f0e7ba\" d=\"M40.75 104.8c.38 1.29 6.44 8.81 22.92 8.81s23.82-6.12 23.98-7.51s4.81-49.03 4.81-49.03s-6.77 8.81-28.31 8.4s-28.23-8.86-28.23-8.86s4.42 46.81 4.83 48.19\"/><path fill=\"#fff\" d=\"M42.13 38.15c-2.36.15-3.59 1.96-3.1 5.71c.33 2.52.98 5.22 4.32 4.89c3.38-.33 3.48-3.86 3.1-5.87c-.56-3.01-1.7-4.89-4.32-4.73m1.15 12.08c-2.28.18-3.02 1.55-2.69 5.63c.43 5.39 3.18 39.24 3.43 42.18c.24 2.94 1.55 4 3.34 4s3.26-1.79 3.18-3.83s-3.18-40.55-3.43-42.75c-.24-2.21-.65-5.48-3.83-5.23M38.46 109c-.68 1.77 1.68 5.39 6.37 7.8c5.23 2.69 11.08 2.28 11.18.08c.1-2.32-3.51-1.7-8.97-4.32c-4.52-2.17-7.52-6.34-8.58-3.56\"/><path fill=\"#d5d5d5\" d=\"M66.18 119.49c-.21 1.74 8.75 1.14 15.61-1.22c7.8-2.69 10.09-6.5 9.19-7.81s-2.71 2.08-10.42 4.59c-10.68 3.45-14.07 1.8-14.38 4.44\"/><path fill=\"#c8c8c8\" d=\"M65.13 34.26h-.71c-22.48-.14-30.9-6.03-33.92-9.68c-1.96-2.38-2.6-4.97-2.13-7.49v-.08c2.26-6.75 15-12.75 35.7-12.83c23.33-.09 35.29 8.14 35.87 13.75c.18 1.8-.15 4.95-2.83 7.77c-4.88 5.11-16.43 8.56-31.98 8.56m-32-16.35c-.31 1.65-.39 3 1.02 4.7c2.16 2.61 8.2 7.98 30.25 8.12h.74c19.76 0 26.07-4.35 28.71-7.26c1.48-1.63 2.06-3.07 1.89-4.79c-.39-3.69-10.14-10.75-31.42-10.63c-22.66.12-30.35 5.86-31.08 9.74z\"/><path fill=\"#fff\" d=\"M35.86 13.87c-.45-.48-2.07-.17-3.39 1.36c-1.17 1.36-2.73 4.16-.43 7.33c2.32 3.19 9.55 9.12 33.21 9.43c21.38.28 31.61-7.02 31.91-11.95s-2.77-4.81-2.77-4.13s.64 2.05.43 3.7c-.25 1.9-4.99 10.03-29.82 10.09c-23.78.06-31.56-7.64-31.48-10.1c.12-3.82 3.33-4.68 2.34-5.73\"/></svg>", "lemon": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#757f3e\" d=\"M24 29.48L13.08 54.15l.91 29.83s6.07 19.56 6.37 19.77c.3.2 1.31-.25 3.74-4.6s8.6-13.05 9.1-15.17c.51-2.12.71-17.39.71-17.39l1.42-32.87z\"/><path fill=\"#94a61d\" d=\"M24.03 30.48S4.09 49.65 4.08 68.11c0 12.85 6.27 19.92 7.79 22.45s5.06 7.99 5.87 9.1s1.79 3.21 2.49 4.02c.71.81-.07-5.34-.88-7.86c-.81-2.53-3.02-16.26-3.03-25.28c-.01-9.88.83-21.85 4.28-29.1c3.81-8 7.39-11.78 7.39-11.78z\"/><path fill=\"#fcc219\" d=\"M30.68 33.02s-5.87 2.93-6.07 6.47s1.62 7.18 2.33 12.03s.71 11.02.81 12.84C27.84 66.19 33 78.53 33 78.53l32.06 28.72l40.15 1.21s12.64.71 14.26-1.21s4.68-6.23 5.06-9.1c.71-5.36-1.21-8.19-2.63-16.79c-.6-3.66-.81-17.98-6.27-29.43c-6.17-12.94-18.41-24.27-43.18-27.51c-18.01-2.35-27.1 1.42-29.73 1.01c-2.63-.4-4.75-1.62-7.79-.2c-3.89 1.81-4.25 7.79-4.25 7.79\"/><path fill=\"#f7932a\" d=\"M110.77 112.2c4.77.16 7.28-2.53 8.29-3.64s3.04-4.93 3.04-4.93s-3.45 2.91-7.39 2.7c-3.94-.2-9.2-1.21-12.34-1.52s-13.05 1.92-25.08-.71s-25.31-9.28-34.08-17.9c-11.83-11.63-15.6-24.64-15.6-24.64s-.58 16.14 10.75 30.91s22.86 20.02 37.01 21.54c16 1.71 24.98-1.92 27.3-2.02c2.34-.09 5.17.11 8.1.21\"/><path fill=\"#ffebc9\" d=\"M53.03 35.34c-.3 3.14 1.62 5.46 3.94 5.87c2.5.43 6.27-.2 11.83 2.93c5.56 3.14 13.37 10.96 18 6.78c4.25-3.84-2.63-10.92-5.06-13.05c-2.43-2.12-8.49-7.58-19.92-7.79c-6.57-.11-8.59 3.14-8.79 5.26\"/><path fill=\"#757f3e\" d=\"M20.36 17.34c-.02-.75-.71-4.95-2.72-3.98c-3.47 1.66-4.78 4.1-3.65 6.92c1.42 3.54 3.8 5.84 6.37 8.49c1.97 2.04 5.87 6.17 7.28 7.38c1.42 1.21 3.51 2.86 5.97-.3c2.62-3.37.85-3.98-1.38-6.11S29 26.9 24.71 22.5c-2.15-2.21-4.33-4.41-4.35-5.16\"/></svg>", "mango": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><radialGradient id=\"SVGCwxsucJm\" cx=\"75.424\" cy=\"-61.613\" r=\"183.963\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".532\" stop-color=\"#f33a1f\"/><stop offset=\".615\" stop-color=\"#f86922\"/><stop offset=\".696\" stop-color=\"#fd9124\"/><stop offset=\".739\" stop-color=\"#ffa025\"/><stop offset=\".793\" stop-color=\"#fca025\"/><stop offset=\".839\" stop-color=\"#f1a124\"/><stop offset=\".883\" stop-color=\"#dfa222\"/><stop offset=\".925\" stop-color=\"#c7a41f\"/><stop offset=\".962\" stop-color=\"#aaa61c\"/></radialGradient><path fill=\"url(#SVGCwxsucJm)\" d=\"M4.03 89.43c-1.2 6.01 5.66 29.12 41.45 33.74c18.39 2.37 36.45-4.16 50.75-15.11S119.3 83 122.31 70.11c4.63-19.85-.69-49.82-40.06-51.59c-40.26-1.81-53.79 40.28-62.23 52.65C9.86 86.08 5.12 84 4.03 89.43\"/><path fill=\"#dc0d27\" d=\"M41.89 36.33s13.57 6.9 34.61 5.44c17.03-1.18 23.73-9.54 23.73-9.54s7.49 2.06 12.46.74c1.99-.53 2.42-1.61-.01-4.13c-3.67-3.82-16.27-10.89-34.85-9.7c-23.25 1.51-35.94 17.19-35.94 17.19\"/><path fill=\"#ffebc9\" d=\"M26.04 76.62c2.36 3.93 9.35-1.14 14.27-6.07c7.1-7.12 10.33-13.64 12.22-16.95s4.45-10.44-.71-11.59c-5.37-1.19-6.96 5.45-9.72 10.34s-6.6 10.71-9.68 14.5c-3.27 4.03-7.78 7.44-6.38 9.77\"/><path fill=\"#6d4c41\" d=\"M102.36 24.98c-.68 2.97 2.05 5.05 3.94 6.54s6.15 2.05 7.57 1.02c1.42-1.02-.16-4.02.87-5.83c1.02-1.81 2.84-4.02.63-5.52c-1.85-1.26-4.34-1.73-6.62-1.26s-2.29 2.21-3.23 2.68c-.96.48-2.93 1.35-3.16 2.37\"/><path fill=\"#518e30\" d=\"M100.14 25.88c-2.52 1.1-9.94 6.95-27.26 8.28c-19.1 1.47-41.53-.8-45.27-1.33s-10.12-.78-10.03-2.38c.13-2.4 2.61-1.63 7.61-3.07c6.01-1.74 12.15-4.14 16.83-6.94c7.18-4.31 21.8-15.09 36.19-15.36c15.76-.29 20.83 4.67 24.7 8.81s3.93 8.48 2.86 10.22c-1.06 1.74-2.56.44-5.63 1.77\"/><path fill=\"#366918\" d=\"M50.46 24.92c.37.46 7.35.72 11.24.59c8.88-.29 15.91-2.65 24.66-3.63s16.38 0 16.67-.34c.53-.62-4.84-7.92-22.41-5.95c-6.47.73-14.79 4.02-20.53 6.31c-3.66 1.49-9.98 2.58-9.63 3.02\"/></svg>", "olive-oil": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"14 4 100 120\" aria-hidden=\"true\"><ellipse cx=\"64\" cy=\"118\" rx=\"30\" ry=\"5\" fill=\"#e6e0c8\"/><rect x=\"56\" y=\"8\" width=\"16\" height=\"12\" rx=\"3\" fill=\"#8d6e63\"/><path d=\"M58 20 h12 v18 q18 10 18 30 v42 q0 8 -8 8 h-32 q-8 0 -8-8 v-42 q0-20 18-30z\" fill=\"#dcedc8\" opacity=\".9\"/><path d=\"M42 70 h44 v40 q0 6 -6 6 h-32 q-6 0 -6-6z\" fill=\"#c0ca33\"/><path d=\"M42 70 q22 -6 44 0\" fill=\"#d4e157\"/><rect x=\"46\" y=\"78\" width=\"36\" height=\"24\" rx=\"4\" fill=\"#fffde7\"/><path d=\"M52 96 q12 -14 26 -10\" stroke=\"#558b2f\" stroke-width=\"2.5\" fill=\"none\"/><ellipse cx=\"58\" cy=\"90\" rx=\"4\" ry=\"2.5\" fill=\"#7cb342\" transform=\"rotate(-30 58 90)\"/><ellipse cx=\"68\" cy=\"87\" rx=\"4\" ry=\"2.5\" fill=\"#7cb342\" transform=\"rotate(-20 68 87)\"/><ellipse cx=\"72\" cy=\"94\" rx=\"3.5\" ry=\"4.5\" fill=\"#33691e\"/><path d=\"M50 28 v8\" stroke=\"#fff\" stroke-width=\"3\" opacity=\".7\" stroke-linecap=\"round\"/></svg>", "pineapple": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#ffbe1f\" d=\"M64.36 54.09c-15.61-.56-28.51 9.61-31.55 29.94c-3.06 20.45 6.76 40.38 31.26 39.93c26.04-.47 34.07-21.65 30.62-41.26c-3.94-22.28-16.97-28.12-30.33-28.61\"/><path fill=\"#f79429\" d=\"M77.01 72.23c-2.19-.06-6.91 4.64-7.85 5.69c-1.9 2.13-.5 4.24 1.69 3.18c2.11-1.02 5.38-3.28 6.2-3.29c.88-.01 3.42 1.67 4.49 2.48c3.08 2.3 4.79-.11 2.9-2.42c-1.06-1.29-4.92-5.57-7.43-5.64m-26.09.06c-2.5-.13-8.08 5.56-8.38 5.88c-1.59 1.74-.11 3.75 2.01 2.85c1.22-.52 5.08-3.1 6.01-3.07c.69.02 2.19 1.14 4.35 2.55c3.54 2.3 5.49-.08 3.15-2.62c-2.36-2.56-4.97-5.48-7.14-5.59M40.09 86.26c-1.45-.1-4.41 2.6-5.24 3.52s-1.5 1.73-.87 2.7c.43.66 1.78.69 2.8.11c1.31-.74 2.66-1.47 3.17-1.45c.83.04 4.12 2.95 5.14 3.82c2.66 2.25 4.35-.77 2.88-2.51c-1.57-1.86-5.2-6-7.88-6.19m24.04.24c-2.78-.04-7.96 5.49-8.75 6.41c-1.91 2.23-.46 5.2 2.51 3.12c.89-.63 4.63-3.84 5.98-3.74c.86.07 3.79 2.37 5.8 3.78c2.68 1.89 4.49-.29 2.64-2.77c-.83-1.12-5.11-6.76-8.18-6.8m23.22-.63c-1.61-.09-7.02 5.6-7.94 6.8c-1.59 2.08.15 4.06 2.59 2.33c1.73-1.23 5.32-3.94 5.69-3.96c.53-.04 1.95 1.03 3.04 1.66c1.17.68 2.51.62 2.92-.15c.56-1.04-.27-2.06-1.12-2.85c-1.42-1.34-3.78-3.75-5.18-3.83M76.5 101.91c-2.9.05-7.07 4.98-7.83 6.25c-1.45 2.44.78 3.46 2.03 2.84c1.89-.95 3.93-3.16 5.95-3.53c.87-.16 3.69 2.07 4.43 2.53c3.68 2.3 5.01-.81 2.58-3.22c-1.75-1.73-5.07-4.91-7.16-4.87m-24.74-.09c-2.04-.1-6.92 4.33-8.14 5.51c-1.64 1.6-.45 4.26 2.15 3c2.27-1.1 4.99-2.78 5.75-2.74c.96.05 3.03 1.66 4.26 2.5c3.66 2.52 5.24-.25 2.96-2.89c-1.63-1.87-4.78-5.27-6.98-5.38\"/><path fill=\"#2f7c31\" d=\"M25.53 23.68c-.91-1.17 4.1-3.87 9.38-4.02c6.63-.19 12.71 1.57 12.71 1.57s.55-4.36-2.95-9.24c-2.4-3.35-3.49-5.01-3.42-6.2c.07-1.2 5.27-1.93 12.2 1.16c5.79 2.58 10.29 7.5 10.29 7.5s3.66-5.12 8.48-7.59C77.82 4 84.68 3.51 85.28 4.64c.46.86-1.72 3.38-3.15 6.62c-2.25 5.08-2.12 9.27-2.12 9.27s4.66-3.4 9.66-4.4c2.54-.51 10.03-.97 9.53.86c-.08.29-12.88 9.28-12.88 9.28l-1.91 9.35s6.79-3.88 12.84-3.17c3.13.37 2.61 1.35 2.61 1.35l-14.52 8.24l-2.16 7.13s4.07-1.02 8.03-1.07c1.91-.02 5.04.48 5.19 1.45c.2 1.25-8.75 5.67-8.75 5.67l-24.09 9.76l-22.87-8.28s-10.27-1.62-10.27-2.74c0-1.13 2.05-2.01 5.13-2.49c3.56-.56 7.22-.36 7.22-.36L32.2 44.1s-6.5-.61-7.06-1.88s2.92-3.59 5.05-4.21c5.39-1.58 11.53-.32 11.53-.32l-3.47-9.29c-.02-.03-11.73-3.45-12.72-4.72\"/><path fill=\"#709921\" d=\"M54.36 33.59c.54.27 1.94-3.05 3.67-5.18c2.52-3.11 5.8-5.44 6.37-5.44c.55 0 3.12 1.95 5.35 4.62c2.7 3.24 3.91 5.95 4.18 6.08c1 .49 4.24-5.22 10.48-10.04c5.39-4.17 14.34-7.9 14.81-6.64c.15.41-4.44 3.43-8.84 9.55c-4.83 6.71-4.36 13.94-4.36 13.94s5.53-3.97 7.31-4.89c1.49-.77 7.14-2.94 6.5-1.73c-.46.86-5.86 6.24-8.96 9.19c-4.88 4.62-6.32 11.51-5.85 11.9c.54.45 4.17-2.24 6.36-3.47c2.08-1.17 5.02-2.12 5-1.92c-.13 1.47-5.43 5.29-9.16 8.64c-2.76 2.47-8.1 9.52-23.31 9.27c-12.57-.2-19.92-6.78-24.5-9.24c-3.16-1.7-9.04-3.6-8.97-4.18c.04-.32 2.8-.54 4.66-.31c5.14.62 8.44 2.17 8.79 1.72c.36-.46-4.55-6.68-13.03-10.46c-4.09-1.83-5.88-2.3-5.8-3.12c.03-.36 2.59-.83 5.85-.94c5.78-.19 11.28 1.85 11.79 1.91c1.2.15-3.65-8.26-6.4-11.54c-4.36-5.21-11.16-6.6-10.88-7.91c.15-.71 8.07-.81 14.57 1.63c6.77 2.52 13.2 7.98 14.37 8.56\"/><path fill=\"#2f7c31\" d=\"M64.38 38.24c-.61.08-3.02 1.38-6.19 4.71c-3.75 3.93-5.07 8.18-4.2 8.9c1.17.96 2.8-.87 5.04-2.45c2.64-1.86 4.78-2.87 5.24-2.87s2.52 1.3 4.25 2.61c2.15 1.64 4.01 3.41 4.96 2.81c1.6-.99-.62-6.17-3.12-9c-2.66-3.02-5.45-4.78-5.98-4.71\"/></svg>", "potato": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#b8885a\" d=\"M3.84 82.02c-1.59-16.7 7.93-29.95 16-35.29c8.25-5.46 12.1-6.24 13.96-7.29c8.57-4.82 14.6-15.57 26.12-23.5c13.11-9.02 31.04-10.36 42.04-4.33c10.03 5.5 20.31 17.48 17.56 41.33s-62.67 63.1-72.95 63.66s-40.33-9.34-42.73-34.58\"/><path fill=\"#875b52\" d=\"M70.64 76.69c-4.71 2.76-22.4 20.29-42.7 19.81S4.52 86.21 4.52 86.21s2.91 17.1 16.91 27.23c15.84 11.46 32.64 6.95 37.54 5.85c7.27-1.63 13.69-4.97 20.12-8.46s29.29-14.5 38.27-31.83c9.91-19.12 7.55-34.44 2.6-45.58c-5.24-11.79-10.35-16.12-10.35-16.12s4.76 24.69-5.32 38.43c-14.3 19.49-28.94 18.2-33.65 20.96\"/><path fill=\"#513531\" d=\"M63.23 97.17c.06 1.26 4.55 1.16 7.81.63c3.45-.56 6.3-.61 6.78-1.94s-4.78-5.96-7.88-5.8c-1.94.11-6.8 5.27-6.71 7.11m23.36 2.43c.67.97 3.45-.51 4.47-1.84s2.17-3.9 1.25-4.47s-3.55-.56-4.85 1.04c-1.29 1.61-1.54 4.3-.87 5.27m30.66-61.32c-1.09-1.92-3.04 2.62-3.13 4.19s1.09 2.49 2.4 2.77c1.29.27 4.23-.79.73-6.96m-88.17 68.8c-.88 1.49.57 2.57 2.04 3.57c1.16.79 4 1.21 4.56.33c.57-.88-.55-2.07-2.67-3.85c-1.45-1.21-3.05-1.54-3.93-.05\"/><path fill=\"#875b52\" d=\"M17.4 84.24c-1.25.87-.24 4.73-.07 5.47s5.15 1 5.89-.14s-.82-2.79-1.92-3.94c-1.1-1.14-2.65-2.26-3.9-1.39m8.9-8.99c1.54 2.09 4.33-.42 4.78-2.29c.48-2.01-1.21-3.32-3.12-2.13c-1.53.94-2.56 3.21-1.66 4.42m19.92-39.79c-2-.84-2.76.92-3.51 2.7s-3.17 5.02-1.65 5.47s5.1.24 5.99-1.21c.89-1.46 1.17-6.11-.83-6.96\"/><path fill=\"#d9ac82\" d=\"M12.07 79.48c2.2.99 5.62-3.69 7.19-5.94c2.31-3.31 5.79-7.49 13.94-12.54c11.18-6.92 22.85-5.18 28.85-10.39s9.48-15.54 14.06-20.66c8.37-9.36 17.06-2.97 18.27-7.5s-4.99-8.38-12.31-8.37c-7.31.02-15.67 2.71-23.27 15s-9.49 16.05-16.54 18.27c-7.05 2.23-15.81 5.17-24.25 14.56c-4.69 5.22-9.61 15.92-5.94 17.57\"/><path fill=\"#875b52\" d=\"M82.77 33.82c.43 3.2 4.83 4.94 7.42 4.97c2.43.03 4.18-1.55 4.15-3.16c-.03-1.93-3.17-2.82-4.4-3.3c-2.41-.93-2.97-2.95-5.22-2.23c-2.04.66-2.01 3.23-1.95 3.72\"/></svg>", "red-apple": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#dc0d28\" d=\"m45.43 68.14l-5.45-13.51l.15-21.87s14.68-2.2 22.39-3.26s23.04-7.52 37.02-1.33c15.88 7.03 24.3 23.3 20.06 48.1s-22.83 44.87-39.57 47.03c-8.29 1.07-9.77-2.15-16.12-1.69c-5.14.37-4.86 3.04-13.63 2.59s-16.21-3.71-20.59-9.15s15.74-46.91 15.74-46.91\"/><path fill=\"#ff5117\" d=\"M21.23 36.99c-12.57 10.5-18.5 32.63-8.47 56.25c8.92 21.02 23.17 27.03 23.17 27.03s24.92-1.63 42.31-11.01s34.18-25.71 34.18-47.18s-11.19-28.73-12.4-29.03s-6.2 2.87-11.8 3.02s-9.98-1.21-9.98-1.21l-17.69 5.9l-16.54-3.86s-.53-2.31 1.26-3.25c3.72-1.94 11.49 1.36 14.67 1.21s5.9-4.39 5.9-4.39s-7.41-.76-9.98-1.36c-2.57-.58-19.96-4.37-34.63 7.88\"/><path fill=\"#8d1d0a\" d=\"M62.03 37.12c-4.58.21-16.86-4.1-17.97-.73c-1.18 3.58 7.96 8.33 19.09 7.55c11.61-.81 18.84-7.23 17-10.69c-1.83-3.46-9.36 3.46-18.12 3.87\"/><path fill=\"#513630\" d=\"M51.04 16.96s-1.93-.1-2.95-.51s-2.46-.38-2.34-2.14c.2-2.95 3.98-5.98 4.89-6.52c1.73-1.02 4.76-.74 5.91 0c1.43.92.71 4.28.71 4.28s5.09 7.64 5.8 12.32c.65 4.27 3.31 16.73-.71 17.51c-3.67.71-2.14-8.86-4.17-13.54c-1.22-2.8-2.95-5.8-4.58-7.84a37 37 0 0 1-2.56-3.56\"/><path fill=\"#2f7c31\" d=\"M105.41 5.05c.41-.71-.41-1.43-3.77-1.53s-21.69-1.83-32.07 11.1c-7.46 9.29-6.31 17.21-6.31 17.21l6.82.31z\"/><path fill=\"#709f19\" d=\"M82.9 17.77c6.17-4.26 22.6-13.54 22.6-13.54s0 2.34-1.02 4.38S100 20.73 85.95 28.06c-13.19 6.88-21.99 5.19-22.71 3.97c-.7-1.22 9.48-7.23 19.66-14.26\"/><path fill=\"#ffd2b1\" d=\"M37.6 39.97c-2.73-3.93-9.34-2.82-15.27 5.09c-7.64 10.18-7.23 23.72-2.04 24.54c5.15.81.61-4.38 8.55-14.66c6.08-7.87 12.22-9.98 8.76-14.97\"/></svg>", "salt": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#dcedf6\" d=\"m48.83 32.34l-9.85 12.99l-8.14 63.68l14.85 10.71s26.56.86 27.84.29s21.99-9.57 21.99-9.57l-8-65.82l-10.99-13.13z\"/><path fill=\"#e0e0e0\" d=\"M37.41 69.04s1.86-4.28 12.99-5.85c6.02-.85 9.26.8 13.72.68c5.76-.15 9.24-1.32 14.83.17c7.29 1.95 9.64 7.15 9.64 7.15s2.93 9.41 2.21 9.41s-56.54 8.42-56.54 8.42z\"/><path fill=\"#fff\" d=\"M31.61 98.9s3.04 13.76 32.84 13.92c17.68.09 22.17-3.94 24.53-5.32c2.36-1.39 5.2-5.07 5.2-5.07l-1.93-17.41l-1.84-11.62s-3.12-1.82-7.55-.71c-2.08.52-6.77 3.02-10.27 4.49s-6.69 3.34-15.17 2.77c-7.77-.52-12.39-6.44-15.16-8.4s-5.54-2.85-5.54-2.85z\"/><path fill=\"#e0e0e0\" d=\"M70.75 89.52c-1.05 0-1.85.53-2.08 1.91s.97 2.15 1.89 2.01c1.2-.19 1.57-1.34 1.57-2.2s-.51-1.72-1.38-1.72m10.56 1.02c-.54 1.05.09 2.58 1.29 2.81s2.1-.78 2.03-1.94c-.09-1.61-2.49-2.49-3.32-.87m3 9.22c-.72.87-.14 2.86 1.38 2.91s2.11-1.69 1.38-2.81c-.59-.93-1.84-1.21-2.76-.1m-16.51 7.61c0 1.02.55 1.75 1.8 1.71c1.25-.05 1.43-1.38 1.34-2.08c-.09-.69-.46-1.38-1.61-1.38s-1.53 1.15-1.53 1.75m-5.45-7.88c-.74-.83-2.17-.64-2.91.32c-.6.78-.56 2.93 1.48 2.86c1.39-.05 2.63-1.85 1.43-3.18m-22.19 3.22c-.75.82-.6 2.17.32 2.86s2.17.37 2.54-.37c.35-.71.09-1.94-.55-2.44s-1.75-.65-2.31-.05\"/><path fill=\"#a6cfd6\" d=\"M99.63 109.81c-.18-1.32-2.91-11.28-4.49-21.93c-1.59-10.66-3.79-30.84-4.14-37.53s-1.98-9.44-3.31-10.5c-1.32-1.06-42.85-4.74-42.85-4.74s-4.95 2.79-6.69 5.29c-1.23 1.76-1.5 2.73-1.94 5.29c-.44 2.55-1.32 13.3-1.5 16.65s-1.94 17.09-3.17 23.26s-3.61 20.97-3.88 22.64c-.26 1.67.35 4.23 1.85 5.37c1.5 1.15 15.96 9.5 17.81 10.03s28.55.68 30.64.28c2.51-.49 19.14-7.97 20.61-9.34c.76-.71 1.24-3.45 1.06-4.77M49.82 75.2c-.62 9.14-3.11 36.37-4.88 37.61c-1.77 1.25-10.6-4.26-11.54-5.82s2.49-17.56 3.53-26.39c.61-5.2 2.83-31.16 3.64-33.15c.47-1.14 2.94.44 5.34 1.61c2.49 1.21 4.92 1.93 5.18 2.76c.52 1.67-.65 14.24-1.27 23.38m23.58 41.05c-1.25.52-5.51.67-9.88.72c-4.82.05-8.8-.37-10.45-1.84c-1.97-1.77-.46-13.83.37-25.89c.63-9.14 2.21-34.64 2.48-36.06c.31-1.66 3.98 0 8.14 0c4.78 0 8.2-1.43 8.41.34s.51 12.34.92 18.89c.42 6.55 2.18 39.28 2.18 41.04s-.92 2.28-2.17 2.8m20.27-8.42c-.31 2.39-9.88 6.63-11.01 5.71c-1.56-1.25-2.91-18.18-3.74-26.81c-.83-8.62-2.18-32.69-2.18-34.08c0-1.26 2.58-1.62 4.64-2.78c2.15-1.21 4.08-2.74 4.4-2.21c.62 1.04 1.35 14.24 2.81 29.61c1.44 15.39 5.39 28.17 5.08 30.56\"/><path fill=\"#6ca4ae\" d=\"M55.54 32.1L42.6 36.13s-1.78 1.21-2.76 2.25c-.84.89-1.69 2.01-1.69 2.01s10.6 8.65 25.19 9.14s25.11-8.94 25.11-8.94s-1-1.41-2.22-2.27c-1.22-.85-6.63-3.78-6.63-3.78z\"/><path fill=\"#aeb0b1\" d=\"M42.17 32.53s-1.73 1.99-.37 4.64c1.55 3.02 8.42 8.41 21.55 8.06c16.18-.43 20.96-7.57 21.25-8.06c.43-.73.92-1.83.98-3.17s-.85-2.14-.85-2.14s3.85-4.52 3.97-10.99s-3-13.07-13.69-16.12c-9.24-2.64-20.7-.98-26.13.73c-4.46 1.4-11 6.11-11.11 14.65c-.12 9.28 4.4 12.4 4.4 12.4\"/><path fill=\"#e0e0e0\" d=\"M42.82 14.65c-.28 4.51 4.79 7.64 20.9 7.92c17.28.31 20.15-5.37 20.27-7.75c.15-2.84-2.99-9.4-20.51-9.52c-16.31-.12-20.51 6.84-20.66 9.35m1.48 19.77c-.6 1.41 4.79 7.85 18.89 7.85s20.28-6.23 19.02-7.73c-.85-1.02-6.85 4.33-18.75 4.03c-16.18-.42-18.3-6.16-19.16-4.15\"/><path fill=\"#5e6367\" d=\"M48.99 14.35c.06 1.89 2.14 2.23 4.18 2.23c2.29 0 4.06-.77 4.09-2.14c.03-1.36-1.15-2.63-4.33-2.51c-2.67.11-3.99 1.06-3.94 2.42m10.12-5.07c-.1 1.48 1.55 2.48 4.15 2.32c2.94-.17 4.06-1.15 4.09-2.42c.03-1.43-1.92-2.26-4.27-2.17c-2.36.1-3.88.91-3.97 2.27m10.12 6c.09 1.86 2.39 2.14 3.99 2.07c2.97-.12 3.87-1.08 3.87-2.42c0-1.7-1.95-2.38-3.87-2.42s-4.08.92-3.99 2.77\"/></svg>", "sugar": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"8 22 112 96\" aria-hidden=\"true\"><ellipse cx=\"64\" cy=\"112\" rx=\"50\" ry=\"8\" fill=\"#e3e8ea\"/><path fill=\"#ffffff\" stroke=\"#b0bec5\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M14,78 l25,-6.875000000000001 l25,6.875000000000001 l-25,6.875000000000001z\"/><path fill=\"#eceff1\" stroke=\"#b0bec5\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M14,78 l25,6.875000000000001 v25 l-25,-6.875000000000001z\"/><path fill=\"#cfd8dc\" stroke=\"#b0bec5\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M39,84.875 l25,-6.875000000000001 v25 l-25,6.875000000000001z\"/><path fill=\"#ffffff\" stroke=\"#b0bec5\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M64,78 l25,-6.875000000000001 l25,6.875000000000001 l-25,6.875000000000001z\"/><path fill=\"#eceff1\" stroke=\"#b0bec5\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M64,78 l25,6.875000000000001 v25 l-25,-6.875000000000001z\"/><path fill=\"#cfd8dc\" stroke=\"#b0bec5\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M89,84.875 l25,-6.875000000000001 v25 l-25,6.875000000000001z\"/><path fill=\"#ffffff\" stroke=\"#b0bec5\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M39,48 l25,-6.875000000000001 l25,6.875000000000001 l-25,6.875000000000001z\"/><path fill=\"#eceff1\" stroke=\"#b0bec5\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M39,48 l25,6.875000000000001 v25 l-25,-6.875000000000001z\"/><path fill=\"#cfd8dc\" stroke=\"#b0bec5\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M64,54.875 l25,-6.875000000000001 v25 l-25,6.875000000000001z\"/><circle cx=\"58\" cy=\"44\" r=\"2\" fill=\"#fff\"/><path d=\"M96 30 l3 8 l8 3 l-8 3 l-3 8 l-3-8 l-8-3 l8-3z\" fill=\"#ffd54f\"/></svg>", "tangerine": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#ff8e00\" d=\"M4.45 78.74c3.05 28.59 23.74 44.75 59.43 45.3s49.02-16.75 54.54-25.73c6.34-10.33 16.49-58.89-39.5-70.3c-21.39-4.36-38.01-.8-49.47 5.62C9 45.07 3.17 66.77 4.45 78.74\"/><path fill=\"#5c6a23\" d=\"M114.83 11.19c-.14-1.4-5.06-6.32-17.7-7.17S75.05 8.78 70.76 16.67c-3.31 6.09-5.24 11.09-5.24 11.09l7.8.75l32.67-11.42z\"/><path fill=\"#767e3a\" d=\"M89.26 18.21c8.77-3.08 25.57-7.02 25.57-7.02s-2.95 6.6-8.85 12.64s-15.51 12.3-28.8 8.99c-5.43-1.35-9.03-4.89-9.03-4.89s7.91-5.08 21.11-9.72\"/><path fill=\"#5c6a23\" d=\"M55.91 11.86c-.75 1.6 1.74 2.86 3.28 5.52c2.83 4.88 2.83 11.76 2.83 11.76s-6.04.64-5.85 5.91c.17 4.69 4.36 6.62 9.19 6.62c5.27 0 7.32-3.92 7.13-6.49c-.3-3.98-4.43-5.52-4.43-5.52s.58-9.12 0-13.68s-1.35-5.72-2.7-6.3s-8.48.12-9.45 2.18\"/><path fill=\"#ffe265\" d=\"M18.26 77.68c3.48 1.1 6.5-2.84 10.44-10.44c2.05-3.97 6.62-9.84 8.85-12.27c4.77-5.19 10.81-10.57 7.18-14.94c-3.88-4.66-15.2.27-22.62 11.27s-8.93 24.78-3.85 26.38\"/><path fill=\"#ff6110\" d=\"M84.04 41.09c-.57 2.28.43 4.21 2.11 4.35c2.02.17 3.02-1.77 3.06-3.75c.03-1.6-1.03-2.67-2.41-2.8c-1.39-.12-2.42.82-2.76 2.2m13.61 9.82c-1.49 1.6-1.65 4.67.26 5.86c2.15 1.34 4.39-.43 5.13-1.94c.58-1.19.9-3.13-.47-4.39c-1.65-1.51-3.72-.82-4.92.47m9.16 6.67c-.38 1.92.43 4.12 2.47 4.43s3.42-1.67 3.54-3.13c.16-1.84-.56-3.32-2.18-3.94c-1.62-.64-3.49.9-3.83 2.64m1.18 9.49c-1.35-.66-4.02-.11-4.93 3.09c-.74 2.6.11 5.12 2 5.58c2.54.61 4.22-1.36 4.65-3.58c.49-2.49-.16-4.32-1.72-5.09m-8.62 21.27c1.9 1.46 1.06 3.99-.39 5.47c-1.59 1.64-3.96 1.81-5.13.65c-1.16-1.16-.82-3.53.82-5.17s3.68-1.74 4.7-.95m-25.2 17.53c.77 1.58-.34 3.62-1.81 4.69c-1.17.86-4.18 1.77-5.6-.3c-1.17-1.7-.3-3.49 1.64-4.95s4.91-1.2 5.77.56\"/></svg>", "tomato": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#ff2a23\" d=\"M119.77 69.38s1.71-13.05-1.4-18.95s-12.71-18.93-32.62-21.28c-10.56-1.24-17.71.16-24.23.93c-4.13.49-11.82-2.05-25.63 1.09C25.65 33.5 10.11 42.51 5.06 61.93C2.4 72.16 3.41 83.21 7.94 92.52c8.7 17.86 24.85 22.21 24.85 22.21l32.46 2.64l39.3-16.62z\"/><path fill=\"#dc0d27\" d=\"M82.03 119.08c20.66-4.04 38.52-22.52 41.63-42.09c2.91-18.31-7.79-30.58-7.79-30.58s1.22 9.77-1.06 20.18c-2.45 11.14-9.54 29.71-32 40.23c-27.57 12.91-57.77 4.4-57.77 4.4s20.52 14.99 56.99 7.86\"/><path fill=\"#fed3b0\" d=\"M24.92 52.76c-5.49-1.42-12.34 2.73-13.33 14.88c-.91 11.13 5.12 24.54 11.03 22.94c5.02-1.36.19-10.66 1.98-18.29c1.81-7.63 8.69-17.36.32-19.53\"/><path fill=\"#bdcf44\" d=\"M31.87 46.05c-.78 1.01 1.03 5.45 10.22 5.39c9.18-.06 10.72-2.83 14.81-1.59s7.28 6.16 11.8 8.85c6.32 3.76 15.44 2.8 15.38 1.13c-.06-1.68-2.29-.82-4.21-3.17c-1.92-2.36-5.32-8.59-5.32-8.59s.95-2.92 2.96-2.81c4.64.25 9.8-.67 12.64-2.45c3.4-2.12 4.68-5.39 4.06-6.14c-.62-.74-2.55 1.26-3.6 1.07s-7.88-.06-7.88-.06l-8.25-1.34s1.13-4.83 3.36-7.31s5.73-5.89 5.66-6.32s-2.88-.05-2.88-.05l-8.69 3.97l-6.08 8l-11.54 1.49l-11.11-7.45s-6.37-5.14-6.66-5.02c-1.61.66.84 3.11 2.69 6.07c1.6 2.57 1.93 3.86 4.09 5.65c2.11 1.74 5.65 3.47 5.65 3.47l-2.54 4.59s-8.19 3.23-9.62 3.23c-1.42.01-4.51-1.16-4.94-.61\"/><path fill=\"#94a61d\" d=\"M57.51 43.28c3.35.25 5.77 4.7 8.79 7.73c4.41 4.41 7.86 6.71 11.57 7.58c1.86.43 6.13 1.14 6.13 1.14s.62-.43-1.49-1.61s-3.38-3.44-3.69-4.49s-1.28-4.5-3.32-7.36s-4.36-4.07-3.62-5.37s7.14.9 13.3-.09c8.13-1.3 9.37-3.91 9-4.22s-5.4 1.18-7.94.62s-4.72-2.3-8.56-2.3c-2.62 0-5.18.95-5.87-.48c-.58-1.2 1.6-5.21 3.26-6.72c4.03-3.66 8.38-4.53 8.38-5.03c0-1.03-7.07-1.61-11.97 2.3c-4.88 3.89-3.96 9-10.3 9c-2.11 0-2.92-.5-2.92-.5s-2.83-2.33-6.61-4.38s-6.63-1.14-8.81-2.19c-2.17-1.05-6.02-3.77-6.39-3.22s2.89 4.27 6.99 7.31s8.69 4.59 7.38 5.83c-1.3 1.24-3.47 2.05-5.52 3.6s-3.85 3.78-6.33 4.59s-6.56.24-7.12.92s4.32 3.03 11.95 1.61c7.61-1.42 7.63-4.72 13.71-4.27\"/><path fill=\"#728035\" d=\"M65.12 4.94c-1.67-.08-3.78 1.24-3.78 1.24s-3.06 3.73-4.27 12.99c-.56 4.28.05 10.03-.07 13.2c-.12 3.16-.81 4.34-.62 5.96c.19 1.61 1.88 3.43 5.79 3.39c3.14-.03 4.76-2.46 4.7-3.33s-2.75-9.74-1.99-17.56c.71-7.27 3.36-12.29 3.47-13.34c.06-.57-.69-2.43-3.23-2.55\"/></svg>"};
+// TITLE: Can You Count It?
+// EYEBROW: Spotlight 4 Grammar · Module 3 · Unit 5a, 5b
+// SUB: Исчисляемые и неисчисляемые: a tomato / two tomatoes, но butter, sugar, flour. Плюс How many? How much? A lot of. Правило, картинки и задания с проверкой.
+// BOARD: Твои правила
+// LEAD: Каждый правильный ответ — одна точка. Все точки зелёные — правило усвоено. Красная рамка — повтори это правило.
+// HOME: index.html
+// HUB: a lemon, two lemons — но sugar, butter; How many / How much; a lot of
+const META = { ls: "s4g-m3-countable", cards: false, boardLabel: "Правила" };
+const P = [
+  { id: "c", phrase: "a lemon, two lemons", ru: "исчисляемые: можно посчитать" },
+  { id: "pl", phrase: "tomato → tomatoes", ru: "много: + -s / -es" },
+  { id: "u", phrase: "sugar, butter, flour", ru: "неисчисляемые: без a и без -s" },
+  { id: "isare", phrase: "there is / there are", ru: "is — один и неисчисл., are — много" },
+  { id: "many", phrase: "How many …?", ru: "сколько? — исчисляемые" },
+  { id: "much", phrase: "How much …?", ru: "сколько? — неисчисляемые" },
+  { id: "alot", phrase: "a lot of", ru: "много — с любыми" }
+];
+const DRILLS = [
+  { type: "rule", title: "Запомни!", short: "Правило", instr: "Прочитай правило. Жёлтым выделено самое важное.",
+    blocks: [
+      { h: "🍋 Исчисляемые — можно посчитать", lines: [
+        ["*a* lemon — two lemon*s*", "один лимон — два лимона"],
+        ["*a* mango — three mango*es*, *a* tomato — tomato*es*", "на -o часто + -es"],
+        ["*an* egg, *an* apple", "перед гласной — an"] ] },
+      { h: "🧈 Неисчисляемые — нельзя посчитать штуками", lines: [
+        ["butter, sugar, flour, salt, pepper, olive oil, milk, bread, cheese", "это вещество, а не штуки"],
+        ["✗ a sugar  ✗ two butters", "без a и без -s!"],
+        ["Можно посчитать упаковки: *a bottle of* oil, *a bag of* flour", "бутылка масла, пакет муки"] ] },
+      { h: "Как спросить «сколько?»", lines: [
+        ["*How many* mangoes are there? — Not many. / A lot!", "many — с исчисляемыми"],
+        ["*How much* sugar is there? — Not much. / A lot!", "much — с неисчисляемыми"],
+        ["There is *a lot of* sugar. There are *a lot of* eggs.", "a lot of = много — с любыми"] ] },
+      { h: "Ловушка!", warn: true, lines: [
+        ["There *is* some butter. There *are* some tomatoes.", "неисчисляемое — всегда is"],
+        ["✗ How much eggs?  ✓ *How many* eggs?", "eggs можно посчитать"] ] }
+    ] },
+  { type: "sort", title: "Можно посчитать?", short: "Сортировка", instr: "Посмотри на картинку. Это можно посчитать штуками или нет?",
+    buckets: ["🔢 можно (countable)", "🚫 нельзя (uncountable)"],
+    items: [
+      { id: "c", img: "lemon", t: "lemon", b: 0 },
+      { id: "u", img: "sugar", t: "sugar", b: 1 },
+      { id: "c", img: "mango", t: "mango", b: 0 },
+      { id: "u", img: "butter", t: "butter", b: 1 },
+      { id: "c", img: "pineapple", t: "pineapple", b: 0 },
+      { id: "u", img: "flour", t: "flour", b: 1 },
+      { id: "c", img: "tomato", t: "tomato", b: 0 },
+      { id: "u", img: "salt", t: "salt", b: 1 },
+      { id: "c", img: "coconut", t: "coconut", b: 0 },
+      { id: "u", img: "olive-oil", t: "olive oil", b: 1 },
+      { id: "c", img: "egg", t: "egg", b: 0 },
+      { id: "u", img: "glass-of-milk", t: "milk", b: 1 },
+      { id: "u", img: "cheese-wedge", t: "cheese", b: 1 },
+      { id: "c", img: "banana", t: "banana", b: 0 }
+    ] },
+  { type: "gaps", title: "a, an или ничего?", short: "a / an / —", instr: "Выбери a, an или «—» (ничего не нужно).",
+    items: [
+      { id: "c", img: "lemon", t: "I've got {{*a|an|—}} lemon." },
+      { id: "c", img: "egg", t: "I've got {{*an|a|—}} egg." },
+      { id: "u", img: "sugar", t: "I need {{*—|a|an}} sugar for the cake." },
+      { id: "u", img: "butter", t: "There is {{*—|a|an}} butter in the fridge." },
+      { id: "c", img: "pineapple", t: "Let's buy {{*a|an|—}} pineapple." },
+      { id: "u", img: "flour", t: "We need {{*—|a|an}} flour for pancakes." },
+      { id: "c", img: "red-apple", t: "She is eating {{*an|a|—}} apple." },
+      { id: "u", img: "salt", t: "Can you pass me {{*the|a|an}} salt, please?" }
+    ] },
+  { type: "gaps", title: "Один или много?", short: "-s / -es", instr: "Посмотри на картинку и выбери правильное слово.",
+    items: [
+      { id: "pl", img: "lemon lemon", t: "two {{*lemons|lemon|lemones}}" },
+      { id: "pl", img: "tomato tomato tomato", t: "three {{*tomatoes|tomatos|tomato}}" },
+      { id: "pl", img: "mango mango", t: "two {{*mangoes|mango|mangoe}}" },
+      { id: "pl", img: "coconut", t: "one {{*coconut|coconuts|coconutes}}" },
+      { id: "u", img: "sugar", t: "a lot of {{*sugar|sugars|a sugar}}" },
+      { id: "u", img: "butter", t: "some {{*butter|butters|a butter}}" },
+      { id: "pl", img: "egg egg egg", t: "a lot of {{*eggs|egg|egges}}" },
+      { id: "u", img: "flour", t: "a bag of {{*flour|flours|a flour}}" }
+    ] },
+  { type: "gaps", title: "How many или How much?", short: "Сколько?", instr: "Это задание 1 из учебника (стр. 44). Выбери How many или How much.",
+    items: [
+      { id: "many", img: "tangerine", t: "{{*How many|How much}} oranges are there in the bag?" },
+      { id: "much", img: "butter", t: "{{*How much|How many}} butter is there in the fridge?" },
+      { id: "much", img: "bread", t: "{{*How much|How many}} bread is there on the table?" },
+      { id: "many", img: "egg", t: "{{*How many|How much}} eggs are there in the box?" },
+      { id: "many", img: "potato", t: "{{*How many|How much}} potatoes are there in the cupboard?" },
+      { id: "much", img: "sugar", t: "{{*How much|How many}} sugar is there? — Not much!" },
+      { id: "many", img: "mango", t: "{{*How many|How much}} mangoes do we need? — Not many. Only two." },
+      { id: "much", img: "glass-of-milk", t: "{{*How much|How many}} milk have we got? — A lot!" }
+    ] },
+  { type: "gaps", title: "There is или There are?", short: "is / are", instr: "Посмотри на картинку на стр. 55 учебника и вспомни: is или are?",
+    items: [
+      { id: "isare", img: "bread", t: "There {{*is|are}} a lot of bread." },
+      { id: "isare", img: "tomato tomato", t: "There {{*are|is}} a lot of tomatoes." },
+      { id: "isare", img: "olive-oil", t: "There {{*is|are}} a lot of olive oil." },
+      { id: "isare", img: "cookie", t: "There {{*are|is}} a lot of biscuits." },
+      { id: "isare", img: "egg egg", t: "There {{*are|is}} a lot of eggs." },
+      { id: "isare", img: "butter", t: "There {{*is|are}} a lot of butter." },
+      { id: "alot", img: "sugar", t: "There is {{*a lot of|many|a}} sugar in the tea." }
+    ] },
+  { type: "tf", title: "Найди ошибку", short: "Ошибки", instr: "Предложение верное или с ошибкой?",
+    items: [
+      { id: "u", img: "sugar", t: "I want a sugar in my tea.", ok: false, fix: "I want sugar in my tea." },
+      { id: "many", img: "egg", t: "How much eggs are there?", ok: false, fix: "How many eggs are there?" },
+      { id: "much", img: "butter", t: "How much butter is there?", ok: true },
+      { id: "u", img: "flour", t: "We need two flours.", ok: false, fix: "We need two bags of flour." },
+      { id: "pl", img: "tomato", t: "There are three tomatos.", ok: false, fix: "There are three tomatoes." },
+      { id: "alot", img: "lemon", t: "There are a lot of lemons.", ok: true },
+      { id: "isare", img: "salt", t: "There are a lot of salt in the salad.", ok: false, fix: "There is a lot of salt in the salad." }
+    ] },
+  { type: "order", title: "Собери предложение", short: "Порядок", instr: "Нажимай на слова по порядку.",
+    items: [
+      { id: "many", img: "mango", q: "Сколько манго нам нужно?", s: "How many mangoes do we need?" },
+      { id: "much", img: "sugar", q: "Сколько сахара есть?", s: "How much sugar is there?" },
+      { id: "alot", img: "salt", q: "В салате много соли!", s: "There is a lot of salt in the salad!" },
+      { id: "isare", img: "lemon lemon", q: "Есть два лимона.", s: "There are two lemons." },
+      { id: "u", img: "butter", q: "В холодильнике есть масло.", s: "There is butter in the fridge." }
+    ] },
+  { type: "translate", title: "Скажи по-английски", short: "Перевод", instr: "Скажи вслух, потом напиши. Проверяется главная часть.",
+    items: [
+      { id: "many", ru: "Сколько яиц?", en: "How many eggs?", key: "how many eggs" },
+      { id: "much", ru: "Сколько муки?", en: "How much flour?", key: "how much flour" },
+      { id: "alot", ru: "Здесь много сахара.", en: "There is a lot of sugar.", key: "a lot of sugar|lots of sugar" },
+      { id: "pl", ru: "У меня три помидора.", en: "I have got three tomatoes.", key: "three tomatoes" },
+      { id: "c", ru: "Мне нужен лимон.", en: "I need a lemon.", key: "a lemon" }
+    ] }
+];
+
+/* ===== Drill engine (shared). Expects META, P, DRILLS defined before this script. ===== */
+const byId = Object.fromEntries(P.map(p => [p.id, p]));
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const norm = s => (s || "").toLowerCase().replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, " ").trim().replace(/[.!?,;:]+$/, "");
+
+let M = {};
+try { M = JSON.parse(localStorage.getItem(META.ls) || "{}") || {}; } catch (e) { M = {}; }
+const save = () => { try { localStorage.setItem(META.ls, JSON.stringify(M)); } catch (e) {} };
+const COUNT = {};
+let COUNTING = true;
+const reg = id => { if (COUNTING && id && byId[id]) COUNT[id] = (COUNT[id] || 0) + 1; };
+const goal = id => Math.max(1, Math.min(5, COUNT[id] || 5));
+function hit(id, ok) {
+  if (!id || !byId[id]) return;
+  const r = M[id] || (M[id] = { c: 0, m: 0 });
+  if (ok) r.c++; else r.m++;
+  save(); renderBoard();
+}
+function renderBoard() {
+  const b = document.getElementById("board");
+  b.innerHTML = "";
+  let learned = 0;
+  P.forEach(p => {
+    const r = M[p.id] || { c: 0, m: 0 };
+    const g = goal(p.id);
+    const n = Math.min(g, r.c);
+    if (n >= g) learned++;
+    const chip = el("div", "chip" + (n >= g ? " master" : r.m > r.c ? " weak" : ""));
+    if (p.img) { chip.classList.add("with-pic"); chip.append(picEl(p, "pic chip-pic")); }
+    chip.append(el("span", "ph", p.phrase));
+    if (p.past) chip.append(el("span", "past", `прош.: ${p.past}`));
+    chip.append(el("span", "ru", p.ru));
+    const dots = el("span", "dots");
+    dots.setAttribute("aria-label", `${n} of ${g}`);
+    for (let i = 0; i < g; i++) dots.append(el("i", i < n ? "on" : ""));
+    chip.append(dots);
+    b.append(chip);
+  });
+  document.getElementById("mastered").textContent = learned;
+  document.getElementById("ptotal").textContent = P.length;
+  document.getElementById("fill").style.width = `${(learned / P.length) * 100}%`;
+}
+
+function card(num, def) {
+  const sec = el("section");
+  sec.id = `d${num}`;
+  const ex = el("article", "ex");
+  const head = el("div", "ex-head");
+  const h3 = el("h3");
+  h3.append(el("span", "num", `Задание ${num}`), def.title);
+  const score = el("span", "score");
+  head.append(h3, score);
+  ex.append(head, el("p", "instr", def.instr));
+  if (def.pic || def.story) {
+    const st = el("div", "story-head");
+    if (def.pic) st.append(el("span", "pic", def.pic));
+    if (def.story) st.append(el("b", "story-t", def.story));
+    ex.append(st);
+  }
+  if (def.bank) {
+    const bank = el("div", "bank");
+    def.bank.forEach(w => bank.append(el("span", null, w)));
+    ex.append(bank);
+  }
+  const body = el("div");
+  const foot = el("div", "foot");
+  ex.append(body, foot);
+  if (def.note) ex.append(el("p", "note", def.note));
+  sec.append(ex);
+  document.getElementById("main").append(sec);
+  const a = el("a", null, `${num} · ${def.short}`);
+  a.href = `#d${num}`;
+  document.getElementById("nav").append(a);
+  return { body, foot, score, total: 0, ok: 0, def };
+}
+const setScore = d => { d.score.hidden = !d.total; d.score.textContent = `${d.ok} / ${d.total}`; d.score.classList.toggle("done", d.total > 0 && d.ok === d.total); };
+function resetBtn(d, build) {
+  const r = el("button", "btn", "Начать заново");
+  r.type = "button";
+  r.addEventListener("click", () => { d.body.innerHTML = ""; d.foot.innerHTML = ""; build(); });
+  d.foot.append(r);
+}
+function splitId(spec, fallback) {
+  const i = spec.lastIndexOf("#");
+  return i > -1 ? [spec.slice(0, i), spec.slice(i + 1)] : [spec, fallback];
+}
+function options(list, correctSet, id, d, shuf, onOk) {
+  reg(id);
+  const wrap = el("span", "choice");
+  let done = false;
+  (shuf ? shuffle(list) : list).forEach(o => {
+    const b = el("button", "opt", o);
+    b.type = "button";
+    b.addEventListener("click", () => {
+      if (done || b.disabled) return;
+      if (correctSet.includes(o)) {
+        done = true;
+        b.classList.add("ok");
+        wrap.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+        d.ok++; setScore(d); hit(id, true);
+        if (onOk) onOk();
+      } else {
+        b.classList.add("bad", "shake");
+        b.disabled = true;
+        hit(id, false);
+      }
+    });
+    wrap.append(b);
+  });
+  return wrap;
+}
+
+/* Inline text with {{*right|wrong#id}} choices, [[ans/alt#id]] typed gaps, ^CUE^ word-formation cues */
+const TOK = /\{\{(.+?)\}\}|\[\[(.+?)\]\]|\^(.+?)\^/g;
+function inline(text, id, d, gaps, shuf) {
+  const frag = document.createDocumentFragment();
+  let last = 0;
+  text.replace(TOK, (m, c, t, q, off) => {
+    frag.append(text.slice(last, off));
+    if (c) {
+      const [spec, gid] = splitId(c, id);
+      const raw = spec.split("|");
+      const right = raw.filter(o => o.startsWith("*")).map(o => o.slice(1));
+      frag.append(options(raw.map(o => o.replace(/^\*/, "")), right, gid, d, shuf));
+      d.total++;
+    } else if (t) {
+      const [spec, gid] = splitId(t, id);
+      const answers = spec.split("/");
+      const inp = el("input", "gap");
+      inp.type = "text"; inp.autocomplete = "off"; inp.spellcheck = false;
+      inp.id = `g${d.num}-${gaps.length}`;
+      inp.setAttribute("autocapitalize", "off"); inp.setAttribute("aria-label", "gap");
+      inp.style.width = `${Math.max(6, Math.max(...answers.map(a => a.length)) + 2)}ch`;
+      reg(gid);
+      const g = { inp, answers: answers.map(norm), show: answers[0], id: gid, ok: false };
+      gaps.push(g);
+      inp.addEventListener("input", () => inp.classList.remove("ok", "bad", "shown"));
+      inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); d.check(); } });
+      frag.append(inp);
+      d.total++;
+    } else {
+      frag.append(el("span", "cue", q));
+    }
+    last = off + m.length;
+    return m;
+  });
+  frag.append(text.slice(last));
+  return frag;
+}
+
+const RENDER = {
+  /* sentences with inline choices and/or typed gaps */
+  gaps(d) {
+    const def = d.def;
+    const gaps = [];
+    d.check = () => {
+      gaps.forEach(g => {
+        if (g.ok) return;
+        const v = norm(g.inp.value);
+        if (!v) return;
+        g.inp.classList.remove("ok", "bad", "shown");
+        if (g.answers.includes(v)) { g.ok = true; g.inp.classList.add("ok"); g.inp.readOnly = true; d.ok++; hit(g.id, true); }
+        else { g.inp.classList.add("bad"); hit(g.id, false); }
+      });
+      setScore(d);
+    };
+    const items = def.keepOrder ? def.items : shuffle(def.items);
+    const shuf = def.shuffleOptions !== false;
+    if (def.layout === "text") {
+      items.forEach(it => { const p = el("p", "text"); p.append(inline(it.t, it.id, d, gaps, shuf)); d.body.append(p); });
+    } else {
+      const ol = el("ol", "items");
+      items.forEach(it => { const li = el("li"); const ip = itemPic(it); if (ip) { li.classList.add("has-ip"); li.append(ip); } const tx = el("span", "gl"); tx.append(inline(it.t, it.id, d, gaps, shuf)); li.append(tx); ol.append(li); });
+      d.body.append(ol);
+    }
+    if (gaps.length) {
+      const c = el("button", "btn primary", "Проверить"); c.type = "button"; c.addEventListener("click", d.check);
+      const s = el("button", "btn", "Показать ответы"); s.type = "button";
+      s.addEventListener("click", () => gaps.forEach(g => { if (!g.ok) { g.inp.value = g.show; g.inp.classList.remove("bad"); g.inp.classList.add("shown"); } }));
+      d.foot.append(c, s);
+    }
+  },
+  /* question + option buttons; first option in o is the correct one */
+  mcq(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      li.append(el("p", "q", it.q));
+      const box = el("div", "mcq");
+      const why = el("p", "fix ok"); why.hidden = true;
+      if (it.why) why.append("✓ ", it.why);
+      box.append(options([...it.o], [it.o[0]], it.id, d, true, () => { if (it.why) why.hidden = false; }));
+      d.total++;
+      li.append(box, why);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* meaning -> phrase, built from P */
+  meaning(d) {
+    const ol = el("ol", "items");
+    const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+    shuffle(pool).forEach(p => {
+      const li = el("li");
+      li.append(el("p", "q", p.en));
+      const lab = x => x.opt || x.phrase;
+      const others = [...new Set(shuffle(pool.filter(x => x.id !== p.id)).map(lab))].filter(t => t !== lab(p)).slice(0, 3);
+      const box = el("div", "mcq");
+      box.append(options([lab(p), ...others], [lab(p)], p.id, d, true));
+      d.total++;
+      li.append(box);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* right or wrong */
+  tf(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      li.append(el("p", "tf-line", it.t));
+      const btns = el("div", "tf-btns");
+      const fb = el("p", "fix"); fb.hidden = true;
+      let done = false;
+      [["Верно", true], ["Неверно", false]].forEach(([label, val]) => {
+        const b = el("button", "opt", label);
+        b.type = "button";
+        b.addEventListener("click", () => {
+          if (done) return;
+          done = true;
+          const correct = val === it.ok;
+          b.classList.add(correct ? "ok" : "bad");
+          btns.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+          fb.hidden = false;
+          fb.className = "fix " + (correct ? "ok" : "bad");
+          fb.innerHTML = "";
+          if (it.ok) fb.append(correct ? "Да, верно." : "Это было верно.");
+          else fb.append(correct ? "Да! Правильно: " : "Здесь ошибка. Правильно: ", el("b", null, it.fix));
+          if (it.why) fb.append(el("span", "why", " " + it.why));
+          if (correct) { d.ok++; setScore(d); }
+          hit(it.id, correct);
+        });
+        btns.append(b);
+      });
+      li.append(btns, fb);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* word order */
+  order(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      if (it.q) li.append(el("p", "q", it.q));
+      const wrap = el("div", "uns");
+      const target = it.s.split(" ");
+      const line = el("div", "answer-line");
+      line.setAttribute("aria-label", "Your sentence");
+      const pool = el("div", "tiles");
+      const fb = el("p", "fix"); fb.hidden = true;
+      let solved = false;
+      const mk = w => {
+        const t = el("button", "tile", w);
+        t.type = "button";
+        t.addEventListener("click", () => {
+          if (solved) return;
+          (t.parentElement === pool ? line : pool).append(t);
+          line.classList.remove("bad"); fb.hidden = true;
+        });
+        return t;
+      };
+      let order = shuffle(target);
+      if (order.join(" ") === it.s && target.length > 1) order = [...order.slice(1), order[0]];
+      order.forEach(w => pool.append(mk(w)));
+      const controls = el("div", "line");
+      const c = el("button", "btn small primary", "Проверить"); c.type = "button";
+      const sh = el("button", "btn small", "Показать ответ"); sh.type = "button";
+      c.addEventListener("click", () => {
+        if (solved) return;
+        const built = [...line.children].map(x => x.textContent).join(" ");
+        if (!built) return;
+        fb.hidden = false;
+        const alts = [it.s, ...(it.alt || [])];
+        if (alts.includes(built)) {
+          solved = true; line.classList.add("ok"); fb.className = "fix ok"; fb.textContent = "Правильно!";
+          d.ok++; setScore(d); hit(it.id, true);
+        } else if (pool.children.length) {
+          fb.className = "fix bad"; fb.textContent = "Используй все карточки.";
+        } else {
+          line.classList.add("bad"); fb.className = "fix bad"; fb.textContent = "Не совсем. Нажимай на слова, чтобы переставить, и попробуй ещё раз.";
+          hit(it.id, false);
+        }
+      });
+      sh.addEventListener("click", () => { fb.hidden = false; fb.className = "fix"; fb.innerHTML = ""; fb.append("Ответ: ", el("b", null, it.s)); });
+      controls.append(c, sh);
+      wrap.append(line, pool, controls, fb);
+      li.append(wrap);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* translation; key = regex the answer must contain */
+  translate(d) {
+    const ol = el("ol", "items tr");
+    shuffle(d.def.items).forEach((it, i) => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      li.append(el("p", "ru-line", it.ru));
+      const ta = el("textarea");
+      ta.id = `t${d.num}-${i}`; ta.rows = 1; ta.placeholder = "Напиши по-английски…"; ta.setAttribute("aria-label", "Your translation");
+      const line = el("div", "line");
+      const c = el("button", "btn small primary", "Проверить"); c.type = "button";
+      const sh = el("button", "btn small", "Показать ответ"); sh.type = "button";
+      const model = el("p", "model"); model.hidden = true;
+      let solved = false;
+      const re = new RegExp(`(^|[^a-z'])(${it.key})($|[^a-z'])`, "i");
+      const check = () => {
+        if (solved || !ta.value.trim()) return;
+        const v = norm(ta.value);
+        ta.classList.remove("ok", "bad");
+        model.hidden = false; model.innerHTML = "";
+        if (re.test(v)) {
+          solved = true; ta.classList.add("ok"); ta.readOnly = true;
+          model.append("Правильно! Ответ: ", el("b", null, it.en));
+          d.ok++; setScore(d); hit(it.id, true);
+        } else {
+          ta.classList.add("bad");
+          model.append("Нужно слово: ", el("b", null, it.hint || (byId[it.id] ? byId[it.id].phrase : "the target phrase")), ". Попробуй ещё раз.");
+          hit(it.id, false);
+        }
+      };
+      c.addEventListener("click", check);
+      ta.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); check(); } });
+      sh.addEventListener("click", () => { model.hidden = false; model.innerHTML = ""; model.append("Ответ: ", el("b", null, it.en)); });
+      line.append(c, sh);
+      li.append(ta, line, model);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  }
+};
+
+
+/* ===== Flashcards (auto Drill 1) ===== */
+const sayText = p => (p.say || p.phrase)
+  .replace(/\([^)]*\)/g, " ").replace(/→/g, ", ").replace(/…|\.\.\./g, " ")
+  .replace(/\bsb\b/g, "someone").replace(/\bsth\b/g, "something")
+  .replace(/\s\/\s/g, " or ").replace(/^-/, "").replace(/\s+/g, " ").trim();
+let VOICE = null;
+function pickVoice() {
+  try {
+    const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+    VOICE = vs.find(v => /en[-_]GB/i.test(v.lang) && /google|natural|online|serena|daniel|kate/i.test(v.name))
+      || vs.find(v => /en[-_]GB/i.test(v.lang)) || vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0] || null;
+  } catch (e) { VOICE = null; }
+}
+try { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } catch (e) {}
+function speak(text) {
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if (VOICE) u.voice = VOICE;
+    u.lang = VOICE ? VOICE.lang : "en-GB";
+    u.rate = 0.9;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+const HAS_TTS = typeof window !== "undefined" && "speechSynthesis" in window;
+
+RENDER.cards = function (d) {
+  let deck = P.map(p => p.id), pos = 0, flipped = false, ruFirst = false, known = 0, auto = false;
+  d.total = deck.length;
+  const box = el("div", "fc");
+  const tools = el("div", "fc-tools");
+  const mk = (txt, title) => { const b = el("button", "btn ghost", txt); b.type = "button"; if (title) b.title = title; return b; };
+  const bShuf = mk("Перемешать"), bDir = mk("Сначала русский"), bAuto = mk("Автозвук: выкл");
+  tools.append(bShuf, bDir);
+  if (HAS_TTS) tools.append(bAuto);
+  const flip = el("div", "flip" + (P.some(hasPic) ? " has-pic" : "")); flip.tabIndex = 0; flip.setAttribute("role", "button");
+  const inner = el("div", "flip-in");
+  const front = el("div", "face front"), back = el("div", "face back");
+  inner.append(front, back); flip.append(inner);
+  const nav = el("div", "fc-nav");
+  const bPrev = mk("‹"), bNext = mk("›"), count = el("span", "fc-count");
+  bPrev.setAttribute("aria-label", "previous"); bNext.setAttribute("aria-label", "next");
+  nav.append(bPrev, count, bNext);
+  const rate = el("div", "fc-rate");
+  const bAgain = el("button", "btn again", "Ещё раз"), bKnow = el("button", "btn know", "Знаю ✓");
+  bAgain.type = bKnow.type = "button";
+  rate.append(bAgain, bKnow);
+  const done = el("div", "fc-done");
+  box.append(tools, flip, nav, rate, done);
+  d.body.append(box);
+
+  const face = (node, p, en) => {
+    node.innerHTML = "";
+    if (hasPic(p)) node.append(picEl(p, "pic fc-pic"));
+    if (en) {
+      node.append(el("div", "fc-word", p.phrase));
+      if (p.past) node.append(el("div", "fc-past", `прошедшее время: ${p.past}`));
+      if (HAS_TTS) {
+        const s = el("button", "speak", "🔊"); s.type = "button"; s.setAttribute("aria-label", "listen");
+        s.addEventListener("click", e => { e.stopPropagation(); speak(sayText(p)); });
+        node.append(s);
+      }
+    } else {
+      node.append(el("div", "fc-ru", p.ru));
+      if (p.en) node.append(el("div", "fc-def", p.en));
+    }
+    node.append(el("div", "fc-hint", "нажми, чтобы перевернуть"));
+  };
+  function show() {
+    done.innerHTML = "";
+    const left = deck.length > 0;
+    [flip, nav, rate].forEach(x => x.hidden = !left);
+    if (!left) {
+      done.append(el("p", null, `Все ${P.length} карточек пройдены! Теперь переходи к заданию 2.`));
+      const r = mk("Пройти карточки ещё раз"); r.addEventListener("click", () => { deck = P.map(p => p.id); known = 0; d.ok = 0; setScore(d); pos = 0; show(); });
+      done.append(r);
+      return;
+    }
+    pos = (pos + deck.length) % deck.length;
+    const p = byId[deck[pos]];
+    flipped = false; flip.classList.remove("on");
+    face(front, p, !ruFirst); face(back, p, ruFirst);
+    count.textContent = `${pos + 1} / ${deck.length}`;
+    if (auto && !ruFirst) speak(sayText(p));
+  }
+  function turn() {
+    flipped = !flipped; flip.classList.toggle("on", flipped);
+    if (auto && ruFirst && flipped) speak(sayText(byId[deck[pos]]));
+  }
+  flip.addEventListener("click", turn);
+  flip.addEventListener("keydown", e => {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); turn(); }
+    else if (e.key === "ArrowRight") { pos++; show(); }
+    else if (e.key === "ArrowLeft") { pos--; show(); }
+  });
+  bPrev.addEventListener("click", () => { pos--; show(); });
+  bNext.addEventListener("click", () => { pos++; show(); });
+  bShuf.addEventListener("click", () => { deck = shuffle(deck); pos = 0; show(); });
+  bDir.addEventListener("click", () => { ruFirst = !ruFirst; bDir.textContent = ruFirst ? "Сначала английский" : "Сначала русский"; show(); });
+  bAuto.addEventListener("click", () => { auto = !auto; bAuto.textContent = `Автозвук: ${auto ? "вкл" : "выкл"}`; if (auto) show(); });
+  bKnow.addEventListener("click", () => { deck.splice(pos, 1); known++; d.ok = known; setScore(d); show(); });
+  bAgain.addEventListener("click", () => { const id = deck.splice(pos, 1)[0]; deck.push(id); if (pos >= deck.length - 1 && deck.length > 1) pos = deck.length - 1; show(); });
+  show();
+};
+
+
+/* ===== Beginner drills: match pairs, listen and choose ===== */
+RENDER.match = function (d) {
+  const ids = d.def.ids || P.map(p => p.id);
+  const size = d.def.size || 6;
+  const groups = [];
+  const sh = shuffle(ids);
+  for (let i = 0; i < sh.length; i += size) groups.push(sh.slice(i, i + size));
+  if (groups.length > 1 && groups[groups.length - 1].length < 3) { const last = groups.pop(); groups[groups.length - 1].push(...last); }
+  groups.forEach((g, gi) => {
+    const box = el("div", "match");
+    if (groups.length > 1) box.append(el("p", "match-n", `Часть ${gi + 1} из ${groups.length}`));
+    const cols = el("div", "match-cols");
+    const L = el("div", "match-col"), Rc = el("div", "match-col");
+    let sel = null;
+    const mkb = (id, txt, side) => {
+      const b = el("button", "opt pair", txt); b.type = "button"; b.dataset.id = id; b.dataset.side = side;
+      b.addEventListener("click", () => {
+        if (b.disabled) return;
+        if (!sel || sel.dataset.side === side) { if (sel) sel.classList.remove("sel"); sel = b; b.classList.add("sel"); return; }
+        const a = sel; sel = null; a.classList.remove("sel");
+        if (a.dataset.id === b.dataset.id) {
+          [a, b].forEach(x => { x.classList.add("ok"); x.disabled = true; });
+          d.ok++; setScore(d); hit(id, true);
+        } else {
+          [a, b].forEach(x => { x.classList.remove("shake"); void x.offsetWidth; x.classList.add("shake", "wrong"); setTimeout(() => x.classList.remove("wrong"), 600); });
+          hit(a.dataset.side === "en" ? a.dataset.id : b.dataset.id, false);
+        }
+      });
+      return b;
+    };
+    shuffle(g).forEach(id => { reg(id); d.total++; L.append(mkb(id, byId[id].phrase, "en")); });
+    shuffle(g).forEach(id => Rc.append(mkb(id, byId[id].ru, "ru")));
+    cols.append(L, Rc); box.append(cols); d.body.append(box);
+  });
+};
+RENDER.listen = function (d) {
+  const ol = el("ol", "items");
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    const q = el("div", "listen-q");
+    if (HAS_TTS) {
+      const s = el("button", "speak", "🔊"); s.type = "button"; s.setAttribute("aria-label", "слушать");
+      s.addEventListener("click", () => speak(sayText(p)));
+      q.append(s);
+      const w = el("button", "btn small ghost", "показать слово"); w.type = "button";
+      w.addEventListener("click", () => { w.replaceWith(el("b", "listen-word", p.phrase)); });
+      q.append(w);
+    } else q.append(el("b", "listen-word", p.phrase));
+    li.append(q);
+    const others = [...new Set(shuffle(pool.filter(x => x.id !== p.id)).map(x => x.ru))].filter(t => t !== p.ru).slice(0, 3);
+    const box = el("div", "mcq");
+    box.append(options([p.ru, ...others], [p.ru], p.id, d, true));
+    d.total++;
+    li.append(box); ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* ===== Grammar: rule sheet and sort-into-baskets ===== */
+RENDER.rule = function (d) {
+  const box = el("div", "rule");
+  d.def.blocks.forEach(bl => {
+    const b = el("div", "rule-b" + (bl.warn ? " warn" : ""));
+    b.append(el("h4", null, bl.h));
+    bl.lines.forEach(ln => {
+      const row = el("p", "rule-l");
+      if (Array.isArray(ln)) {
+        const en = el("span", "rule-en"); en.innerHTML = ln[0].replace(/\*(.+?)\*/g, "<mark>$1</mark>");
+        row.append(en);
+        if (ln[1]) row.append(el("span", "rule-ru", ln[1]));
+      } else row.append(ln);
+      b.append(row);
+    });
+    box.append(b);
+  });
+  d.body.append(box);
+  d.foot.hidden = true;
+};
+RENDER.sort = function (d) {
+  const bk = d.def.buckets;
+  const ol = el("ol", "items");
+  shuffle(d.def.items).forEach(it => {
+    d.total++; reg(it.id);
+    const li = el("li");
+    const ip = itemPic(it); if (ip) li.append(ip);
+    li.append(el("p", "tf-line", it.t));
+    const btns = el("div", "tf-btns sort-btns");
+    const fb = el("p", "fix"); fb.hidden = true;
+    let done = false;
+    bk.forEach((label, i) => {
+      const b = el("button", "opt", label); b.type = "button";
+      b.addEventListener("click", () => {
+        if (done || b.disabled) return;
+        if (i === it.b) {
+          done = true; b.classList.add("ok");
+          btns.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+          d.ok++; setScore(d); hit(it.id, true);
+          if (it.why) { fb.hidden = false; fb.className = "fix ok"; fb.textContent = "✓ " + it.why; }
+        } else {
+          b.classList.add("bad", "shake"); b.disabled = true; hit(it.id, false);
+          if (it.why) { fb.hidden = false; fb.className = "fix bad"; fb.textContent = "Подсказка: " + it.why; }
+        }
+      });
+      btns.append(b);
+    });
+    li.append(btns, fb); ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* ===== Pictures (Noto Emoji, Apache 2.0). p.img / it.img = "giraffe" or "bicycle !no" or "mouse elephant" =====
+   PICS = { name: "<svg…>" } is injected by build.py with only the pictures a page uses. */
+const hasPic = p => !!(p && p.img);
+function picHTML(spec) {
+  const parts = spec.split(/\s+/).filter(Boolean);
+  const no = parts.includes("!no"), yes = parts.includes("!yes");
+  const names = parts.filter(x => x[0] !== "!");
+  const imgs = names.map(n => `<span class="pi">${PICS[n] || ""}</span>`).join("");
+  return `<span class="pics n${names.length}">${imgs}</span>` +
+    (no ? `<span class="pic-no">${PICS["prohibited"] || ""}</span>` : "") +
+    (yes ? `<span class="pic-yes">${PICS["check-mark-button"] || ""}</span>` : "");
+}
+const picEl = (p, cls) => { const d = el("div", (cls || "pic") + " has-img"); d.innerHTML = picHTML(p.img); return d; };
+const itemPic = (it, cls) => it && it.img ? picEl(it, cls || "pic i-pic") : null;
+
+/* picture → choose the word */
+RENDER.pic = function (d) {
+  const ol = el("ol", "items pic-items");
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(hasPic);
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    li.append(picEl(p, "pic q-pic"));
+    const others = shuffle(pool.filter(x => x.id !== p.id)).map(x => x.phrase).slice(0, (d.def.n || 4) - 1);
+    const box = el("div", "mcq");
+    box.append(options([p.phrase, ...others], [p.phrase], p.id, d, true));
+    d.total++;
+    li.append(box); ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* buttons with pictures; first is correct */
+function picOptions(right, pool, d, n) {
+  const wrap = el("div", "pic-opts");
+  let done = false;
+  const others = shuffle(pool.filter(x => x.id !== right.id && x.img !== right.img)).slice(0, (n || 4) - 1);
+  reg(right.id);
+  shuffle([right, ...others]).forEach(p => {
+    const b = el("button", "popt"); b.type = "button";
+    b.innerHTML = picHTML(p.img);
+    b.setAttribute("aria-label", p.phrase);
+    b.addEventListener("click", () => {
+      if (done || b.disabled) return;
+      if (p.id === right.id) {
+        done = true; b.classList.add("ok");
+        wrap.querySelectorAll(".popt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+        d.ok++; setScore(d); hit(right.id, true);
+      } else { b.classList.add("bad", "shake"); b.disabled = true; hit(right.id, false); }
+    });
+    wrap.append(b);
+  });
+  return wrap;
+}
+/* read the word → tap the picture */
+RENDER.pick = function (d) {
+  const ol = el("ol", "items");
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(hasPic);
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    const q = el("p", "q big-q", p.phrase);
+    li.append(q, picOptions(p, pool, d, d.def.n)); d.total++;
+    ol.append(li);
+  });
+  d.body.append(ol);
+};
+/* listen → tap the picture */
+RENDER.listenpic = function (d) {
+  const ol = el("ol", "items");
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(hasPic);
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    const q = el("div", "listen-q");
+    if (HAS_TTS) {
+      const s = el("button", "speak", "🔊"); s.type = "button"; s.setAttribute("aria-label", "слушать");
+      s.addEventListener("click", () => speak(sayText(p)));
+      const w = el("button", "btn small ghost", "показать слово"); w.type = "button";
+      w.addEventListener("click", () => { w.replaceWith(el("b", "listen-word", p.phrase)); });
+      q.append(s, w);
+    } else q.append(el("b", "listen-word", p.phrase));
+    li.append(q, picOptions(p, pool, d, d.def.n)); d.total++;
+    ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* auto drills built from P (pictures carried into each item) */
+RENDER.ru2en = function (d) {
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, img: p.img, q: p.ru, o: [p.phrase, ...shuffle(pool.filter(x => x.id !== p.id)).slice(0, 3).map(x => x.phrase)] })) });
+  RENDER.mcq(d);
+};
+RENDER.en2ru = function (d) {
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, q: p.phrase, o: [p.ru, ...shuffle(pool.filter(x => x.id !== p.id)).slice(0, 3).map(x => x.ru)] })) });
+  RENDER.mcq(d);
+};
+RENDER.letters = function (d) {
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(p => !/\s/.test(p.spell || p.phrase));
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, img: p.img, q: p.ru, s: (p.spell || p.phrase).split("").join(" ") })) });
+  RENDER.order(d);
+};
+RENDER.write = function (d) {
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, img: p.img, t: `${p.ru} — [[${p.ans || p.phrase}]]` })) });
+  RENDER.gaps(d);
+};
+
+function startDrill(num, def) {
+  const d = card(num, def);
+  d.num = num;
+  const build = () => {
+    d.ok = 0; d.total = 0;
+    RENDER[def.type](d);
+    setScore(d);
+    resetBtn(d, build);
+  };
+  build();
+}
+
+document.getElementById("reset-all").addEventListener("click", e => {
+  const b = e.currentTarget;
+  if (b.dataset.armed) { M = {}; save(); renderBoard(); b.textContent = "Сбросить прогресс"; delete b.dataset.armed; }
+  else { b.dataset.armed = "1"; b.textContent = "Нажми ещё раз для сброса"; setTimeout(() => { if (b.dataset.armed) { delete b.dataset.armed; b.textContent = "Сбросить прогресс"; } }, 3000); }
+});
+const boardLink = el("a", null, META.boardLabel || "Слова"); boardLink.href = "#board-sec";
+document.getElementById("nav").append(boardLink);
+const CARDS = { type: "cards", title: "Карточки", short: "Карточки",
+  instr: "Посмотри на слово и вспомни перевод. Нажми на карточку, чтобы перевернуть, 🔊 — послушать. Потом нажми «Знаю» или «Ещё раз» — эти карточки вернутся в конце." };
+(META.cards === false ? DRILLS : [CARDS, ...DRILLS]).forEach((def, i) => startDrill(i + 1, def));
+COUNTING = false;
+renderBoard();
+
+</script>
+</body>
+</html>

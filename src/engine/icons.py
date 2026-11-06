@@ -4,6 +4,8 @@
 import sys, json, re, glob, os
 base = os.path.dirname(os.path.abspath(__file__)); root = os.path.dirname(base)
 full = json.load(open(sys.argv[1])); W = full.get('width', 128); H = full.get('height', 128)
+# own drawings in the same style (sugar, flour, olive oil, pepper shaker…)
+full['icons'].update(json.load(open(os.path.join(base, 'custom.json'))))
 names = {'prohibited', 'check-mark-button'}
 for f in glob.glob(os.path.join(root, 'packs', '*.js')) + glob.glob(os.path.join(root, 'grammar', '*.js')):
     for spec in re.findall(r'\bimg:\s*"([^"]+)"', open(f).read()):
