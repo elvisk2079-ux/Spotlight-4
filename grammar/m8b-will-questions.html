@@ -1,0 +1,1081 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What Will the Weather Be Like?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column — mastery board of the 20 phrases, then five drills in a fixed ladder */
+:root {
+  --paper: #F1F4F0; --card: #FFFFFF; --ink: #1B2733; --muted: #5B6977; --line: #D6DCD5;
+  --accent: #2A55C9; --accent-soft: #E4EBFB; --on-accent: #FFFFFF;
+  --ok: #1D8455; --ok-soft: #DCF1E5; --bad: #BF3F2D; --bad-soft: #F8E2DD;
+  --mark: #FFE892; --mark-ink: #4A3C00; --dot: #CBD3CC;
+  --font-display: "Young Serif", Georgia, "Times New Roman", serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11171D; --card: #19212A; --ink: #E4EAF0; --muted: #9AA7B4; --line: #2B3642;
+    --accent: #8AA8FF; --accent-soft: #1F2C4A; --on-accent: #0E1730;
+    --ok: #62D39F; --ok-soft: #163327; --bad: #FF8E7C; --bad-soft: #3B201B;
+    --mark: #5B4C14; --mark-ink: #FFF1BF; --dot: #34404C; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11171D; --card: #19212A; --ink: #E4EAF0; --muted: #9AA7B4; --line: #2B3642;
+  --accent: #8AA8FF; --accent-soft: #1F2C4A; --on-accent: #0E1730;
+  --ok: #62D39F; --ok-soft: #163327; --bad: #FF8E7C; --bad-soft: #3B201B;
+  --mark: #5B4C14; --mark-ink: #FFF1BF; --dot: #34404C; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.55; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.wrap { max-width: 760px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+.hero { padding-block: 40px 16px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(32px, 6vw, 46px); line-height: 1.1; margin: 0 0 12px; text-wrap: balance; }
+.sub { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); border-bottom: 1px solid var(--line); }
+.bar .wrap { display: flex; flex-direction: column; gap: 8px; padding-block: 10px; }
+.nav { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.nav::-webkit-scrollbar { display: none; }
+.nav a { flex: none; text-decoration: none; color: var(--ink); font-size: 14px; font-weight: 600; padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); }
+.nav a:hover { border-color: var(--accent); color: var(--accent); }
+.progress { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.track { flex: 1; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.fill { height: 100%; width: 0; background: var(--ok); transition: width .4s ease; }
+.progress b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+main { padding-block: 8px 64px; }
+section { padding-top: 26px; scroll-margin-top: 110px; }
+h2 { font-family: var(--font-display); font-weight: 400; font-size: 26px; line-height: 1.2; margin: 0 0 4px; }
+.lead { margin: 0 0 14px; color: var(--muted); }
+
+/* Mastery board */
+.board { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; }
+.chip { min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; display: flex; flex-direction: column; gap: 4px; }
+.chip .ph { font-weight: 600; font-size: 15px; line-height: 1.3; }
+.chip .ru { font-size: 12.5px; color: var(--muted); line-height: 1.3; }
+.dots { display: flex; gap: 3px; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--dot); }
+.dots i.on { background: var(--ok); }
+.chip.weak { border-color: var(--bad); }
+.chip.master { border-color: var(--ok); background: var(--ok-soft); }
+.board-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; font-size: 13px; color: var(--muted); }
+
+/* Exercise card */
+.ex { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 18px 16px; }
+.ex-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+h3 { margin: 0; font-size: 18px; font-weight: 700; }
+h3 .num { font-family: var(--font-mono); font-size: 13px; color: var(--accent); margin-right: 8px; }
+.score { flex: none; font-family: var(--font-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); }
+.score.done { color: var(--ok); border-color: var(--ok); background: var(--ok-soft); }
+.instr { margin: 6px 0 14px; color: var(--muted); font-size: 15px; }
+ol.items { margin: 0; padding-left: 1.6em; display: flex; flex-direction: column; gap: 10px; }
+ol.items li { line-height: 2; padding-left: 4px; }
+ol.items li::marker { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+
+.choice { display: inline-flex; flex-wrap: wrap; gap: 4px; vertical-align: baseline; }
+.opt { font: inherit; font-size: 16px; line-height: 1.4; color: var(--ink); cursor: pointer; background: var(--card); border: 1.5px solid var(--line); border-radius: 999px; padding: 1px 11px; text-align: left; }
+.opt:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.opt.ok { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); font-weight: 600; cursor: default; }
+.opt.bad { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); text-decoration: line-through; cursor: default; }
+.opt.dim { opacity: .4; cursor: default; }
+.shake { animation: shake .3s; }
+@keyframes shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+
+/* MCQ */
+.q { margin: 0 0 6px; line-height: 1.5; }
+.mcq { display: flex; flex-wrap: wrap; gap: 6px; }
+.mcq .opt { border-radius: 8px; padding: 4px 12px; }
+
+/* Right or wrong */
+.tf-line { line-height: 1.5; margin: 0 0 6px; }
+.tf-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.fix { margin: 6px 0 0; font-size: 15px; line-height: 1.5; }
+.fix.ok { color: var(--ok); }
+.fix.bad { color: var(--bad); }
+.fix b { color: var(--ink); }
+
+.gap { font: inherit; font-size: 16px; color: var(--ink); background: var(--accent-soft); border: none; border-bottom: 2px dashed var(--accent); border-radius: 4px 4px 0 0; padding: 1px 6px; max-width: 100%; }
+.gap:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.gap.ok { background: var(--ok-soft); border-bottom: 2px solid var(--ok); }
+.gap.bad { background: var(--bad-soft); border-bottom: 2px solid var(--bad); }
+.gap.shown { background: var(--mark); color: var(--mark-ink); border-bottom: 2px solid var(--mark-ink); }
+
+/* Translate */
+.tr li { line-height: 1.5 !important; }
+.tr .ru-line { margin: 0 0 6px; font-weight: 500; }
+.tr textarea { width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; resize: vertical; min-height: 44px; }
+.tr textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.tr textarea.ok { border-color: var(--ok); background: var(--ok-soft); }
+.tr textarea.bad { border-color: var(--bad); background: var(--bad-soft); }
+.tr .line { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; align-items: center; }
+.model { margin: 8px 0 2px; font-size: 15px; color: var(--muted); }
+.model b { color: var(--ink); }
+
+.foot { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.btn { font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.primary:hover { filter: brightness(1.08); color: var(--on-accent); }
+.btn.small { font-size: 13px; padding: 4px 10px; }
+.btn:focus-visible, .opt:focus-visible, .nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.note { margin: 14px 0 0; padding: 10px 12px; border-radius: 8px; font-size: 15px; background: var(--accent-soft); }
+
+@media (max-width: 480px) { body { font-size: 16px; } .ex { padding: 14px; } ol.items { padding-left: 1.3em; } }
+@media (prefers-reduced-motion: reduce) { .shake { animation: none; } .fill { transition: none; } html { scroll-behavior: auto; } }
+
+/* Word order */
+.uns { display: flex; flex-direction: column; gap: 6px; }
+.answer-line { min-height: 42px; display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; border: 1.5px dashed var(--line); border-radius: 8px; background: var(--paper); }
+.answer-line.ok { border: 1.5px solid var(--ok); background: var(--ok-soft); }
+.answer-line.bad { border: 1.5px solid var(--bad); background: var(--bad-soft); }
+.tiles { display: flex; flex-wrap: wrap; gap: 6px; }
+.tile { font: inherit; font-size: 16px; padding: 3px 10px; border-radius: 6px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+.tile:hover { border-color: var(--accent); color: var(--accent); }
+.tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.uns .line { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.uns .fix { margin: 0; }
+
+.cue { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .06em; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin: 0 3px; white-space: nowrap; }
+.bank { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; padding: 10px; border: 1px dashed var(--line); border-radius: 8px; }
+.bank span { font-size: 14px; padding: 2px 9px; border-radius: 6px; background: var(--accent-soft); }
+p.text { margin: 0 0 10px; line-height: 2.2; }
+
+/* flashcards */
+.fc-tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.btn.ghost { background: transparent; border: 1px solid var(--line); color: inherit; }
+.flip { perspective: 1200px; cursor: pointer; outline: none; margin: 0 auto; max-width: 560px; }
+.flip-in { position: relative; min-height: 220px; transition: transform .45s; transform-style: preserve-3d; }
+.flip.on .flip-in { transform: rotateY(180deg); }
+.flip:focus-visible .flip-in { box-shadow: 0 0 0 3px var(--accent-soft); border-radius: 14px; }
+.face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 22px 18px 30px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+.face.back { transform: rotateY(180deg); background: var(--accent-soft); }
+.fc-word { font-size: clamp(22px, 5vw, 30px); font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.fc-ru { font-size: clamp(19px, 4.4vw, 25px); font-weight: 600; line-height: 1.3; }
+.fc-def { font-size: 14px; opacity: .75; max-width: 42ch; }
+.fc-hint { position: absolute; bottom: 8px; font-size: 12px; opacity: .45; }
+.speak { font-size: 22px; line-height: 1; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+.fc-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 12px 0 6px; }
+.fc-nav .btn { font-size: 20px; padding: 4px 16px; }
+.fc-count { font-variant-numeric: tabular-nums; min-width: 5ch; text-align: center; }
+.fc-rate { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.btn.again { background: transparent; border: 1px solid #d9822b; color: #d9822b; }
+.btn.know { background: #2e9e5b; border: 1px solid #2e9e5b; color: #fff; }
+.fc-done { text-align: center; }
+.fc-done p { font-weight: 600; margin: 8px 0 10px; }
+.btn.know:hover { color: #fff; filter: brightness(1.08); border-color: #2e9e5b; }
+.btn.again:hover { color: #d9822b; border-color: #d9822b; background: rgba(217,130,43,.08); }
+.match { margin-bottom: 14px; }
+.match-n { margin: 0 0 6px; font-size: 13px; color: var(--muted); }
+.match-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.match-col { display: flex; flex-direction: column; gap: 6px; }
+.opt.pair { border-radius: 8px; padding: 8px 10px; text-align: center; min-height: 44px; }
+.opt.sel { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.listen-q { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.listen-word { font-size: 18px; }
+.match-cols { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+.board { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+/* Grammar additions */
+.story-head { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; padding: 10px 14px; background: var(--accent-soft); border-radius: 10px; }
+.story-head .pic { font-size: 30px; line-height: 1; letter-spacing: 2px; }
+.story-t { font-family: var(--font-display); font-weight: 400; font-size: 20px; }
+.rule { display: flex; flex-direction: column; gap: 10px; }
+.rule-b { border: 1px solid var(--line); border-left: 4px solid var(--ok); border-radius: 10px; padding: 10px 14px; background: var(--card); }
+.rule-b.warn { border-left-color: var(--bad); }
+.rule-b h4 { margin: 0 0 6px; font-size: 16px; }
+.rule-l { margin: 2px 0; display: flex; flex-wrap: wrap; column-gap: 10px; }
+.rule-en { font-weight: 600; }
+.rule-en mark { background: var(--mark); color: var(--mark-ink); border-radius: 3px; padding: 0 2px; }
+.rule-ru { color: var(--muted); font-size: 15px; }
+.why { color: var(--muted); }
+.sort-btns .opt { min-width: 9em; }
+
+[hidden] { display: none !important; }
+.home { display: inline-block; margin-bottom: 14px; font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.fc-past { font-size: 16px; color: var(--muted); margin-top: -4px; }
+.chip .past { font-size: 12.5px; color: var(--accent); line-height: 1.3; }
+.pic svg { display: block; width: 100%; height: 100%; }
+.fc-pic { width: 150px; height: 200px; }
+.flip.has-pic .flip-in { min-height: 380px; }
+.q-pic { width: 120px; height: 160px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 6px; padding: 2px; }
+/* ===== Spotlight 4: pictures ===== */
+.pic.has-img { position: relative; display: flex; align-items: center; justify-content: center; }
+.pics { display: flex; align-items: center; justify-content: center; gap: 6%; width: 100%; height: 100%; }
+.pics .pi { display: block; height: 100%; aspect-ratio: 1; }
+.pics.n2 .pi { height: 70%; } .pics.n3 .pi { height: 52%; }
+.pics .pi svg, .pic-no svg, .pic-yes svg { display: block; width: 100%; height: 100%; }
+.pic-no { position: absolute; inset: 4%; margin: auto; aspect-ratio: 1; height: 92%; opacity: .82; pointer-events: none; }
+.pic-yes { position: absolute; right: 2%; bottom: 2%; width: 34%; aspect-ratio: 1; pointer-events: none; }
+.fc-pic.has-img { width: 190px; height: 170px; }
+.flip.has-pic .flip-in { min-height: 340px; }
+.q-pic.has-img { width: 150px; height: 120px; padding: 10px; background: var(--card); }
+.i-pic { width: 128px; height: 84px; flex: none; margin-bottom: 8px; padding: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.i-pic .pics.n1 .pi { height: 100%; }
+ol.items li.has-ip { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+ol.items li.has-ip .i-pic { margin: 0; }
+ol.items li.has-ip .gl { flex: 1; min-width: 14em; }
+.chip.with-pic { display: grid; grid-template-columns: 40px minmax(0,1fr); column-gap: 8px; align-items: center; }
+.chip.with-pic .chip-pic { grid-row: span 3; width: 40px; height: 40px; }
+.chip.with-pic > :not(.chip-pic) { grid-column: 2; }
+.board { grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); }
+.big-q { font-size: 22px; font-weight: 700; margin: 0 0 8px; }
+.pic-opts { display: grid; grid-template-columns: repeat(4, minmax(0, 96px)); gap: 10px; margin: 2px 0 6px; }
+.popt { position: relative; aspect-ratio: 1; padding: 10px; border: 2px solid var(--line); border-radius: 14px; background: var(--card); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.popt:hover:not(:disabled) { border-color: var(--accent); }
+.popt.ok { border-color: var(--ok); background: var(--ok-soft); }
+.popt.bad { border-color: var(--bad); background: var(--bad-soft); opacity: .55; }
+.popt.dim { opacity: .35; }
+.popt .pics { pointer-events: none; }
+@media (max-width: 480px) { .pic-opts { grid-template-columns: repeat(2, minmax(0, 120px)); } }
+/* bigger, friendlier type for young learners */
+body { font-size: 18px; }
+.opt { font-size: 17px; padding: 3px 13px; }
+.tile { font-size: 18px; padding: 5px 12px; }
+.q { font-weight: 600; }
+.credits { padding-block: 0 40px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="hero wrap">
+  <a class="home" href="index.html">← Все темы</a>
+  <p class="eyebrow">Spotlight 4 Grammar · Module 8 · Unit 16a, 16b</p>
+  <h1>What Will the Weather Be Like?</h1>
+  <p class="sub">Future Simple: will/won&#x27;t + be. Вопросительные слова: Who, What, Where, When, Why, How.</p>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <nav class="nav" id="nav" aria-label="Задания"></nav>
+    <div class="progress" aria-live="polite">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <span><b id="mastered">0</b> / <b id="ptotal">0</b> выучено</span>
+    </div>
+  </div>
+</div>
+
+<main class="wrap" id="main">
+  <section id="board-sec">
+    <h2>Твои правила</h2>
+    <p class="lead">Каждый правильный ответ — одна точка. Все точки зелёные — правило усвоено. Красная рамка — повтори это правило.</p>
+    <div class="board" id="board"></div>
+    <div class="board-foot">
+      <span>Прогресс сохраняется в этом браузере.</span>
+      <button class="btn small" type="button" id="reset-all">Сбросить прогресс</button>
+    </div>
+  </section>
+</main>
+<footer class="wrap credits">Картинки: Noto Emoji (Google), лицензия Apache 2.0.</footer>
+
+<script>
+const PICS = {"alarm-clock": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#82aec0\" d=\"M32.04 123.67a3.12 3.12 0 0 1-1.55-3.8l4.02-11.77l7.87 5.31l-6.36 9.24a3.13 3.13 0 0 1-3.98 1.02m63.32 0c1.39-.7 2.06-2.32 1.55-3.8l-4.07-11.91l-8.29 4.77l6.83 9.92a3.13 3.13 0 0 0 3.98 1.02\"/><path fill=\"#2f7889\" d=\"m34.51 108.1l-2.05 6c1.27-.73 2.93-.66 4.25-.01s2.33 1.79 3.1 3.05l2.33-3.38c0-.14-7.63-5.66-7.63-5.66m58.36-.15l2.22 6.6c-1.27-.73-2.79-.71-4.12-.06c-1.32.65-2.33 1.79-3.1 3.05l-3.05-4.43z\"/><circle cx=\"63.7\" cy=\"73.93\" r=\"42.01\" fill=\"#ffefa1\"/><circle cx=\"63.7\" cy=\"70.22\" r=\"49.36\" fill=\"#cc2929\"/><circle cx=\"63.7\" cy=\"72.7\" r=\"46.4\" fill=\"#ff4638\"/><circle cx=\"63.7\" cy=\"72.7\" r=\"40.03\" fill=\"#fafafa\"/><circle cx=\"64\" cy=\"72.7\" r=\"4.45\" fill=\"#563428\"/><path fill=\"#b2947c\" d=\"M63.7 42.57c-.81 0-1.47-.66-1.47-1.47v-4.4c0-.81.66-1.47 1.47-1.47s1.47.66 1.47 1.47v4.4c0 .81-.66 1.47-1.47 1.47m0 67.59c-.81 0-1.47-.66-1.47-1.47v-4.4c0-.81.66-1.47 1.47-1.47s1.47.66 1.47 1.47v4.4c0 .81-.66 1.47-1.47 1.47m35.99-36h-4.4c-.81 0-1.47-.66-1.47-1.47s.66-1.47 1.47-1.47h4.4c.81 0 1.47.66 1.47 1.47c0 .82-.66 1.47-1.47 1.47m-67.58 0h-4.4c-.81 0-1.47-.66-1.47-1.47s.66-1.47 1.47-1.47h4.4c.81 0 1.47.66 1.47 1.47c0 .82-.66 1.47-1.47 1.47\"/><path fill=\"#b2947c\" d=\"M63.7 42.57c-.81 0-1.47-.66-1.47-1.47v-4.4c0-.81.66-1.47 1.47-1.47s1.47.66 1.47 1.47v4.4c0 .81-.66 1.47-1.47 1.47m0 67.59c-.81 0-1.47-.66-1.47-1.47v-4.4c0-.81.66-1.47 1.47-1.47s1.47.66 1.47 1.47v4.4c0 .81-.66 1.47-1.47 1.47M46.63 46.07l-2.2-3.81c-.41-.7-.17-1.6.54-2.01c.7-.41 1.6-.17 2.01.54l2.2 3.81c.41.7.17 1.6-.54 2.01c-.7.4-1.6.16-2.01-.54m33.8 58.53l-2.2-3.81c-.41-.7-.16-1.6.54-2.01s1.6-.16 2.01.54l2.2 3.81c.41.7.16 1.6-.54 2.01c-.71.4-1.61.16-2.01-.54\"/><path fill=\"#b2947c\" d=\"m46.63 46.07l-2.2-3.81c-.41-.7-.17-1.6.54-2.01c.7-.41 1.6-.17 2.01.54l2.2 3.81c.41.7.17 1.6-.54 2.01c-.7.4-1.6.16-2.01-.54m33.8 58.53l-2.2-3.81c-.41-.7-.16-1.6.54-2.01s1.6-.16 2.01.54l2.2 3.81c.41.7.16 1.6-.54 2.01c-.71.4-1.61.16-2.01-.54M35.61 58.17l-3.81-2.2c-.7-.41-.94-1.3-.54-2.01c.41-.7 1.3-.94 2.01-.54l3.81 2.2c.7.41.94 1.3.54 2.01c-.41.71-1.31.95-2.01.54m58.53 33.79l-3.81-2.2c-.7-.41-.94-1.3-.54-2.01c.41-.7 1.3-.94 2.01-.54l3.81 2.2c.7.41.94 1.3.54 2.01c-.41.71-1.31.95-2.01.54M78.76 46.61c-.7-.41-.94-1.3-.54-2.01l2.2-3.81c.41-.7 1.3-.94 2.01-.54c.7.41.94 1.3.54 2.01l-2.2 3.81c-.41.7-1.3.94-2.01.54m-33.79 58.53c-.7-.41-.94-1.3-.54-2.01l2.2-3.81c.41-.7 1.3-.94 2.01-.54c.7.41.94 1.3.54 2.01l-2.2 3.81c-.41.7-1.31.94-2.01.54m44.82-47.51c-.41-.7-.17-1.6.54-2.01l3.81-2.2c.7-.41 1.6-.16 2.01.54s.16 1.6-.54 2.01l-3.81 2.2c-.71.41-1.61.17-2.01-.54m-58.53 33.8c-.41-.7-.16-1.6.54-2.01l3.81-2.2c.7-.41 1.6-.16 2.01.54s.16 1.6-.54 2.01l-3.81 2.2c-.71.4-1.61.16-2.01-.54\"/><path fill=\"none\" stroke=\"#563428\" stroke-linecap=\"round\" stroke-miterlimit=\"10\" stroke-width=\"5\" d=\"M47.49 63.49L63.7 72.7\"/><path fill=\"none\" stroke=\"#563428\" stroke-linecap=\"round\" stroke-miterlimit=\"10\" stroke-width=\"3.5\" d=\"M86.87 59.41L64.44 72.7\"/><path fill=\"#82aec0\" d=\"m91.99 32.49l-4.14-2.71l14.09-24.96l4.3 2.43z\"/><path fill=\"#cc2929\" d=\"M111.17 35.21c1.23.36 2.55-.32 2.93-1.54c3.24-10.35-.96-21.61-11.12-26.84c-10.23-5.27-21.34-1.81-27.81 7.02c-.73.99-.56 2.38.36 3.19c2.09 1.85 6.73 5.33 15.98 10.01c9.77 4.94 16.47 7.22 19.66 8.16\"/><path fill=\"#82aec0\" d=\"M105.85 10.3s2.61-3.33-1.18-5.44c-2.95-1.64-4.82 1.95-4.82 1.95c-.65 1.19 5.55 4.31 6 3.49M35.63 32.52L21.36 7.25l4.31-2.43l13.86 24.56z\"/><path fill=\"#cc2929\" d=\"M16.83 35.21c-1.23.36-2.55-.32-2.93-1.54c-3.24-10.35.96-21.61 11.12-26.84c10.23-5.27 21.34-1.81 27.81 7.02c.73.99.56 2.38-.36 3.19c-2.09 1.85-6.73 5.33-15.98 10.01c-9.77 4.94-16.47 7.22-19.66 8.16\"/><path fill=\"#82aec0\" d=\"M22.15 10.3s-2.61-3.33 1.18-5.44c2.95-1.64 4.82 1.95 4.82 1.95c.65 1.19-5.55 4.31-6 3.49\"/><path fill=\"none\" stroke=\"#82aec0\" stroke-miterlimit=\"10\" stroke-width=\"3.706\" d=\"M63.7 23.22V9.5\"/><path fill=\"#82aec0\" d=\"M63.76 14.38c-3.92 0-7.85-1.5-7.85-1.5V9.91s3.65-1.63 8.04-1.63s7.65 1.63 7.65 1.63v2.97c.01.01-3.91 1.5-7.84 1.5\"/><path fill=\"#94d1e0\" d=\"M56.9 9.79c-.43.16-.47.75-.07.98c.58.33 1.27.67 1.51.63c3.3-.51 8.09-.26 11.4.24c.23.04.89-.52 1.36-.94c.26-.24.2-.65-.12-.8c-1.04-.47-3.39-1.31-7.03-1.31c-3.36 0-5.79.71-7.05 1.2\"/><path fill=\"#ff4638\" d=\"M95.06 7.9c.31 1.06-.83 1.93-1.75 2.54a15.76 15.76 0 0 0-5.4 6.22c-.58 1.2-1.23 2.67-2.56 2.86c-.53.07-1.05-.09-1.55-.27c-.77-.28-1.52-.6-2.25-.97c-.87-.44-1.76-1-2.16-1.89c-.52-1.17-.03-2.55.67-3.63c1.67-2.55 4.39-4.13 7.19-5.17c1.69-.63 6.97-2.56 7.81.31m-68.93 8.43c.65 1.35 1.38 2.66 2.19 3.92c.99 1.54 2.14 3.26 1.72 5.04c-.49 2.04-2.75 3.02-4.74 3.7c-1.02.35-2.03.7-3.05 1.05c-.54.19-1.11.38-1.68.35c-.9-.04-1.71-.61-2.22-1.34c-.52-.73-.78-1.61-.98-2.48c-.75-3.35-.6-6.9.43-10.18c.6-1.88 1.54-3.86 3.67-4.01c2.59-.18 3.69 1.93 4.66 3.95\"/></svg>", "cloud-with-rain": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#e2ebee\" d=\"M107.62 46.29s1.72-32.32-23.89-38.72C54.12.17 48.29 28.49 48.29 28.49s-11.55-2.19-18.74 5.62c-6.03 6.55-5.46 12.96-5.46 12.96s-7.96-1.72-14.21 3.75s-5.31 10.61-5.31 10.61l18.58 7.18s93.83.47 94.3.16s6.25-9.37 6.25-9.37s-.94-7.81-6.4-10.93c-5.47-3.12-9.68-2.18-9.68-2.18\"/><path fill=\"#b9ced2\" d=\"M14.25 73.45c4.68.16 35.29.78 53.86.62s46.81.14 50.73-1.71c3.07-1.45 4.9-3.85 5.19-7.21c.28-3.21-.34-5.75-.34-5.75s-4.37 3.16-12.65 3.28c-5.15.07-15.61-.78-13.58-2.65c.57-.53 8.66-6.66 8.27-12.33c-.09-1.34-7.34 5.31-14.21 8.12s-13.39 4.98-22.47 4.4c-7.65-.5-10.97-3.61-10.97-3.61s-3.69 4.33-14.78 5.26c-11.09.94-13.48-3.23-13.48-3.23s-5.37 4.06-14.39 3.94c-9-.14-10.77-3.38-10.77-3.38s-.85 5.77 1.03 9.14c1.92 3.43 5.41 5.01 8.56 5.11\"/><path fill=\"#4fc4f8\" d=\"M69.99 81.57c-1.71-.6-7.81 4.23-10.56 9c-2.76 4.79-.96 8.29 1.99 9.73c3.32 1.62 8.1.62 9.46-4.1c1.34-4.67.95-13.98-.89-14.63m-32.33-2.38c-1.55-.55-6.58 4.12-8.84 6.64c-3.03 3.39-5.37 9.71.38 12.27c5.79 2.57 9.55-1.64 9.84-7.46c.28-5.42-.1-10.99-1.38-11.45m12.21 22.46c-1.65-.89-8.58 5.26-10.79 8.93c-2.2 3.67-2.06 8.38 2.44 10.31s8.47-.54 9.3-6.97c.58-4.56.64-11.41-.95-12.27m33.51.53c-1.19-.67-9.43 5.69-11.28 10.32c-3.67 9.19 8.87 13.29 11.72 4.65c1.66-5.04 1.03-14.14-.44-14.97m20.49-19.81c-1.63-1-8.48 4.64-10.76 8.88c-2.88 5.36-.64 9.4 2.5 10.68c3.26 1.32 7.45.05 8.87-4.78c2.05-6.96.97-13.8-.61-14.78\"/><path fill=\"#aee6fd\" d=\"M96.4 91.09c-1.08.13-2.42 1.67-2.63 4.3s1.45 3.96 3.13 3.29c1.58-.63 1.84-2.88 1.84-4.3s-.67-3.5-2.34-3.29M63 90.26c-1.14-.32-3.26 1.44-3.63 4.29c-.29 2.2.56 3.53 2.27 3.66c2.38.18 3.13-2.75 3.07-4.54c-.04-1.02-.22-2.99-1.71-3.41m-20.55 19.53c-1.06-.08-2.84 1.7-2.84 4.47s1.44 3.97 3.14 3.6c1.7-.38 2.04-3.63 1.93-4.92s-.66-3.03-2.23-3.15M30.91 88.44c-1.43-.41-3.26 1.4-3.48 3.44c-.23 2.04.72 3.52 2.23 3.75s2.8-1.59 2.95-3.71c.16-2.12-.37-3.11-1.7-3.48m45.49 22.53c-1.32-.11-3.21 1.84-3.16 4.79s1.58 3.45 2.59 3.51c1.45.09 2.46-1.62 2.59-4.3c.11-2.25-.4-3.87-2.02-4\"/></svg>", "oncoming-bus": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#4e433d\" d=\"m105.66 102.2l-14.63-2.02s-.09 18.68-.18 20.43s.92 3.02 2.39 3.13c2.58.18 7.45.09 9.2 0s2.94-1.29 3.04-2.94s0-11.59 0-11.59zm-67.91 0l-14.63-2.02s-.09 18.68-.18 20.43s.92 3.02 2.39 3.13c2.58.18 7.45.09 9.2 0s2.94-1.29 3.04-2.94s0-11.59 0-11.59z\"/><path fill=\"#b9a074\" d=\"M25.79 20.23s.95-3.18 2.76-6.22c1.4-2.35 2.63-4.42 5.97-4.89c2.83-.4 12.48-.25 28.76-.37c15.66-.13 25.09.03 27.12.13c4.66.24 5.73 2.27 7.41 5.02s2.15 7.05 2.15 7.05l-74.16-.72z\"/><path fill=\"#97886e\" d=\"M61.98 13.78c-10.53 0-28.64 1.18-34.16 1.55c-1.33 2.57-2.04 4.89-2.04 4.89l74.16.71s-.34-3.33-1.62-6.06c-8.64-.37-26.96-1.11-36.34-1.11c-.01 0 0 .02 0 .02\"/><path fill=\"#464c50\" d=\"M16.63 33.69s-4.14-1.6-7.67.74s-2.85 6.8-2.85 6.8s-4.2-.37-4.08 3.47c.05 1.72-.14 8.77 0 11.18c.12 1.96 1.3 3.7 4.82 3.65c4.01-.06 4.68-1.44 4.76-2.97s.17-12.27.17-13.2c0-1.45-.23-3.36 1.45-3.92c1.48-.5 2.97.5 2.97.5l.43-6.24c.01 0 0-.01 0-.01m95.06 40.11s2.16.81 3.89.31c2.2-.63 1.33-5.5 1.31-7.11c-.03-4.16-.27-9.33-.27-9.77c0-1.98.78-3.04 2.22-3.22s3.94-.17 5.13-.12c1.73.06 2.12 1.6 2.1 4.01c-.04 4.55.06 10.91 0 11.37c-.08.68-.52 2.07-1.62 2.23c-1.17.18-1.9.3-1.9.3s-.14 4.37-2.78 6.49s-7.54 1.6-7.54 1.6s-.48-6.29-.56-6.11c0 .01.02.02.02.02\"/><path fill=\"#f4daad\" d=\"m19.65 92.76l-5.04-12.09l-.41-4.4s.29-42.42 1.03-51.7c.31-3.96 2.96-4.36 5.31-4.72c3.83-.59 21.22-2.21 40.82-2.36c19.6-.14 41.27 1.18 46.13 2.06s4.42 4.42 4.86 7.51s1.18 20.17 1.18 29.16s.29 19.74.29 19.74l-2.95 13.55l-41.71 6.19l-49.52-2.95c0 .01.01.01.01.01\"/><path fill=\"#ffb803\" d=\"m14.18 76.27l-.14 25.86L15.8 112l95.26-.11l2.74-11.3V75.97s-5.29 5.14-10.78 6.24s-24.11.42-41.65.71c-17.34.28-35.53.88-40.22-.86c-6.99-2.6-6.97-5.8-6.97-5.8z\"/><path fill=\"#ff6110\" d=\"M61.63 93.92c-23.34 0-38.81-1.17-47.53-2.11l-.06 10.32L15.8 112l95.26-.11l2.74-11.3v-9.03c-10.18.99-28.67 2.36-52.17 2.36\"/><path fill=\"#97886e\" d=\"m21.49 31.8l85.74-.64s-.29-8.04-7.63-9.06s-63.12-.89-71.62.77c-7.36 1.43-6.49 8.93-6.49 8.93\"/><path fill=\"#84765f\" d=\"M17.01 92.48c-.48 3.59 1.54 6.58 10.43 7.13s18.01.36 37.77.69s33.67.23 38.97-.26c5.93-.55 8.75-4.59 8.32-8s-5.91-3.78-10.53-3.29c-5.27.55-23.45 1.32-36.29 1.3c-19.47-.03-31-1.3-33.95-1.41c-1.23-.04-5.11-.25-7.46-.39c-3.32-.21-6.72.37-7.24 4.23c-.01.01-.02 0-.02 0\"/><path fill=\"#474c4f\" d=\"M14.04 102.14s.1 8.22.22 9.77c.22 2.86 1.64 4.82 6.91 5.05s30.62 0 44.89.11s39.29-.33 42.58-.43s4.51-2.52 4.72-5.05c.23-2.78.43-10.97.43-10.97s-6.26 3.4-12.07 3.62s-75.41.28-78.25.12c-6.03-.33-9.44-2.21-9.44-2.21z\"/><path fill=\"#5e6367\" d=\"M19.86 106.41c-1.31-.22-2.64-1.43-3.62-.55c-1.11.98-.43 3.4 2.41 3.72s9.88.66 19.53.55c9.66-.11 46.1-.33 54.22-.22s13.39-.33 15.15-.98s4.07-3.29 3.62-4.27s-2.96.77-4.61 1.1s-8.89.77-16.36.66c-7.46-.11-54.77.22-60.04.22s-8.45.09-10.31-.22z\"/><path fill=\"#464c52\" d=\"M21.21 36.98c-1.72.17-2.79.46-3.25 2.89s-.72 12.61-.99 18.46s-.27 11.98 0 14.23s2.16 3.51 5.68 3.79c3.52.27 20.72.72 30.82.72s52-.9 54.52-1.17s3.06-2.16 3.25-4.06c.18-1.89 0-7.75-.36-15.94s-1.09-16.66-1.26-18.01s-1.62-1.53-3.06-1.53s-31.18 0-43.25.27s-40.21.16-42.1.35\"/><path fill=\"#96c8ed\" d=\"M21.02 44.27c-.3 1.62-.72 6.3-.81 11.43s-.36 13.33-.18 14.76s1.71 2.07 3.6 2.07s20.28.27 36.85.46c13.16.14 42.53-.54 44.96-.81c1.66-.19 2.26-1.53 2.26-3.06s-.27-9.99-.36-14.41c-.09-4.41-.81-9.82-1.09-11.79s-1.71-2.16-3.25-2.26s-24.51.25-40.19.36c-12.53.09-32.44.46-38.11.72c-3.25.16-3.42 1.08-3.69 2.52c0 .01.01.01.01.01\"/><path fill=\"#afe3fb\" d=\"m24.99 66.79l23.34-.09l.11-25.48s-5.18.03-12.79.22c-5.97.14-10.94.33-10.94.33l.27 25.04c.01-.01.01-.02.01-.02m26.62-25.66l-.04 25.66h23.52l.09-25.84s-6.05-.01-11.64.05c-6.47.08-11.93.13-11.93.13m27.3-.24l.05 21.03s1.18-.6 2.16-.81c1.71-.36 3.95-.35 3.95-.35s.1-4.86.1-6.31s1.09-2.34 2.26-2.43s4.86-.09 5.86 0s1.62 1.26 1.71 2.26s.36 6.49.36 6.49l5.59-.09l-.11-19.99s-6.94 0-11.17.05s-10.76.16-10.76.16z\"/><path fill=\"none\" stroke=\"#ffb803\" stroke-miterlimit=\"10\" stroke-width=\"2.545\" d=\"M38.11 94.72s13.61.4 27.37.4s24.04-.52 24.04-.52\"/><path fill=\"#f1edec\" d=\"M88.37 98.34c.04 1.2.18 2.24 3.36 2.33s11.31.22 12.92-1.04s2.77-3.43 3.37-5.76s1.54-4.63-.49-5.23c-1.47-.43-6.89.04-10.08.3s-8.78 0-9.12 1.82c-.27 1.43 0 6.25.04 7.58c.01-.01 0 0 0 0m-67.63-9.81c-1.34.99-.34 4.08.58 6.53c.78 2.07 1.55 4.31 3.62 4.4s12.16 1.12 13.79.52s1.87-1.99 1.99-4.06c.18-3.1.26-5.23-.79-6.28c-.77-.77-3.76-.99-8.41-1.28c-5.51-.34-9.48-.78-10.77.18c0-.01-.01-.01-.01-.01\"/></svg>", "snowflake": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#95c7ec\" d=\"m69.83 50.53l-.4-18.43s9.61-5.08 11.45-8.43s1.08-8.97-.97-9.18S69 20.76 68.25 20c-.76-.76 3.67-6.16 3.46-8.21c-.22-2.05-6.81-7.07-6.81-7.07l-7.45 8.47s2.16 6.7 1.84 7.35s-10.48-5.62-12.64-5.19s-1.42 4.82-.67 6.88c.76 2.05 14.6 8.46 14.6 8.46l-.6 20.12s-2.53-.04-3.18.29c-.65.32-2.2 2.92-2.2 2.92s-14.55-7.88-14.66-9.5s.22-16.1-.54-17.61s-4-3.27-5.62-3.27s-2.7 16.01-3.67 16.01s-4.65-9.4-5.73-9.4s-9.45 1.4-9.45 1.4l3.19 12.75l9.94 2.05l-12.17 13.76s2.98 2.9 5.79 2.25s10.91-8.75 11.77-8.75s15.56 8.43 15.56 8.43s-.65 1.51-.22 2.38c.43.86 1.19 1.94 1.19 1.94S35.4 75.32 34.42 75.1s-10.8-7.24-13.61-7.24s-4.54 3.67-4.54 3.67l11.67 9.83l-9.83 4.86l-4.21 8.75s9.51 3.35 10.8 3.02s4.65-8.32 5.29-8.53c.65-.22.89 1.82.89 1.82s3.43 10.72 4.73 10.39s4.54-2.38 4.97-4s-.64-14.47-.64-14.47l15.34-8.33s1.22 1.98 2.05 2.58c.65.47 3.88.78 3.88.78l-.43 16.74s-16 6.9-16.54 8.84s-.42 6.28 1.1 6.82c1.51.54 13.31-4.86 13.85-4.43s-.23 8.42-.23 8.42s6.34 8.96 7.74 8.1s6.31-6.36 6.35-7.38c.09-1.93-4.72-8.58-4.63-8.97c.19-.85 9.98 6.2 11.71 5.98s3.02-2.05 3.02-4.11c0-2.05-13.18-11.77-13.18-11.77l-.21-18.57s2.55-.14 3.42-.57c.86-.43 2.58-4.34 2.58-4.34l15.71 10.53s-.65 17.72.97 18.8s4.54 1.73 5.62 1.19s1.19-15.66 1.19-15.66l6.81 6.16s9.78-.87 9.78-2.17s-1.96-8.64-2.75-9.28c-1.41-1.14-7.63-.58-8.36-.97c-.58-.31 11.38-5.08 11.38-7.02s-3.91-5.01-4.99-5.12s-15.21 6.2-15.21 6.2l-16.42-9.72s.86-1.51.86-2.27s-1.07-2.03-1.07-2.03l16.84-9.2s14.8 5.29 16.2 4.65c1.4-.65 2.59-1.84 2.59-3.02s-12.5-6.93-11.56-7.45c.72-.4 7.67.43 8.75 0s4.52-9.19 4.41-9.62s-11.76-3.34-11.76-3.34l-5.19 6.16s.86-11.67-.43-12.96s-4.78-.65-6.18.32s-2.24 18.15-2.24 18.15l-15.84 8.59s-1.48-2.38-2.35-2.82c-.85-.47-2.69-.56-2.69-.56\"/><path fill=\"#afe3ff\" d=\"M76.44 56.05L95 46.37l-.28-19.97s-2.88.49-4.29 2.37s-.94 14.51-.94 14.51l-16.06 8.73zM99.48 43.9s6.08-7.56 7.25-7.94c1.96-.64 9.53 2.02 9.53 2.02s.84-2.09.5-2.9s-9.65-4.97-11.88-4.18c-1.74.62-5.28 7.34-5.28 7.34zm-.52 6.84c-.4-.07-3.64 2.05-3.64 2.05s9.62 5.83 12.44 5.96c3.48.17 5.78-2.37 5.78-2.37s-2.49.07-4.3-.6c-2.95-1.1-10.28-5.04-10.28-5.04M77.19 70.09l-2.28 4.64s13.71 8.53 13.77 8.94c.07.4-.34 15.18 1.08 16.86c1.41 1.68 4.1 2.55 4.1 2.55s.81-21.77.74-22.11c-.08-.34-17.41-10.88-17.41-10.88m17.49 4.79s9.66-6.54 12.28-6.54s4.84 1.34 4.84 1.34l-12.78 7.73zm5.02 9.83c-.34.94-.51 4.46-.51 4.46s3.14 7.39 5.35 8.19c2.22.81 10.68-2.35 11.36-3.16c.67-.81-.32-4.09-.32-4.09s-6.69 2.65-8.69 2.28c-2.56-.47-7.19-7.68-7.19-7.68M59.03 54.84c-.97.97-5.2 7.18-5.28 8.38c-.08 1.21 4.63 9.26 5.76 9.9s10.23 0 10.23 0l4.67-9.59s-4.11-8.78-4.75-8.94s-9.98-.4-10.63.25m4.15-32.78c.64.12-2.37-8.95-2.37-8.95l6.66-6.29s-2.48-3.06-3.76-3.06c-1.29 0-8.3 6.52-8.3 8.06s3.87 8.72 3.87 8.72s2.68 1.29 3.9 1.52m-17.94-3.13s.01 4.53 1.46 6.14s11.77 6.66 11.77 6.66l.26 19.11l4.49-.02V28.58s-8.94-4.27-10.71-5.07c-1.77-.81-5.98-2.89-7.27-4.58m-5.62 28.74l13.53 8.54l2.18-3.3l-15.39-9.02zm-9.65-7.93s2.86 2.81 3.48 2.79c1.2-.04 1.12-18.75 1.12-18.75s-2.31-.87-3.52.26c-1.22 1.12-1.08 15.7-1.08 15.7m-1.46 4.55c2.87.73 2.33 2.74 1.93 3.38S16.91 61.04 16.91 61.04s-2.5-1.37-2.5-2.82S25.8 47.4 25.2 47.26c-.47-.1-8.62 1.27-10.39.16c-1.14-.71-4.3-12.6-3.7-14.2c.48-1.29 4.59-1.67 4.59-1.67s1.45 10.63 2.58 11.2c1.12.57 7.94.96 10.23 1.54M49.7 65.97l-16.04 8.8l4.03 3.27l14.01-9.02zM31.41 80.78c-.12 1.37-5.76 4.13-6.24 4.54c-.48.4-5.76-.83-6.09-.35c-.32.48-3.35 9.8-3.92 10.35c-.08.08-3.29-.92-3.53-1.45c-.58-1.27 3.02-11.32 4.63-12.77s8.7.4 8.94-.08s-9.26-5.64-9.99-7.25c-.72-1.61 2.34-4.19 2.34-4.19s14.02 9.34 13.86 11.2m2.08 5.32c-.53-.37-3.32 3.34-3.32 3.34s.98 11.99 1.89 12.76c.92.78 3.57-.54 3.57-.54s-1.34-15-2.14-15.56m25.71-8.17s.15 14.93-.17 15.49s-12.47 6.33-14.18 8.54c-1.16 1.5-.86 5.45-.86 5.45s18.66-10.52 19.06-10.84s.09-18.59.09-18.59zm23.93 30.64s-12.83-7.95-12.98-9.02c-.15-1.02-.23-5.44-.23-5.44s11.27 7.93 12.4 9.78s.81 4.68.81 4.68m-22.73 4.99c.2 2.09 7.62 8.05 7.62 8.05s-2.35 2.54-3.56 2.62s-9.14-7.53-9.3-8.81c-.16-1.29 4.03-9.42 4.03-9.42s1.88-.9 3.3-1.2c.9-.2-2.28 6.73-2.09 8.76\"/><path fill=\"#fefefe\" d=\"M71 62.49s-1.19 2.37-1.78 3.71s-1.33 3.63-1.33 3.63s-5.56.43-7.04.37c-1.93-.07-3.04 3.41-.22 3.48s9.56.22 10.15-.22s4.96-8.45 4.96-10.23s-3.85-6.74-5.26-8.15c-1.64-1.64-4.52 0-2.89 2.67S71 62.49 71 62.49m22.43-32.86c-2.26-.08-2.09 2.98-2.01 6.52s.32 5.88 2.17 5.88c2.26 0 1.85-4.91 1.85-7.17c0-2.25.33-5.15-2.01-5.23M63.79 7.56c1.31 1.31-.48 3.54-1.21 4.19c-.72.64-2.74 1.93-4.11.64s.24-3.14 1.53-4.11s2.82-1.69 3.79-.72m-.49 20.3c-2.09-.24-2.01 4.91-1.93 11.2c.1 8.06 0 11.84 1.69 11.76c1.93-.09 1.37-4.11 1.37-12.49c0-4.6.48-10.29-1.13-10.47m-48.33 5.23c-2.73.85-1.53 4.19-.81 6.61c.46 1.54 1.86 5.93 4.43 5.16s1.05-4.43.48-6.77c-.55-2.34-1.76-5.72-4.1-5M92.3 89.56c-1.61 0-1.77 3.06-1.77 5.8s0 4.75 1.85 4.75s1.53-4.03 1.53-5.48s.25-5.07-1.61-5.07M63.14 77.88c-1.37.06-1.53 3.14-1.53 9.18s-.33 9.61 1.69 9.51c1.61-.08 1.29-6.12 1.29-10.23s.49-8.54-1.45-8.46m-25.93.06c.81.94 4.95-1.69 7.93-3.33c3.58-1.97 7.55-3.86 6.71-5.53s-5.03 1.29-7.93 2.8c-2.9 1.52-8.08 4.47-6.71 6.06m-12.5 7.83c-.87.65-3.3.24-4.35 1.05s-1.27 3.55-2.5 4.03c-1.85.72-3.3-.56-2.34-3.06c.97-2.5 1.29-4.19 2.17-4.83c.89-.64 4.11-.48 5.4-.48c2.26-.01 2.91 2.32 1.62 3.29\"/></svg>", "sun": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#fcc11a\" d=\"M37.41 41.95c-9.71 12.48-9.54 34.65 2.87 45.64c14.09 12.47 33.92 12.34 46.39.87c14.95-13.76 14.09-36.66.87-49.63c-13.29-13.04-37.04-13.72-50.13 3.12\"/><path fill=\"#fee269\" d=\"M53 37.67c-3.84-1.7-8.04 2.93-9.87 6.09c-1.83 3.17-3.53 9.38.37 10.97c3.9 1.58 6.7-1.1 9.51-5.73c2.79-4.63 4.38-9.38-.01-11.33\"/><path fill=\"#ffa722\" d=\"M63 20.27c-.93 1.74-.62 3.08 1.23 3.52s13.36 2.31 14.33 2.37c1.41.09 1.93-.97 1.76-2.2c-.18-1.23-2.99-18.46-3.25-20.04S75.14.76 73.55 2.87S63.7 18.96 63 20.27m29.8 11.96c-1.81.56-1.76 1.67-.79 3.08s7.65 11.6 8.26 12.31c.62.7 1.67.88 2.55-.18c.88-1.05 11.86-16.45 12.66-17.41c1.32-1.58.53-3.25-1.49-2.73c-1.54.41-20.05 4.58-21.19 4.93m13.8 29.63c-1.3-.74-2.99-.53-3.43 1.14s-2.37 13.8-2.55 14.86s.62 2.11 1.93 1.85s19.45-2.95 20.66-3.25c2.11-.53 2.81-2.64.62-4.22c-1.42-1.03-16-9.68-17.23-10.38M92.09 90.6c1.4-.75 2.64-.18 2.99 1.41c.35 1.58 4.22 17.76 4.84 20.75c.31 1.5-1.41 2.73-2.81 1.85c-1.41-.88-16.69-11.53-17.67-12.4c-1.41-1.23-.43-2.51.26-3.16c1.4-1.33 11.07-7.74 12.39-8.45m-42.55 8.88c-1.77-.17-2.29 1.41-2.02 2.81c.26 1.41 2.9 19.24 3.08 20.57c.26 1.93 2.29 2.73 3.6.79s10.35-16.4 11.08-17.76c1.32-2.46.35-2.99-.97-3.6c-1.31-.61-12.92-2.63-14.77-2.81M24.23 79c1.23-2.02 2.81-1.49 3.96.44c.78 1.32 7.38 10.2 8 11.16c.62.97.88 2.81-1.05 3.25c-1.95.45-17.68 4.58-20.14 5.02s-3.87-1.49-2.29-3.6c.92-1.24 10.82-15.12 11.52-16.27m-3.34-15.3c2.25 1 3.31.64 3.78-.97c.62-2.11 2.46-11.78 2.55-13.98c.06-1.43-.53-2.81-2.73-2.46S6.47 48.85 4.45 49.55c-2.35.82-2.18 3.4-.62 4.22c1.85.97 15.47 9.23 17.06 9.93m27.34-36.92c1.27-1.01.88-2.46-.26-3.25s-15.26-11-17.05-12.4c-1.58-1.23-3.52-.79-2.99 2.02c.38 2.02 4.88 19.7 5.19 20.92c.35 1.41 1.41 2.11 2.64 1.23c1.21-.87 11.15-7.46 12.47-8.52\"/></svg>", "wind-face": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#afe3fe\" d=\"M3.95 11.39s.18 44.33.18 59.53s-.54 49.03.72 49.4c1.27.36 11.04-10.31 13.03-12.3s4.34-4.7 5.79-4.89c1.45-.18 13.93 1.09 19.18.9s13.21 0 17.19-3.44s3.44-12.3 4.34-13.39s3.24-5.03 3.79-6.4s-.09-3.2-.64-3.48c-.55-.27-1.19-2.29-1.19-2.29l3.3-5.31s0-2.2-1.01-2.56c-1.01-.37-4.67-.55-4.76-.92s2.01-2.11 3.3-3.57c1.28-1.46 1.83-4.49 1.1-5.22s-8.24-4.85-9.7-7.41s-3.3-6.41-3.94-7.96c-.64-1.56-2.11-6.13-3.2-7.78c-1.1-1.65 1.37-2.65 1.37-2.65s6.77-5.58 6.13-12.91s-6.14-12.17-15.48-10.8S31 14.81 31 14.81s-5.86-4.3-13.36-5.03s-13.38.76-13.69 1.61\"/><radialGradient id=\"SVGHsvDvd4D\" cx=\"40.787\" cy=\"59.099\" r=\"80.658\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".633\" stop-color=\"#afe3fe\"/><stop offset=\".69\" stop-color=\"#b9e7fe\"/><stop offset=\".855\" stop-color=\"#d2f0fe\"/><stop offset=\".955\" stop-color=\"#dbf3fe\"/></radialGradient><path fill=\"url(#SVGHsvDvd4D)\" d=\"m76.96 69.55l-5.02 5.31s.8.84 1.47 1.24c.85.5 1.78.77 1.78.77l4.6-3.13l11.54.48s-8.08 3.95-8.7 12.27c-.64 8.6 4.67 17.21 16.11 17.21s17.11-7.96 17.39-15.01c.27-6.87-3.48-11.81-3.48-11.81s12.23-3.6 13.09-14.74c.92-11.9-7.02-21.85-19.22-22.98c-12.91-1.19-17.96 9.82-18.4 13.82c-.73 6.68 3.2 12.45 3.2 12.45z\"/><path fill=\"#4fc1f5\" d=\"M70.91 69.36c.54 3.74-3.07 6.14-3.07 6.14s1.42.37 1.74 1.81c.28 1.26-.54 2.48-1.33 3.31c0 0-.75-.99-2.04-2.05c-.69-.57-1.56 0-2.23-1.06s1.06-3.18 1.06-3.18s1.56-2.79 2.01-3.74s1.35-3.49 1.35-3.49s2.12-.37 2.51 2.26m-13.74-4.33c-.59.87.49 7.44 0 14.02c-.61 8.21-4.8 13.85-4.13 14.74c.93 1.24 7.54-.56 8.99-15.19c1.04-10.48-3.8-15.14-4.86-13.57\"/><path fill=\"#159df5\" d=\"M49.66 52.7c-2.04.37-.26 3.87-1.85 4.42c-1 .35-2.23.07-4.07-.88c-3.18-1.64-6.27-5.3-7.61-3.34c-1.35 1.96 5.26 14.26 14.03 11.69c2.18-.64 3.18-2.71 3.34-4.58c.27-3.41-1.73-7.7-3.84-7.31\"/><path fill=\"#4fc1f5\" d=\"M74.87 76.71c.52.62 1.85.29 3.4-.68c3.34-2.1 10.76-3.05 16.29.42c5.52 3.47 7.11 9.57 3.68 12.75c-2.9 2.69-7.92 1.69-8.36-1.13c-.35-2.27 2.69-3.12 3.33-.78c.28 1.02 2.05 1.91 2.76 0s-1.75-7.09-7.15-5.03c-4.98 1.91-3.51 11.19 3.77 12.68c6.59 1.35 14.57-5.03 11.17-14.73c-2.49-7.1-11.54-11.33-21.25-9.42c-4.74.93-9.03 4.26-7.64 5.92\"/><path fill=\"#4fc1f5\" d=\"M72.32 75.32c1.06.74 1.43-1.48 3.87-3.48c2.13-1.74 7.18-4.52 14.33-3.46s16.22 4.04 22.8-1.42s5.24-17.92-4.53-21.39s-15.58 2.27-15.23 8.78c.4 7.31 9.33 7.03 11.24 3.63c1.63-2.9.17-5.33-1.11-5.97c-1.27-.64-2.99-.08-2.41 1.84c.71 2.34-1.91 2.97-3.12 1.56c-1.2-1.42-.52-5.75 2.62-6.66c4.89-1.42 13.47 1.95 11.9 10.84c-1.63 9.21-16.71 5.88-22.87 5.1s-13.17 2.05-15.79 4.6c-2.62 2.56-3.06 5.09-1.7 6.03\"/><path fill=\"#fff\" d=\"M4.02 92.05c-.4.5-.64 4.52-.06 4.6c1.31.19 11.69-6.81 16.83-21.03s3.23-28.54 3.23-28.54s3.33-4.13 5.04-7.16c1.71-3.02 2.82-7.76 2.82-7.76s2.72 3.63 9.98 3.93s18.46-2.82 20.07-12.7C63.42 14.22 55 9.7 53.28 9.33c0 0 1.7 1 2.84 2.35c.79.94 1.66 2.26 2.12 3.87c1.11 3.87.4 7.49-.44 9.38c-1.18 2.63-3.23 5.27-6.97 6.6c-8.17 2.92-18.14.13-18.04-4.91s6.14-8.43 10.31-8.32c3.07.08 4.68 2.69 1.96 4.2s-4.85.56-6.06 1.67c-1.07.99-.46 3.06 3.97 2.35s8.17-4.03 7.06-7.46s-7.46-6.52-15.37-1.19c-6.69 4.51-4.96 10.73-5 11.27c-.02.3-1.92 6.35-4.34 10.49s-5.55 7.86-5.55 7.86s1.34 14.02-1.92 23.59C13.03 85.3 4.02 92.05 4.02 92.05\"/></svg>", "wrapped-gift": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#f5b03e\" d=\"M16.4 31.73s-6.45.51-7.31 1.96c-.87 1.45-.92 3.68-.92 6.13c0 2.46-.1 8.1-.1 8.1l1.54 3.31s.29 42.19.29 43.5c0 1.3 0 2.89 1.88 3.9s49.66 24.09 51.15 24.71c2.25.93 3.32.58 3.32.58l53.09-88.79s-.17-2.43-2.38-3.01c-1.27-.32-100.56-.39-100.56-.39\"/><path fill=\"#e07f14\" d=\"M65.68 60.92c-.81 2.23-.44 25.29-.3 42.06c.14 16.76-.43 20.23 0 20.81s1.6.02 4.91-1.45c6.15-2.72 35.69-17.34 37.86-18.64s7.47-3.99 8.34-5.44s1.34-14.94 1.63-25.77c.29-10.84.58-19.51.58-19.51l1.3-3.9s-.28-10.54-.33-11.7c-.09-1.92-.3-2.91-.79-2.67c-.7.33-6.54 5.12-22 12.64c-9.71 4.71-30.64 12.03-31.2 13.57\"/><path fill=\"#fdd717\" d=\"M65.82 11.21c-4.33-.2-16.18 6.65-27.6 10.4S9.56 32.9 9.41 33.34c-.14.43 6.94 3.6 11.46 5.77c5.37 2.57 25.87 12.28 29.62 13.87c3.76 1.59 12.72 5.31 14.16 5.2c2.02-.14 21.1-7.66 30.78-12.28s21.78-11.78 21.94-13.52c.07-.78-17.8-7.45-26.71-11.48c-17.2-7.79-21.67-9.54-24.84-9.69\"/><path fill=\"#e37d14\" d=\"M8.12 49.77c.15 1.88 1.18 2.55 3.8 3.69s52.15 26.87 53.29 26.87s1.48-4.08.23-3.97c-.68.06-16.95-7.67-32.15-15.39C20.39 54.43 8.04 47.9 8.04 47.9z\"/><path fill=\"#ba5e0d\" d=\"M120.01 48.99S67.12 75.89 66.6 76.15s-1.35.17-1.35.17l-.04 4.01s.49.11 1.04-.06c.32-.1 52.23-26.97 52.46-27.05s1.23-.68 1.44-1.95c.18-1.02-.14-2.28-.14-2.28\"/><path fill=\"#af0f1b\" d=\"m28.86 97.42l10.35 15.4l4.53 1.55s.37-16.8.52-29.25c.21-18.19.13-34.78.39-35.72c.43-1.59 20.56-8.12 20.56-8.12S87.95 48.41 88.67 50c.32.7.07 12.48 0 26.21c-.09 17.34-.06 37.36-.06 37.36s2.35-.01 2.63-.88c.29-.87 1.45-7.58 1.45-7.58l8.82-58.79l4.48-5.78l-6.22-11.84l-25.52-12.56l-8.77 1.97l-9.49-1.45l-30.1 21.63l3.51 7.12l8.61 4.39z\"/><path fill=\"#dc0d28\" d=\"M91.28 49.39c-.55 1.21-.23 63.56-.23 63.56s2.75-1.52 6.29-3.22c3.52-1.69 6.05-2.74 6.27-3.62s.61-62.54.61-62.54z\"/><path fill=\"#ff2a23\" d=\"M41.35 48.1c.33.36-.21 65.06-.88 65.21c-.53.13-12.58-5.25-12.58-5.8s.97-62.38.97-62.38S40.37 47 41.35 48.1m23.88-33.85c-3.33 0-7.01.95-8.08 3.74s-1.31 6.94-1.31 10.04c0 2.97-.48 10.57 8.67 10.45s9.42-3.51 9.56-10.99c.12-6.24-.71-9.27-1.54-10.57c-.74-1.17-3.2-2.67-7.3-2.67\"/><path fill=\"#fcc9d2\" d=\"M59.94 29.69c2.08.12 2.97-4.45 4.57-6.95c1.6-2.49 3.27-4.16 2.67-5.46c-.49-1.08-4.84-1.43-7.19 1.84c-1.65 2.31-1.94 10.46-.05 10.57\"/><path fill=\"#ff2a23\" d=\"M73.33 16.42s2.95 3 3.72 8.88s-.12 10.45-.12 10.45s14.66-.44 19.72.53c4.99.97 6.73 3.17 6.73 4.77s-3.28 2.89-6.61 2.65s-5.58-.42-6 .42s.18 2.14 4.81 2.49c4.63.36 9.98-.3 11.64-6.06s1.72-15.74 1.13-22.93s-1.89-11.3-5.11-12.86c-3.39-1.63-11.88-1.9-19.9 2.61s-10.01 9.05-10.01 9.05\"/><path fill=\"#fcc9d2\" d=\"M89.94 9.58c-1.04-1.34-4.39-1.3-6.18.77c-1.9 2.2-2.32 10.57.12 11.05c2.76.54 2.26-3.98 4.28-6.77c1.98-2.73 2.79-3.74 1.78-5.05\"/><path fill=\"#ff2a23\" d=\"M56.38 16.71S45.15 3.62 32.32 3.82c-7.72.12-9.68 4.57-10.1 6.41s-3.62 20.14.65 30.05S36 47.62 37.39 47.3c1.78-.42 5.57-1.72 5.21-3.09s-12.95 3.56-13.07-2.08s8.91-6.24 13.07-6.36s11.29.83 11.29.83s-1.25-6.83-.42-11.7s2.91-8.19 2.91-8.19\"/><path fill=\"#fcc9d2\" d=\"M28.88 8.57c-1.6 1.66-2.26 11.23-1.25 15.98s1.9 6.77 3.98 6.36c1.74-.35 2.79-9.67 3.62-12.95c.89-3.5 3.09-7.22 2.2-8.85c-1.36-2.5-6.88-2.27-8.55-.54\"/></svg>"};
+// TITLE: What Will the Weather Be Like?
+// EYEBROW: Spotlight 4 Grammar · Module 8 · Unit 16a, 16b
+// SUB: Future Simple: will/won't + be. Вопросительные слова: Who, What, Where, When, Why, How.
+// BOARD: Твои правила
+// LEAD: Каждый правильный ответ — одна точка. Все точки зелёные — правило усвоено. Красная рамка — повтори это правило.
+// HOME: index.html
+// HUB: It will be sunny tomorrow. It won't be cold. Who is he? What is this? Where is London?
+const META = { ls: "s4g-m8-will", cards: false, boardLabel: "Правила" };
+const P = [
+  { id: "will", phrase: "will + be/verb", ru: "будущее: будет" },
+  { id: "wont", phrase: "won't + be/verb", ru: "не будет" },
+  { id: "qwill", phrase: "Will …? Yes/No", ru: "вопрос с will" },
+  { id: "who_what", phrase: "Who…? What…?", ru: "кто? что?" },
+  { id: "where_when", phrase: "Where…? When…?", ru: "где? когда?" },
+  { id: "why_how", phrase: "Why…? How…?", ru: "почему? как?" }
+];
+const DRILLS = [
+  { type: "rule", title: "Запомни!", short: "Правило", instr: "Прочитай правило. Жёлтым выделено самое важное.",
+    blocks: [
+      { h: "🔮 will — предсказания о будущем", lines: [
+        ["It *will* be sunny tomorrow.", "Завтра будет солнечно."],
+        ["It *won't* be cold.", "Не будет холодно."],
+        ["*Will* it be rainy? — Yes, it will. / No, it won't.", "вопрос и краткий ответ"] ] },
+      { h: "❓ Вопросительные слова", lines: [
+        ["*Who* is he? — My brother Joe.", "кто?"],
+        ["*What* is this? — A present from George.", "что?"],
+        ["*Where* is London? — In England.", "где?"],
+        ["*When* is the race? — At seven o'clock.", "когда?"],
+        ["*Why* are you buying so much food? — Because I'm having a party!", "почему?"],
+        ["*How* do you go to school? — By bus.", "как?"] ] },
+      { h: "Ловушка!", warn: true, lines: [
+        ["✗ It will sunny.  ✓ It will *be* sunny.", "после will не забывай be!"],
+        ["✗ Who you are?  ✓ *Who are* you?", "в вопросе глагол идёт перед подлежащим"] ] }
+    ] },
+  { type: "sort", title: "Will или won't?", short: "Погода", instr: "Посмотри на картинку погоды и выбери правильное предложение.",
+    buckets: ["will", "won't"],
+    items: [
+      { id: "will", img: "sun", t: "It will be sunny.", b: 0 },
+      { id: "wont", img: "sun", t: "It won't be rainy.", b: 1 },
+      { id: "will", img: "cloud-with-rain", t: "It will be rainy.", b: 0 },
+      { id: "wont", img: "cloud-with-rain", t: "It won't be sunny.", b: 1 },
+      { id: "will", img: "snowflake", t: "It will be cold.", b: 0 },
+      { id: "wont", img: "snowflake", t: "It won't be hot.", b: 1 }
+    ] },
+  { type: "gaps", title: "Will или won't?", short: "Прогноз", instr: "Посмотри на картинку и выбери will или won't.",
+    items: [
+      { id: "will", img: "sun", t: "It {{*will|won't}} be sunny tomorrow." },
+      { id: "wont", img: "snowflake", t: "It {{*won't|will}} be hot tomorrow. It will be cold!" },
+      { id: "will", img: "cloud-with-rain", t: "It {{*will|won't}} be rainy tomorrow." },
+      { id: "will", img: "wind-face", t: "It {{*will|won't}} be windy today." }
+    ] },
+  { type: "gaps", title: "Задай вопрос", short: "Will…?", instr: "Выбери Will, Is или Does.",
+    items: [
+      { id: "qwill", img: "sun", t: "{{*Will|Is|Does}} it be sunny tomorrow? — Yes, it will." },
+      { id: "qwill", img: "cloud-with-rain", t: "{{*Will|Is|Does}} it rain tomorrow? — No, it won't." },
+      { id: "qwill", img: "wrapped-gift", t: "{{*Will|Is|Does}} you come to the party? — Yes, I will." },
+      { id: "qwill", img: "oncoming-bus", t: "{{*Will|Is|Does}} they be at home? — No, they won't." }
+    ] },
+  { type: "gaps", title: "Какое слово?", short: "Кто? Что? Где?", instr: "Выбери правильное вопросительное слово.",
+    items: [
+      { id: "who_what", t: "{{*Who|What|Where}} is he? — My brother Joe." },
+      { id: "who_what", t: "{{*What|Who|When}} is this? — A present from George." },
+      { id: "where_when", t: "{{*Where|When|Why}} is London? — In England." },
+      { id: "where_when", img: "alarm-clock", t: "{{*When|Where|How}} is the race? — At seven o'clock." },
+      { id: "why_how", img: "wrapped-gift", t: "{{*Why|How|Who}} are you buying so much food? — Because I'm having a party!" },
+      { id: "why_how", img: "oncoming-bus", t: "{{*How|Why|What}} do you go to school? — By bus." }
+    ] },
+  { type: "tf", title: "Найди ошибку", short: "Ошибки", instr: "Предложение верное или с ошибкой?",
+    items: [
+      { id: "will", t: "It will be sunny tomorrow.", ok: true },
+      { id: "wont", t: "It won't rainy tomorrow.", ok: false, fix: "It won't be rainy tomorrow." },
+      { id: "qwill", t: "Will it be cold? — Yes, it will.", ok: true },
+      { id: "who_what", t: "What is he? — My brother Joe.", ok: false, fix: "Who is he? — My brother Joe." },
+      { id: "where_when", t: "Where is the race? — At seven o'clock.", ok: false, fix: "When is the race? — At seven o'clock." },
+      { id: "why_how", t: "How do you go to school? — By bus.", ok: true }
+    ] },
+  { type: "order", title: "Собери предложение", short: "Порядок", instr: "Нажимай на слова по порядку.",
+    items: [
+      { id: "will", img: "sun", q: "Завтра будет солнечно.", s: "It will be sunny tomorrow." },
+      { id: "wont", img: "snowflake", q: "Не будет холодно.", s: "It won't be cold." },
+      { id: "qwill", img: "cloud-with-rain", q: "Завтра будет дождь?", s: "Will it be rainy tomorrow?" },
+      { id: "who_what", q: "Кто он?", s: "Who is he?" },
+      { id: "where_when", img: "alarm-clock", q: "Когда гонка?", s: "When is the race?" },
+      { id: "why_how", img: "oncoming-bus", q: "Как ты добираешься до школы?", s: "How do you go to school?" }
+    ] },
+  { type: "translate", title: "Скажи по-английски", short: "Перевод", instr: "Скажи вслух, потом напиши. Проверяется главная часть.",
+    items: [
+      { id: "will", ru: "Завтра будет жарко.", en: "It will be hot tomorrow.", key: "will be hot" },
+      { id: "wont", ru: "Не будет ветрено.", en: "It won't be windy.", key: "won't be windy" },
+      { id: "qwill", ru: "Будет дождь?", en: "Will it rain?", key: "will it rain" },
+      { id: "who_what", ru: "Что это?", en: "What is this?", key: "what is this" },
+      { id: "where_when", ru: "Где Лондон?", en: "Where is London?", key: "where is london" },
+      { id: "why_how", ru: "Почему ты покупаешь столько еды?", en: "Why are you buying so much food?", key: "why are you buying" }
+    ] }
+];
+
+/* ===== Drill engine (shared). Expects META, P, DRILLS defined before this script. ===== */
+const byId = Object.fromEntries(P.map(p => [p.id, p]));
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const norm = s => (s || "").toLowerCase().replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, " ").trim().replace(/[.!?,;:]+$/, "");
+
+let M = {};
+try { M = JSON.parse(localStorage.getItem(META.ls) || "{}") || {}; } catch (e) { M = {}; }
+const save = () => { try { localStorage.setItem(META.ls, JSON.stringify(M)); } catch (e) {} };
+const COUNT = {};
+let COUNTING = true;
+const reg = id => { if (COUNTING && id && byId[id]) COUNT[id] = (COUNT[id] || 0) + 1; };
+const goal = id => Math.max(1, Math.min(5, COUNT[id] || 5));
+function hit(id, ok) {
+  if (!id || !byId[id]) return;
+  const r = M[id] || (M[id] = { c: 0, m: 0 });
+  if (ok) r.c++; else r.m++;
+  save(); renderBoard();
+}
+function renderBoard() {
+  const b = document.getElementById("board");
+  b.innerHTML = "";
+  let learned = 0;
+  P.forEach(p => {
+    const r = M[p.id] || { c: 0, m: 0 };
+    const g = goal(p.id);
+    const n = Math.min(g, r.c);
+    if (n >= g) learned++;
+    const chip = el("div", "chip" + (n >= g ? " master" : r.m > r.c ? " weak" : ""));
+    if (p.img) { chip.classList.add("with-pic"); chip.append(picEl(p, "pic chip-pic")); }
+    chip.append(el("span", "ph", p.phrase));
+    if (p.past) chip.append(el("span", "past", `прош.: ${p.past}`));
+    chip.append(el("span", "ru", p.ru));
+    const dots = el("span", "dots");
+    dots.setAttribute("aria-label", `${n} of ${g}`);
+    for (let i = 0; i < g; i++) dots.append(el("i", i < n ? "on" : ""));
+    chip.append(dots);
+    b.append(chip);
+  });
+  document.getElementById("mastered").textContent = learned;
+  document.getElementById("ptotal").textContent = P.length;
+  document.getElementById("fill").style.width = `${(learned / P.length) * 100}%`;
+}
+
+function card(num, def) {
+  const sec = el("section");
+  sec.id = `d${num}`;
+  const ex = el("article", "ex");
+  const head = el("div", "ex-head");
+  const h3 = el("h3");
+  h3.append(el("span", "num", `Задание ${num}`), def.title);
+  const score = el("span", "score");
+  head.append(h3, score);
+  ex.append(head, el("p", "instr", def.instr));
+  if (def.pic || def.story) {
+    const st = el("div", "story-head");
+    if (def.pic) st.append(el("span", "pic", def.pic));
+    if (def.story) st.append(el("b", "story-t", def.story));
+    ex.append(st);
+  }
+  if (def.bank) {
+    const bank = el("div", "bank");
+    def.bank.forEach(w => bank.append(el("span", null, w)));
+    ex.append(bank);
+  }
+  const body = el("div");
+  const foot = el("div", "foot");
+  ex.append(body, foot);
+  if (def.note) ex.append(el("p", "note", def.note));
+  sec.append(ex);
+  document.getElementById("main").append(sec);
+  const a = el("a", null, `${num} · ${def.short}`);
+  a.href = `#d${num}`;
+  document.getElementById("nav").append(a);
+  return { body, foot, score, total: 0, ok: 0, def };
+}
+const setScore = d => { d.score.hidden = !d.total; d.score.textContent = `${d.ok} / ${d.total}`; d.score.classList.toggle("done", d.total > 0 && d.ok === d.total); };
+function resetBtn(d, build) {
+  const r = el("button", "btn", "Начать заново");
+  r.type = "button";
+  r.addEventListener("click", () => { d.body.innerHTML = ""; d.foot.innerHTML = ""; build(); });
+  d.foot.append(r);
+}
+function splitId(spec, fallback) {
+  const i = spec.lastIndexOf("#");
+  return i > -1 ? [spec.slice(0, i), spec.slice(i + 1)] : [spec, fallback];
+}
+function options(list, correctSet, id, d, shuf, onOk) {
+  reg(id);
+  const wrap = el("span", "choice");
+  let done = false;
+  (shuf ? shuffle(list) : list).forEach(o => {
+    const b = el("button", "opt", o);
+    b.type = "button";
+    b.addEventListener("click", () => {
+      if (done || b.disabled) return;
+      if (correctSet.includes(o)) {
+        done = true;
+        b.classList.add("ok");
+        wrap.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+        d.ok++; setScore(d); hit(id, true);
+        if (onOk) onOk();
+      } else {
+        b.classList.add("bad", "shake");
+        b.disabled = true;
+        hit(id, false);
+      }
+    });
+    wrap.append(b);
+  });
+  return wrap;
+}
+
+/* Inline text with {{*right|wrong#id}} choices, [[ans/alt#id]] typed gaps, ^CUE^ word-formation cues */
+const TOK = /\{\{(.+?)\}\}|\[\[(.+?)\]\]|\^(.+?)\^/g;
+function inline(text, id, d, gaps, shuf) {
+  const frag = document.createDocumentFragment();
+  let last = 0;
+  text.replace(TOK, (m, c, t, q, off) => {
+    frag.append(text.slice(last, off));
+    if (c) {
+      const [spec, gid] = splitId(c, id);
+      const raw = spec.split("|");
+      const right = raw.filter(o => o.startsWith("*")).map(o => o.slice(1));
+      frag.append(options(raw.map(o => o.replace(/^\*/, "")), right, gid, d, shuf));
+      d.total++;
+    } else if (t) {
+      const [spec, gid] = splitId(t, id);
+      const answers = spec.split("/");
+      const inp = el("input", "gap");
+      inp.type = "text"; inp.autocomplete = "off"; inp.spellcheck = false;
+      inp.id = `g${d.num}-${gaps.length}`;
+      inp.setAttribute("autocapitalize", "off"); inp.setAttribute("aria-label", "gap");
+      inp.style.width = `${Math.max(6, Math.max(...answers.map(a => a.length)) + 2)}ch`;
+      reg(gid);
+      const g = { inp, answers: answers.map(norm), show: answers[0], id: gid, ok: false };
+      gaps.push(g);
+      inp.addEventListener("input", () => inp.classList.remove("ok", "bad", "shown"));
+      inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); d.check(); } });
+      frag.append(inp);
+      d.total++;
+    } else {
+      frag.append(el("span", "cue", q));
+    }
+    last = off + m.length;
+    return m;
+  });
+  frag.append(text.slice(last));
+  return frag;
+}
+
+const RENDER = {
+  /* sentences with inline choices and/or typed gaps */
+  gaps(d) {
+    const def = d.def;
+    const gaps = [];
+    d.check = () => {
+      gaps.forEach(g => {
+        if (g.ok) return;
+        const v = norm(g.inp.value);
+        if (!v) return;
+        g.inp.classList.remove("ok", "bad", "shown");
+        if (g.answers.includes(v)) { g.ok = true; g.inp.classList.add("ok"); g.inp.readOnly = true; d.ok++; hit(g.id, true); }
+        else { g.inp.classList.add("bad"); hit(g.id, false); }
+      });
+      setScore(d);
+    };
+    const items = def.keepOrder ? def.items : shuffle(def.items);
+    const shuf = def.shuffleOptions !== false;
+    if (def.layout === "text") {
+      items.forEach(it => { const p = el("p", "text"); p.append(inline(it.t, it.id, d, gaps, shuf)); d.body.append(p); });
+    } else {
+      const ol = el("ol", "items");
+      items.forEach(it => { const li = el("li"); const ip = itemPic(it); if (ip) { li.classList.add("has-ip"); li.append(ip); } const tx = el("span", "gl"); tx.append(inline(it.t, it.id, d, gaps, shuf)); li.append(tx); ol.append(li); });
+      d.body.append(ol);
+    }
+    if (gaps.length) {
+      const c = el("button", "btn primary", "Проверить"); c.type = "button"; c.addEventListener("click", d.check);
+      const s = el("button", "btn", "Показать ответы"); s.type = "button";
+      s.addEventListener("click", () => gaps.forEach(g => { if (!g.ok) { g.inp.value = g.show; g.inp.classList.remove("bad"); g.inp.classList.add("shown"); } }));
+      d.foot.append(c, s);
+    }
+  },
+  /* question + option buttons; first option in o is the correct one */
+  mcq(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      li.append(el("p", "q", it.q));
+      const box = el("div", "mcq");
+      const why = el("p", "fix ok"); why.hidden = true;
+      if (it.why) why.append("✓ ", it.why);
+      box.append(options([...it.o], [it.o[0]], it.id, d, true, () => { if (it.why) why.hidden = false; }));
+      d.total++;
+      li.append(box, why);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* meaning -> phrase, built from P */
+  meaning(d) {
+    const ol = el("ol", "items");
+    const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+    shuffle(pool).forEach(p => {
+      const li = el("li");
+      li.append(el("p", "q", p.en));
+      const lab = x => x.opt || x.phrase;
+      const others = [...new Set(shuffle(pool.filter(x => x.id !== p.id)).map(lab))].filter(t => t !== lab(p)).slice(0, 3);
+      const box = el("div", "mcq");
+      box.append(options([lab(p), ...others], [lab(p)], p.id, d, true));
+      d.total++;
+      li.append(box);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* right or wrong */
+  tf(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      li.append(el("p", "tf-line", it.t));
+      const btns = el("div", "tf-btns");
+      const fb = el("p", "fix"); fb.hidden = true;
+      let done = false;
+      [["Верно", true], ["Неверно", false]].forEach(([label, val]) => {
+        const b = el("button", "opt", label);
+        b.type = "button";
+        b.addEventListener("click", () => {
+          if (done) return;
+          done = true;
+          const correct = val === it.ok;
+          b.classList.add(correct ? "ok" : "bad");
+          btns.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+          fb.hidden = false;
+          fb.className = "fix " + (correct ? "ok" : "bad");
+          fb.innerHTML = "";
+          if (it.ok) fb.append(correct ? "Да, верно." : "Это было верно.");
+          else fb.append(correct ? "Да! Правильно: " : "Здесь ошибка. Правильно: ", el("b", null, it.fix));
+          if (it.why) fb.append(el("span", "why", " " + it.why));
+          if (correct) { d.ok++; setScore(d); }
+          hit(it.id, correct);
+        });
+        btns.append(b);
+      });
+      li.append(btns, fb);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* word order */
+  order(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      if (it.q) li.append(el("p", "q", it.q));
+      const wrap = el("div", "uns");
+      const target = it.s.split(" ");
+      const line = el("div", "answer-line");
+      line.setAttribute("aria-label", "Your sentence");
+      const pool = el("div", "tiles");
+      const fb = el("p", "fix"); fb.hidden = true;
+      let solved = false;
+      const mk = w => {
+        const t = el("button", "tile", w);
+        t.type = "button";
+        t.addEventListener("click", () => {
+          if (solved) return;
+          (t.parentElement === pool ? line : pool).append(t);
+          line.classList.remove("bad"); fb.hidden = true;
+        });
+        return t;
+      };
+      let order = shuffle(target);
+      if (order.join(" ") === it.s && target.length > 1) order = [...order.slice(1), order[0]];
+      order.forEach(w => pool.append(mk(w)));
+      const controls = el("div", "line");
+      const c = el("button", "btn small primary", "Проверить"); c.type = "button";
+      const sh = el("button", "btn small", "Показать ответ"); sh.type = "button";
+      c.addEventListener("click", () => {
+        if (solved) return;
+        const built = [...line.children].map(x => x.textContent).join(" ");
+        if (!built) return;
+        fb.hidden = false;
+        const alts = [it.s, ...(it.alt || [])];
+        if (alts.includes(built)) {
+          solved = true; line.classList.add("ok"); fb.className = "fix ok"; fb.textContent = "Правильно!";
+          d.ok++; setScore(d); hit(it.id, true);
+        } else if (pool.children.length) {
+          fb.className = "fix bad"; fb.textContent = "Используй все карточки.";
+        } else {
+          line.classList.add("bad"); fb.className = "fix bad"; fb.textContent = "Не совсем. Нажимай на слова, чтобы переставить, и попробуй ещё раз.";
+          hit(it.id, false);
+        }
+      });
+      sh.addEventListener("click", () => { fb.hidden = false; fb.className = "fix"; fb.innerHTML = ""; fb.append("Ответ: ", el("b", null, it.s)); });
+      controls.append(c, sh);
+      wrap.append(line, pool, controls, fb);
+      li.append(wrap);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* translation; key = regex the answer must contain */
+  translate(d) {
+    const ol = el("ol", "items tr");
+    shuffle(d.def.items).forEach((it, i) => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      li.append(el("p", "ru-line", it.ru));
+      const ta = el("textarea");
+      ta.id = `t${d.num}-${i}`; ta.rows = 1; ta.placeholder = "Напиши по-английски…"; ta.setAttribute("aria-label", "Your translation");
+      const line = el("div", "line");
+      const c = el("button", "btn small primary", "Проверить"); c.type = "button";
+      const sh = el("button", "btn small", "Показать ответ"); sh.type = "button";
+      const model = el("p", "model"); model.hidden = true;
+      let solved = false;
+      const re = new RegExp(`(^|[^a-z'])(${it.key})($|[^a-z'])`, "i");
+      const check = () => {
+        if (solved || !ta.value.trim()) return;
+        const v = norm(ta.value);
+        ta.classList.remove("ok", "bad");
+        model.hidden = false; model.innerHTML = "";
+        if (re.test(v)) {
+          solved = true; ta.classList.add("ok"); ta.readOnly = true;
+          model.append("Правильно! Ответ: ", el("b", null, it.en));
+          d.ok++; setScore(d); hit(it.id, true);
+        } else {
+          ta.classList.add("bad");
+          model.append("Нужно слово: ", el("b", null, it.hint || (byId[it.id] ? byId[it.id].phrase : "the target phrase")), ". Попробуй ещё раз.");
+          hit(it.id, false);
+        }
+      };
+      c.addEventListener("click", check);
+      ta.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); check(); } });
+      sh.addEventListener("click", () => { model.hidden = false; model.innerHTML = ""; model.append("Ответ: ", el("b", null, it.en)); });
+      line.append(c, sh);
+      li.append(ta, line, model);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  }
+};
+
+
+/* ===== Flashcards (auto Drill 1) ===== */
+const sayText = p => (p.say || p.phrase)
+  .replace(/\([^)]*\)/g, " ").replace(/→/g, ", ").replace(/…|\.\.\./g, " ")
+  .replace(/\bsb\b/g, "someone").replace(/\bsth\b/g, "something")
+  .replace(/\s\/\s/g, " or ").replace(/^-/, "").replace(/\s+/g, " ").trim();
+let VOICE = null;
+function pickVoice() {
+  try {
+    const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+    VOICE = vs.find(v => /en[-_]GB/i.test(v.lang) && /google|natural|online|serena|daniel|kate/i.test(v.name))
+      || vs.find(v => /en[-_]GB/i.test(v.lang)) || vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0] || null;
+  } catch (e) { VOICE = null; }
+}
+try { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } catch (e) {}
+function speak(text) {
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if (VOICE) u.voice = VOICE;
+    u.lang = VOICE ? VOICE.lang : "en-GB";
+    u.rate = 0.9;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+const HAS_TTS = typeof window !== "undefined" && "speechSynthesis" in window;
+
+RENDER.cards = function (d) {
+  let deck = P.map(p => p.id), pos = 0, flipped = false, ruFirst = false, known = 0, auto = false;
+  d.total = deck.length;
+  const box = el("div", "fc");
+  const tools = el("div", "fc-tools");
+  const mk = (txt, title) => { const b = el("button", "btn ghost", txt); b.type = "button"; if (title) b.title = title; return b; };
+  const bShuf = mk("Перемешать"), bDir = mk("Сначала русский"), bAuto = mk("Автозвук: выкл");
+  tools.append(bShuf, bDir);
+  if (HAS_TTS) tools.append(bAuto);
+  const flip = el("div", "flip" + (P.some(hasPic) ? " has-pic" : "")); flip.tabIndex = 0; flip.setAttribute("role", "button");
+  const inner = el("div", "flip-in");
+  const front = el("div", "face front"), back = el("div", "face back");
+  inner.append(front, back); flip.append(inner);
+  const nav = el("div", "fc-nav");
+  const bPrev = mk("‹"), bNext = mk("›"), count = el("span", "fc-count");
+  bPrev.setAttribute("aria-label", "previous"); bNext.setAttribute("aria-label", "next");
+  nav.append(bPrev, count, bNext);
+  const rate = el("div", "fc-rate");
+  const bAgain = el("button", "btn again", "Ещё раз"), bKnow = el("button", "btn know", "Знаю ✓");
+  bAgain.type = bKnow.type = "button";
+  rate.append(bAgain, bKnow);
+  const done = el("div", "fc-done");
+  box.append(tools, flip, nav, rate, done);
+  d.body.append(box);
+
+  const face = (node, p, en) => {
+    node.innerHTML = "";
+    if (hasPic(p)) node.append(picEl(p, "pic fc-pic"));
+    if (en) {
+      node.append(el("div", "fc-word", p.phrase));
+      if (p.past) node.append(el("div", "fc-past", `прошедшее время: ${p.past}`));
+      if (HAS_TTS) {
+        const s = el("button", "speak", "🔊"); s.type = "button"; s.setAttribute("aria-label", "listen");
+        s.addEventListener("click", e => { e.stopPropagation(); speak(sayText(p)); });
+        node.append(s);
+      }
+    } else {
+      node.append(el("div", "fc-ru", p.ru));
+      if (p.en) node.append(el("div", "fc-def", p.en));
+    }
+    node.append(el("div", "fc-hint", "нажми, чтобы перевернуть"));
+  };
+  function show() {
+    done.innerHTML = "";
+    const left = deck.length > 0;
+    [flip, nav, rate].forEach(x => x.hidden = !left);
+    if (!left) {
+      done.append(el("p", null, `Все ${P.length} карточек пройдены! Теперь переходи к заданию 2.`));
+      const r = mk("Пройти карточки ещё раз"); r.addEventListener("click", () => { deck = P.map(p => p.id); known = 0; d.ok = 0; setScore(d); pos = 0; show(); });
+      done.append(r);
+      return;
+    }
+    pos = (pos + deck.length) % deck.length;
+    const p = byId[deck[pos]];
+    flipped = false; flip.classList.remove("on");
+    face(front, p, !ruFirst); face(back, p, ruFirst);
+    count.textContent = `${pos + 1} / ${deck.length}`;
+    if (auto && !ruFirst) speak(sayText(p));
+  }
+  function turn() {
+    flipped = !flipped; flip.classList.toggle("on", flipped);
+    if (auto && ruFirst && flipped) speak(sayText(byId[deck[pos]]));
+  }
+  flip.addEventListener("click", turn);
+  flip.addEventListener("keydown", e => {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); turn(); }
+    else if (e.key === "ArrowRight") { pos++; show(); }
+    else if (e.key === "ArrowLeft") { pos--; show(); }
+  });
+  bPrev.addEventListener("click", () => { pos--; show(); });
+  bNext.addEventListener("click", () => { pos++; show(); });
+  bShuf.addEventListener("click", () => { deck = shuffle(deck); pos = 0; show(); });
+  bDir.addEventListener("click", () => { ruFirst = !ruFirst; bDir.textContent = ruFirst ? "Сначала английский" : "Сначала русский"; show(); });
+  bAuto.addEventListener("click", () => { auto = !auto; bAuto.textContent = `Автозвук: ${auto ? "вкл" : "выкл"}`; if (auto) show(); });
+  bKnow.addEventListener("click", () => { deck.splice(pos, 1); known++; d.ok = known; setScore(d); show(); });
+  bAgain.addEventListener("click", () => { const id = deck.splice(pos, 1)[0]; deck.push(id); if (pos >= deck.length - 1 && deck.length > 1) pos = deck.length - 1; show(); });
+  show();
+};
+
+
+/* ===== Beginner drills: match pairs, listen and choose ===== */
+RENDER.match = function (d) {
+  const ids = d.def.ids || P.map(p => p.id);
+  const size = d.def.size || 6;
+  const groups = [];
+  const sh = shuffle(ids);
+  for (let i = 0; i < sh.length; i += size) groups.push(sh.slice(i, i + size));
+  if (groups.length > 1 && groups[groups.length - 1].length < 3) { const last = groups.pop(); groups[groups.length - 1].push(...last); }
+  groups.forEach((g, gi) => {
+    const box = el("div", "match");
+    if (groups.length > 1) box.append(el("p", "match-n", `Часть ${gi + 1} из ${groups.length}`));
+    const cols = el("div", "match-cols");
+    const L = el("div", "match-col"), Rc = el("div", "match-col");
+    let sel = null;
+    const mkb = (id, txt, side) => {
+      const b = el("button", "opt pair", txt); b.type = "button"; b.dataset.id = id; b.dataset.side = side;
+      b.addEventListener("click", () => {
+        if (b.disabled) return;
+        if (!sel || sel.dataset.side === side) { if (sel) sel.classList.remove("sel"); sel = b; b.classList.add("sel"); return; }
+        const a = sel; sel = null; a.classList.remove("sel");
+        if (a.dataset.id === b.dataset.id) {
+          [a, b].forEach(x => { x.classList.add("ok"); x.disabled = true; });
+          d.ok++; setScore(d); hit(id, true);
+        } else {
+          [a, b].forEach(x => { x.classList.remove("shake"); void x.offsetWidth; x.classList.add("shake", "wrong"); setTimeout(() => x.classList.remove("wrong"), 600); });
+          hit(a.dataset.side === "en" ? a.dataset.id : b.dataset.id, false);
+        }
+      });
+      return b;
+    };
+    shuffle(g).forEach(id => { reg(id); d.total++; L.append(mkb(id, byId[id].phrase, "en")); });
+    shuffle(g).forEach(id => Rc.append(mkb(id, byId[id].ru, "ru")));
+    cols.append(L, Rc); box.append(cols); d.body.append(box);
+  });
+};
+RENDER.listen = function (d) {
+  const ol = el("ol", "items");
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    const q = el("div", "listen-q");
+    if (HAS_TTS) {
+      const s = el("button", "speak", "🔊"); s.type = "button"; s.setAttribute("aria-label", "слушать");
+      s.addEventListener("click", () => speak(sayText(p)));
+      q.append(s);
+      const w = el("button", "btn small ghost", "показать слово"); w.type = "button";
+      w.addEventListener("click", () => { w.replaceWith(el("b", "listen-word", p.phrase)); });
+      q.append(w);
+    } else q.append(el("b", "listen-word", p.phrase));
+    li.append(q);
+    const others = [...new Set(shuffle(pool.filter(x => x.id !== p.id)).map(x => x.ru))].filter(t => t !== p.ru).slice(0, 3);
+    const box = el("div", "mcq");
+    box.append(options([p.ru, ...others], [p.ru], p.id, d, true));
+    d.total++;
+    li.append(box); ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* ===== Grammar: rule sheet and sort-into-baskets ===== */
+RENDER.rule = function (d) {
+  const box = el("div", "rule");
+  d.def.blocks.forEach(bl => {
+    const b = el("div", "rule-b" + (bl.warn ? " warn" : ""));
+    b.append(el("h4", null, bl.h));
+    bl.lines.forEach(ln => {
+      const row = el("p", "rule-l");
+      if (Array.isArray(ln)) {
+        const en = el("span", "rule-en"); en.innerHTML = ln[0].replace(/\*(.+?)\*/g, "<mark>$1</mark>");
+        row.append(en);
+        if (ln[1]) row.append(el("span", "rule-ru", ln[1]));
+      } else row.append(ln);
+      b.append(row);
+    });
+    box.append(b);
+  });
+  d.body.append(box);
+  d.foot.hidden = true;
+};
+RENDER.sort = function (d) {
+  const bk = d.def.buckets;
+  const ol = el("ol", "items");
+  shuffle(d.def.items).forEach(it => {
+    d.total++; reg(it.id);
+    const li = el("li");
+    const ip = itemPic(it); if (ip) li.append(ip);
+    li.append(el("p", "tf-line", it.t));
+    const btns = el("div", "tf-btns sort-btns");
+    const fb = el("p", "fix"); fb.hidden = true;
+    let done = false;
+    bk.forEach((label, i) => {
+      const b = el("button", "opt", label); b.type = "button";
+      b.addEventListener("click", () => {
+        if (done || b.disabled) return;
+        if (i === it.b) {
+          done = true; b.classList.add("ok");
+          btns.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+          d.ok++; setScore(d); hit(it.id, true);
+          if (it.why) { fb.hidden = false; fb.className = "fix ok"; fb.textContent = "✓ " + it.why; }
+        } else {
+          b.classList.add("bad", "shake"); b.disabled = true; hit(it.id, false);
+          if (it.why) { fb.hidden = false; fb.className = "fix bad"; fb.textContent = "Подсказка: " + it.why; }
+        }
+      });
+      btns.append(b);
+    });
+    li.append(btns, fb); ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* ===== Pictures (Noto Emoji, Apache 2.0). p.img / it.img = "giraffe" or "bicycle !no" or "mouse elephant" =====
+   PICS = { name: "<svg…>" } is injected by build.py with only the pictures a page uses. */
+const hasPic = p => !!(p && p.img);
+function picHTML(spec) {
+  const parts = spec.split(/\s+/).filter(Boolean);
+  const no = parts.includes("!no"), yes = parts.includes("!yes");
+  const names = parts.filter(x => x[0] !== "!");
+  const imgs = names.map(n => `<span class="pi">${PICS[n] || ""}</span>`).join("");
+  return `<span class="pics n${names.length}">${imgs}</span>` +
+    (no ? `<span class="pic-no">${PICS["prohibited"] || ""}</span>` : "") +
+    (yes ? `<span class="pic-yes">${PICS["check-mark-button"] || ""}</span>` : "");
+}
+const picEl = (p, cls) => { const d = el("div", (cls || "pic") + " has-img"); d.innerHTML = picHTML(p.img); return d; };
+const itemPic = (it, cls) => it && it.img ? picEl(it, cls || "pic i-pic") : null;
+
+/* picture → choose the word */
+RENDER.pic = function (d) {
+  const ol = el("ol", "items pic-items");
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(hasPic);
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    li.append(picEl(p, "pic q-pic"));
+    const others = shuffle(pool.filter(x => x.id !== p.id)).map(x => x.phrase).slice(0, (d.def.n || 4) - 1);
+    const box = el("div", "mcq");
+    box.append(options([p.phrase, ...others], [p.phrase], p.id, d, true));
+    d.total++;
+    li.append(box); ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* buttons with pictures; first is correct */
+function picOptions(right, pool, d, n) {
+  const wrap = el("div", "pic-opts");
+  let done = false;
+  const others = shuffle(pool.filter(x => x.id !== right.id && x.img !== right.img)).slice(0, (n || 4) - 1);
+  reg(right.id);
+  shuffle([right, ...others]).forEach(p => {
+    const b = el("button", "popt"); b.type = "button";
+    b.innerHTML = picHTML(p.img);
+    b.setAttribute("aria-label", p.phrase);
+    b.addEventListener("click", () => {
+      if (done || b.disabled) return;
+      if (p.id === right.id) {
+        done = true; b.classList.add("ok");
+        wrap.querySelectorAll(".popt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+        d.ok++; setScore(d); hit(right.id, true);
+      } else { b.classList.add("bad", "shake"); b.disabled = true; hit(right.id, false); }
+    });
+    wrap.append(b);
+  });
+  return wrap;
+}
+/* read the word → tap the picture */
+RENDER.pick = function (d) {
+  const ol = el("ol", "items");
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(hasPic);
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    const q = el("p", "q big-q", p.phrase);
+    li.append(q, picOptions(p, pool, d, d.def.n)); d.total++;
+    ol.append(li);
+  });
+  d.body.append(ol);
+};
+/* listen → tap the picture */
+RENDER.listenpic = function (d) {
+  const ol = el("ol", "items");
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(hasPic);
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    const q = el("div", "listen-q");
+    if (HAS_TTS) {
+      const s = el("button", "speak", "🔊"); s.type = "button"; s.setAttribute("aria-label", "слушать");
+      s.addEventListener("click", () => speak(sayText(p)));
+      const w = el("button", "btn small ghost", "показать слово"); w.type = "button";
+      w.addEventListener("click", () => { w.replaceWith(el("b", "listen-word", p.phrase)); });
+      q.append(s, w);
+    } else q.append(el("b", "listen-word", p.phrase));
+    li.append(q, picOptions(p, pool, d, d.def.n)); d.total++;
+    ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* auto drills built from P (pictures carried into each item) */
+RENDER.ru2en = function (d) {
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, img: p.img, q: p.ru, o: [p.phrase, ...shuffle(pool.filter(x => x.id !== p.id)).slice(0, 3).map(x => x.phrase)] })) });
+  RENDER.mcq(d);
+};
+RENDER.en2ru = function (d) {
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, q: p.phrase, o: [p.ru, ...shuffle(pool.filter(x => x.id !== p.id)).slice(0, 3).map(x => x.ru)] })) });
+  RENDER.mcq(d);
+};
+RENDER.letters = function (d) {
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(p => !/\s/.test(p.spell || p.phrase));
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, img: p.img, q: p.ru, s: (p.spell || p.phrase).split("").join(" ") })) });
+  RENDER.order(d);
+};
+RENDER.write = function (d) {
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, img: p.img, t: `${p.ru} — [[${p.ans || p.phrase}]]` })) });
+  RENDER.gaps(d);
+};
+
+function startDrill(num, def) {
+  const d = card(num, def);
+  d.num = num;
+  const build = () => {
+    d.ok = 0; d.total = 0;
+    RENDER[def.type](d);
+    setScore(d);
+    resetBtn(d, build);
+  };
+  build();
+}
+
+document.getElementById("reset-all").addEventListener("click", e => {
+  const b = e.currentTarget;
+  if (b.dataset.armed) { M = {}; save(); renderBoard(); b.textContent = "Сбросить прогресс"; delete b.dataset.armed; }
+  else { b.dataset.armed = "1"; b.textContent = "Нажми ещё раз для сброса"; setTimeout(() => { if (b.dataset.armed) { delete b.dataset.armed; b.textContent = "Сбросить прогресс"; } }, 3000); }
+});
+const boardLink = el("a", null, META.boardLabel || "Слова"); boardLink.href = "#board-sec";
+document.getElementById("nav").append(boardLink);
+const CARDS = { type: "cards", title: "Карточки", short: "Карточки",
+  instr: "Посмотри на слово и вспомни перевод. Нажми на карточку, чтобы перевернуть, 🔊 — послушать. Потом нажми «Знаю» или «Ещё раз» — эти карточки вернутся в конце." };
+(META.cards === false ? DRILLS : [CARDS, ...DRILLS]).forEach((def, i) => startDrill(i + 1, def));
+COUNTING = false;
+renderBoard();
+
+</script>
+</body>
+</html>

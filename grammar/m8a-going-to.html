@@ -1,0 +1,1093 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Going on Holiday!</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column — mastery board of the 20 phrases, then five drills in a fixed ladder */
+:root {
+  --paper: #F1F4F0; --card: #FFFFFF; --ink: #1B2733; --muted: #5B6977; --line: #D6DCD5;
+  --accent: #2A55C9; --accent-soft: #E4EBFB; --on-accent: #FFFFFF;
+  --ok: #1D8455; --ok-soft: #DCF1E5; --bad: #BF3F2D; --bad-soft: #F8E2DD;
+  --mark: #FFE892; --mark-ink: #4A3C00; --dot: #CBD3CC;
+  --font-display: "Young Serif", Georgia, "Times New Roman", serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11171D; --card: #19212A; --ink: #E4EAF0; --muted: #9AA7B4; --line: #2B3642;
+    --accent: #8AA8FF; --accent-soft: #1F2C4A; --on-accent: #0E1730;
+    --ok: #62D39F; --ok-soft: #163327; --bad: #FF8E7C; --bad-soft: #3B201B;
+    --mark: #5B4C14; --mark-ink: #FFF1BF; --dot: #34404C; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11171D; --card: #19212A; --ink: #E4EAF0; --muted: #9AA7B4; --line: #2B3642;
+  --accent: #8AA8FF; --accent-soft: #1F2C4A; --on-accent: #0E1730;
+  --ok: #62D39F; --ok-soft: #163327; --bad: #FF8E7C; --bad-soft: #3B201B;
+  --mark: #5B4C14; --mark-ink: #FFF1BF; --dot: #34404C; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.55; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.wrap { max-width: 760px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+.hero { padding-block: 40px 16px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(32px, 6vw, 46px); line-height: 1.1; margin: 0 0 12px; text-wrap: balance; }
+.sub { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); border-bottom: 1px solid var(--line); }
+.bar .wrap { display: flex; flex-direction: column; gap: 8px; padding-block: 10px; }
+.nav { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.nav::-webkit-scrollbar { display: none; }
+.nav a { flex: none; text-decoration: none; color: var(--ink); font-size: 14px; font-weight: 600; padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); }
+.nav a:hover { border-color: var(--accent); color: var(--accent); }
+.progress { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.track { flex: 1; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.fill { height: 100%; width: 0; background: var(--ok); transition: width .4s ease; }
+.progress b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+main { padding-block: 8px 64px; }
+section { padding-top: 26px; scroll-margin-top: 110px; }
+h2 { font-family: var(--font-display); font-weight: 400; font-size: 26px; line-height: 1.2; margin: 0 0 4px; }
+.lead { margin: 0 0 14px; color: var(--muted); }
+
+/* Mastery board */
+.board { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; }
+.chip { min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; display: flex; flex-direction: column; gap: 4px; }
+.chip .ph { font-weight: 600; font-size: 15px; line-height: 1.3; }
+.chip .ru { font-size: 12.5px; color: var(--muted); line-height: 1.3; }
+.dots { display: flex; gap: 3px; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--dot); }
+.dots i.on { background: var(--ok); }
+.chip.weak { border-color: var(--bad); }
+.chip.master { border-color: var(--ok); background: var(--ok-soft); }
+.board-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; font-size: 13px; color: var(--muted); }
+
+/* Exercise card */
+.ex { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 18px 16px; }
+.ex-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+h3 { margin: 0; font-size: 18px; font-weight: 700; }
+h3 .num { font-family: var(--font-mono); font-size: 13px; color: var(--accent); margin-right: 8px; }
+.score { flex: none; font-family: var(--font-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); }
+.score.done { color: var(--ok); border-color: var(--ok); background: var(--ok-soft); }
+.instr { margin: 6px 0 14px; color: var(--muted); font-size: 15px; }
+ol.items { margin: 0; padding-left: 1.6em; display: flex; flex-direction: column; gap: 10px; }
+ol.items li { line-height: 2; padding-left: 4px; }
+ol.items li::marker { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+
+.choice { display: inline-flex; flex-wrap: wrap; gap: 4px; vertical-align: baseline; }
+.opt { font: inherit; font-size: 16px; line-height: 1.4; color: var(--ink); cursor: pointer; background: var(--card); border: 1.5px solid var(--line); border-radius: 999px; padding: 1px 11px; text-align: left; }
+.opt:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.opt.ok { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); font-weight: 600; cursor: default; }
+.opt.bad { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); text-decoration: line-through; cursor: default; }
+.opt.dim { opacity: .4; cursor: default; }
+.shake { animation: shake .3s; }
+@keyframes shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+
+/* MCQ */
+.q { margin: 0 0 6px; line-height: 1.5; }
+.mcq { display: flex; flex-wrap: wrap; gap: 6px; }
+.mcq .opt { border-radius: 8px; padding: 4px 12px; }
+
+/* Right or wrong */
+.tf-line { line-height: 1.5; margin: 0 0 6px; }
+.tf-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.fix { margin: 6px 0 0; font-size: 15px; line-height: 1.5; }
+.fix.ok { color: var(--ok); }
+.fix.bad { color: var(--bad); }
+.fix b { color: var(--ink); }
+
+.gap { font: inherit; font-size: 16px; color: var(--ink); background: var(--accent-soft); border: none; border-bottom: 2px dashed var(--accent); border-radius: 4px 4px 0 0; padding: 1px 6px; max-width: 100%; }
+.gap:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.gap.ok { background: var(--ok-soft); border-bottom: 2px solid var(--ok); }
+.gap.bad { background: var(--bad-soft); border-bottom: 2px solid var(--bad); }
+.gap.shown { background: var(--mark); color: var(--mark-ink); border-bottom: 2px solid var(--mark-ink); }
+
+/* Translate */
+.tr li { line-height: 1.5 !important; }
+.tr .ru-line { margin: 0 0 6px; font-weight: 500; }
+.tr textarea { width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; resize: vertical; min-height: 44px; }
+.tr textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.tr textarea.ok { border-color: var(--ok); background: var(--ok-soft); }
+.tr textarea.bad { border-color: var(--bad); background: var(--bad-soft); }
+.tr .line { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; align-items: center; }
+.model { margin: 8px 0 2px; font-size: 15px; color: var(--muted); }
+.model b { color: var(--ink); }
+
+.foot { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.btn { font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; padding: 7px 14px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.primary:hover { filter: brightness(1.08); color: var(--on-accent); }
+.btn.small { font-size: 13px; padding: 4px 10px; }
+.btn:focus-visible, .opt:focus-visible, .nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.note { margin: 14px 0 0; padding: 10px 12px; border-radius: 8px; font-size: 15px; background: var(--accent-soft); }
+
+@media (max-width: 480px) { body { font-size: 16px; } .ex { padding: 14px; } ol.items { padding-left: 1.3em; } }
+@media (prefers-reduced-motion: reduce) { .shake { animation: none; } .fill { transition: none; } html { scroll-behavior: auto; } }
+
+/* Word order */
+.uns { display: flex; flex-direction: column; gap: 6px; }
+.answer-line { min-height: 42px; display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; border: 1.5px dashed var(--line); border-radius: 8px; background: var(--paper); }
+.answer-line.ok { border: 1.5px solid var(--ok); background: var(--ok-soft); }
+.answer-line.bad { border: 1.5px solid var(--bad); background: var(--bad-soft); }
+.tiles { display: flex; flex-wrap: wrap; gap: 6px; }
+.tile { font: inherit; font-size: 16px; padding: 3px 10px; border-radius: 6px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+.tile:hover { border-color: var(--accent); color: var(--accent); }
+.tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.uns .line { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.uns .fix { margin: 0; }
+
+.cue { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .06em; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin: 0 3px; white-space: nowrap; }
+.bank { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; padding: 10px; border: 1px dashed var(--line); border-radius: 8px; }
+.bank span { font-size: 14px; padding: 2px 9px; border-radius: 6px; background: var(--accent-soft); }
+p.text { margin: 0 0 10px; line-height: 2.2; }
+
+/* flashcards */
+.fc-tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.btn.ghost { background: transparent; border: 1px solid var(--line); color: inherit; }
+.flip { perspective: 1200px; cursor: pointer; outline: none; margin: 0 auto; max-width: 560px; }
+.flip-in { position: relative; min-height: 220px; transition: transform .45s; transform-style: preserve-3d; }
+.flip.on .flip-in { transform: rotateY(180deg); }
+.flip:focus-visible .flip-in { box-shadow: 0 0 0 3px var(--accent-soft); border-radius: 14px; }
+.face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 22px 18px 30px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+.face.back { transform: rotateY(180deg); background: var(--accent-soft); }
+.fc-word { font-size: clamp(22px, 5vw, 30px); font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.fc-ru { font-size: clamp(19px, 4.4vw, 25px); font-weight: 600; line-height: 1.3; }
+.fc-def { font-size: 14px; opacity: .75; max-width: 42ch; }
+.fc-hint { position: absolute; bottom: 8px; font-size: 12px; opacity: .45; }
+.speak { font-size: 22px; line-height: 1; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+.fc-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 12px 0 6px; }
+.fc-nav .btn { font-size: 20px; padding: 4px 16px; }
+.fc-count { font-variant-numeric: tabular-nums; min-width: 5ch; text-align: center; }
+.fc-rate { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.btn.again { background: transparent; border: 1px solid #d9822b; color: #d9822b; }
+.btn.know { background: #2e9e5b; border: 1px solid #2e9e5b; color: #fff; }
+.fc-done { text-align: center; }
+.fc-done p { font-weight: 600; margin: 8px 0 10px; }
+.btn.know:hover { color: #fff; filter: brightness(1.08); border-color: #2e9e5b; }
+.btn.again:hover { color: #d9822b; border-color: #d9822b; background: rgba(217,130,43,.08); }
+.match { margin-bottom: 14px; }
+.match-n { margin: 0 0 6px; font-size: 13px; color: var(--muted); }
+.match-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.match-col { display: flex; flex-direction: column; gap: 6px; }
+.opt.pair { border-radius: 8px; padding: 8px 10px; text-align: center; min-height: 44px; }
+.opt.sel { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.listen-q { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.listen-word { font-size: 18px; }
+.match-cols { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+.board { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+/* Grammar additions */
+.story-head { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; padding: 10px 14px; background: var(--accent-soft); border-radius: 10px; }
+.story-head .pic { font-size: 30px; line-height: 1; letter-spacing: 2px; }
+.story-t { font-family: var(--font-display); font-weight: 400; font-size: 20px; }
+.rule { display: flex; flex-direction: column; gap: 10px; }
+.rule-b { border: 1px solid var(--line); border-left: 4px solid var(--ok); border-radius: 10px; padding: 10px 14px; background: var(--card); }
+.rule-b.warn { border-left-color: var(--bad); }
+.rule-b h4 { margin: 0 0 6px; font-size: 16px; }
+.rule-l { margin: 2px 0; display: flex; flex-wrap: wrap; column-gap: 10px; }
+.rule-en { font-weight: 600; }
+.rule-en mark { background: var(--mark); color: var(--mark-ink); border-radius: 3px; padding: 0 2px; }
+.rule-ru { color: var(--muted); font-size: 15px; }
+.why { color: var(--muted); }
+.sort-btns .opt { min-width: 9em; }
+
+[hidden] { display: none !important; }
+.home { display: inline-block; margin-bottom: 14px; font-size: 14px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.fc-past { font-size: 16px; color: var(--muted); margin-top: -4px; }
+.chip .past { font-size: 12.5px; color: var(--accent); line-height: 1.3; }
+.pic svg { display: block; width: 100%; height: 100%; }
+.fc-pic { width: 150px; height: 200px; }
+.flip.has-pic .flip-in { min-height: 380px; }
+.q-pic { width: 120px; height: 160px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 6px; padding: 2px; }
+/* ===== Spotlight 4: pictures ===== */
+.pic.has-img { position: relative; display: flex; align-items: center; justify-content: center; }
+.pics { display: flex; align-items: center; justify-content: center; gap: 6%; width: 100%; height: 100%; }
+.pics .pi { display: block; height: 100%; aspect-ratio: 1; }
+.pics.n2 .pi { height: 70%; } .pics.n3 .pi { height: 52%; }
+.pics .pi svg, .pic-no svg, .pic-yes svg { display: block; width: 100%; height: 100%; }
+.pic-no { position: absolute; inset: 4%; margin: auto; aspect-ratio: 1; height: 92%; opacity: .82; pointer-events: none; }
+.pic-yes { position: absolute; right: 2%; bottom: 2%; width: 34%; aspect-ratio: 1; pointer-events: none; }
+.fc-pic.has-img { width: 190px; height: 170px; }
+.flip.has-pic .flip-in { min-height: 340px; }
+.q-pic.has-img { width: 150px; height: 120px; padding: 10px; background: var(--card); }
+.i-pic { width: 128px; height: 84px; flex: none; margin-bottom: 8px; padding: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.i-pic .pics.n1 .pi { height: 100%; }
+ol.items li.has-ip { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+ol.items li.has-ip .i-pic { margin: 0; }
+ol.items li.has-ip .gl { flex: 1; min-width: 14em; }
+.chip.with-pic { display: grid; grid-template-columns: 40px minmax(0,1fr); column-gap: 8px; align-items: center; }
+.chip.with-pic .chip-pic { grid-row: span 3; width: 40px; height: 40px; }
+.chip.with-pic > :not(.chip-pic) { grid-column: 2; }
+.board { grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); }
+.big-q { font-size: 22px; font-weight: 700; margin: 0 0 8px; }
+.pic-opts { display: grid; grid-template-columns: repeat(4, minmax(0, 96px)); gap: 10px; margin: 2px 0 6px; }
+.popt { position: relative; aspect-ratio: 1; padding: 10px; border: 2px solid var(--line); border-radius: 14px; background: var(--card); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.popt:hover:not(:disabled) { border-color: var(--accent); }
+.popt.ok { border-color: var(--ok); background: var(--ok-soft); }
+.popt.bad { border-color: var(--bad); background: var(--bad-soft); opacity: .55; }
+.popt.dim { opacity: .35; }
+.popt .pics { pointer-events: none; }
+@media (max-width: 480px) { .pic-opts { grid-template-columns: repeat(2, minmax(0, 120px)); } }
+/* bigger, friendlier type for young learners */
+body { font-size: 18px; }
+.opt { font-size: 17px; padding: 3px 13px; }
+.tile { font-size: 18px; padding: 5px 12px; }
+.q { font-weight: 600; }
+.credits { padding-block: 0 40px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="hero wrap">
+  <a class="home" href="index.html">← Все темы</a>
+  <p class="eyebrow">Spotlight 4 Grammar · Module 8 · Unit 15a, 15b</p>
+  <h1>Going on Holiday!</h1>
+  <p class="sub">be going to — планы на будущее: I&#x27;m/he&#x27;s/we&#x27;re going to..., отрицание, вопрос, вопросительные слова Where/What.</p>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <nav class="nav" id="nav" aria-label="Задания"></nav>
+    <div class="progress" aria-live="polite">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <span><b id="mastered">0</b> / <b id="ptotal">0</b> выучено</span>
+    </div>
+  </div>
+</div>
+
+<main class="wrap" id="main">
+  <section id="board-sec">
+    <h2>Твои правила</h2>
+    <p class="lead">Каждый правильный ответ — одна точка. Все точки зелёные — правило усвоено. Красная рамка — повтори это правило.</p>
+    <div class="board" id="board"></div>
+    <div class="board-foot">
+      <span>Прогресс сохраняется в этом браузере.</span>
+      <button class="btn small" type="button" id="reset-all">Сбросить прогресс</button>
+    </div>
+  </section>
+</main>
+<footer class="wrap credits">Картинки: Noto Emoji (Google), лицензия Apache 2.0.</footer>
+
+<script>
+const PICS = {"airplane": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#006ca8\" d=\"M37.08 80.79S9.61 74.92 9.14 75.01s-5.97 5.59-5.78 6.44C3.55 82.31 27.61 95 27.61 95l6.91-7.29zm-3.79 19.42s13.35 23.11 13.92 23.11s6.72-4.74 6.72-5.21s-5.68-28.03-5.68-28.03l-9.76 1.14z\"/><path fill=\"#9a9a9a\" d=\"M22.79 25.78s-1.92 2.17-2.33 2.94s-.48 2.09.4 2.56s1.95.15 2.48-.44s3.14-3.8 3.14-3.8s-3.46-1.44-3.69-1.26m14.02 7.85s-1.55 1.84-2.18 2.68c-.61.81-.6 2.08.25 2.68c1.22.86 2.43-.1 3.09-.81c.61-.66 2.33-2.68 2.33-2.68zm13.27 7.14s-2.03 2.03-2.63 2.84c-.67.89-.82 2.19.1 2.89c1.01.76 2.13.41 3.04-.41c.91-.81 2.94-3.04 2.94-3.04zm35.03 34.28s-2.38 1.65-2.97 2.29c-.58.64-.97 1.92-.22 2.59c.74.67 1.86.61 2.52.17s3.96-2.93 3.96-2.93s-3.02-2.23-3.29-2.12m8.02 12.56s-1.97 1.38-2.79 2.03c-.8.63-1.11 1.86-.44 2.66c.95 1.14 2.38.53 3.19.01c.76-.48 2.94-2 2.94-2zm7.34 12.84s-2.45 1.48-3.24 2.12c-.86.71-1.32 1.93-.59 2.83c.8.98 1.97.9 3.05.34s3.58-2.24 3.58-2.24zm-43.2-76.72s-.35-2.33 1.54-4.96s8.16-8.77 9.13-8.82s3.29 1.18 5.62 3.47c2.22 2.17 3.25 4.96 3.29 5.62s-4.34 5-5.48 6.05s-4.21 4.47-4.21 4.47z\"/><path fill=\"#c8c8c8\" d=\"M60.13 24.08s7.68-9.39 9.74-7.98c2.08 1.42-6.23 9.48-6.23 9.48z\"/><path fill=\"#848484\" d=\"M58.37 23.48s4.35-4.41 4.83-5.11s.04-1.75-.35-2.33c-.39-.57-.99-.79-.99-.79s-3.07 2.75-4.12 5.16c-.82 1.87-.68 2.82-.68 2.82zm7.49 2.27s1.65-1.71 2.48-2.39c.75-.61 1.86-.55 2.52-.16c.85.5 1.05 1.36 1.05 1.36l-3.06 3.25z\"/><path fill=\"#9a9a9a\" d=\"M101.96 59.45s2.51-2.92 3.97-4.38c1.51-1.51 3.97-3.56 4.47-3.52c.5.05 2.71 1.39 4.79 3.52c2.37 2.42 3.84 5.43 3.88 5.71c.05.27-4.38 4.7-6.35 6.39c-1.41 1.21-10.18 4.79-10.18 4.34c.02-.46-.58-12.06-.58-12.06\"/><path fill=\"#c8c8c8\" d=\"M103.41 65.1s7.26-7.96 8.92-6.47s-8.31 10.45-8.31 10.45z\"/><path fill=\"#848484\" d=\"m102.87 63.1l2.65-2.92c.94-1.03.88-2.41.6-3.01c-.36-.77-1.29-.95-1.29-.95l-3.45 3.67zm2.51 6.61s4.16-3.75 4.87-4.34s1.86-1.01 2.77-.38c.68.47.98 1.04.98 1.04s-3.2 3.48-5.13 4.71c-1.21.77-4.07 1.21-4.07 1.21z\"/><path fill=\"#006ca8\" d=\"M11.65 8.92c-.98.08-7.19 7.42-7.41 7.96s0 1.42 1.53 2.18c1.52.76 44.47 23.44 45.13 23.98c.65.55 9.16 10.03 9.16 10.03s21.04-14.5 20.93-14.93c-.11-.44-.76-9.48-.76-9.48S13.07 8.81 11.65 8.92m61.38 56.91s12.86 11.66 13.95 13.08s23.33 41.97 23.66 42.62s1.74 1.2 2.51.44s6.54-5.78 6.65-6.98s-21.37-70.42-21.37-70.42l-16.57 6z\"/><path fill=\"#014eac\" d=\"M66.81 43.26s-10.14-9.81-10.9-10.36c-.76-.54-48.29-20.16-48.29-20.16l-1.95 2.15s48.18 20.35 48.95 20.89s10.2 10.2 10.2 10.2zM82.4 60.45s11.17 13.72 11.84 14.61s20.26 45.65 20.26 45.65l1.95-1.82S96.88 73.22 96.53 72.6S83.17 55.9 83.17 55.9z\"/><path fill=\"#9a9a9a\" d=\"M24.22 98.4s-4.18 5.98-4.18 6.45c0 .48 2.8 3.54 3.12 3.54s6.4-4.34 6.4-4.34l-.85-4.34z\"/><path fill=\"#c8c8c8\" d=\"M24.22 98.4s8.28-13.93 17.15-26.38c9.11-12.79 16.5-20.16 27.86-32.52C83.48 24 92.97 15.22 101.75 9.31c7.28-4.9 17.68-8.22 21.39-4.91c4.07 3.64-.42 15.12-4.99 21.66c-10.37 14.84-19.27 21.9-29.48 31.81c-10.07 9.77-18.58 18.25-29.12 26.16c-7.1 5.33-30 20.04-30 20.04z\"/><path fill=\"#3b5361\" d=\"m103.92 11.05l2.77 2.92s4.64-4.47 8.11-1.14c3.56 3.41-1.35 8.25-1.35 8.25l2.99 3.34s8.11-9.18 1.49-15.15c-5.76-5.2-14.01 1.78-14.01 1.78\"/><path fill=\"#9a9a9a\" d=\"M47.84 74c-1.29 1.24-16.53 19.28-17.38 20.35c-1.09 1.38-1.59 3.04-.36 4.06c1.23 1.01 2.56.01 3.77-.8c1.52-1.01 19.18-16.59 20.35-17.67c1.88-1.74 2.2-4.88.22-6.66c-2.18-1.96-4.64-1.16-6.6.72\"/><path fill=\"#dfdfdf\" d=\"M47.29 69.91c-.87-.75-1.95-.25-3.09.98c-.98 1.07-1.43 2.73-.45 3.4s2.28-.31 3.09-1.3c.81-.98 1.43-2.23.45-3.08m2.82-5.82c-.9 1.03-2.21 2.73-.98 3.94c1.21 1.19 3.04-.32 3.84-1.22c.79-.9 9.84-11.52 21.29-22.96c11.18-11.18 18.7-18.25 19.86-19.49c.98-1.05.89-2.72.03-3.25c-1.02-.63-2.15-.23-3.55 1.17S79.7 32.37 70.74 41.43S51.23 62.8 50.11 64.09\"/><path fill=\"#3b5361\" d=\"M105.47 41.61s-.55-3.72-2.86-2.26c-2.48 1.57-.63 5.83-.63 5.83s.93-.87 1.92-1.91c.82-.85 1.3-1.35 1.57-1.66m-8.87 8.75s-.39-4.77-3.01-2.81c-2.09 1.57-.67 6.26-.67 6.26s1.2-1.09 1.98-1.83c.79-.75 1.7-1.62 1.7-1.62m-8.46 8.02s-.3-3.96-2.65-2.65s-.78 5.99-.78 5.99s1.04-.94 1.74-1.64s1.69-1.7 1.69-1.7m-9.58 9.26s-.18-3.94-2.49-2.89c-2.4 1.09-.96 6.14-.96 6.14s1.17-1.09 1.82-1.7c.66-.6 1.63-1.55 1.63-1.55\"/></svg>", "elephant": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#878787\" d=\"M38.09 74.55c.14 1.27-.99 7.6-1.55 9.71s-1.41 6.48-.56 8.02c.84 1.55 6.9 7.67 9.15 9.78s7.88 6.41 10.14 6.69c2.25.28 6.05-5.21 5.49-8.31s-6.34-9.85-6.34-9.85l2.82-5.07l9.71.99s-.28 8.73-.28 12.53s-1.86 10.8.28 12.25c2.39 1.62 9.71 1.2 11.4-.63s.14-8.94 1.13-12.46s3.66-9.71 3.66-9.71l8.02-36.74l-4.5-13.94s-.14-1.83-.42-3.38s-2.39-5.21-2.82-6.05s-34.21-5.35-34.21-5.35l-11.97-2.25l-.05-3.94l-19.52 2.25l-6.85 11.54L8.2 51.75s-2.72 7.6-2.06 9.29s2.63 6.29 5.54 7.23s8.82 2.06 8.82 2.06l6.85 3.66s4.21-2.07 7.13-1.5c3.84.75 3.61 2.06 3.61 2.06\"/><path fill=\"#bebebe\" d=\"M16.74 10.64c-2.96.84-8.92 7.13-9.85 11.17s1.36 12.79.95 15.43c-.52 3.33-2.46 11.78-2.64 16.38s3.47 7.88 3.47 7.88l3.61-.75s-.56-15.81.09-18.07c.66-2.25 2.21-3.52 2.21-3.52s-.7-8.07 2.67-12.58s8.92-7.18 12.67-7.56s7.27.47 7.27.47s.8-6.15-2.91-8.59c-4.21-2.76-15.43-.86-17.54-.26m37.82 54.71s2.53 3.47 6.19 3.19s8.82-4.04 11.45-6.38s9.29-8.73 11.07-11.36s2.82-5.09 3.19-8.07c.4-3.17.19-4.93.19-4.93s3.52.92 7.04 4.5c2.61 2.66 5.54 5.61 7.32 13.3s2.25 12.08 2.63 12.83s2.23 3.07 3.5 4.48c1.7 1.88 3.38 2.82 3.82 2.75c1.22-.28 2.58-.28 4.34.14s4.13 3.04 5.42 4.43c1.69 1.83 3.45 3.24 3.45 3.59c0 .72-5.41 1.21-10.77-.84c-3.31-1.27-4.65-4.58-4.65-4.58s-2.75-1.9-4.43-3.38c-.9-.79-2.25-2.11-2.25-2.11s-.67 2.83-1.41 5.28c-.84 2.82-1.69 6.19-1.41 9.64s1.83 7.6 3.38 10.84s3.1 7.39 1.27 10.35s-8.09 7.75-11.4 5.35c-2.04-1.48-3.31-7.18-4.08-10.35s-3.52-9.92-3.87-10.7c-.35-.77-2.25-3.59-2.25-3.59s-5.77.35-11.47.28s-9.01-.63-9.01-.63s-4.29 7.95-5.91 12.53s-2.67 11.4-3.73 13.3s-2.89 5.19-9.85 4.5c-5.7-.56-6.9-4.15-6.9-4.15s-.77-3.52 1.34-10.28s4.58-13.37 6.19-18.65c.56-1.84 1.2-4.93 1.2-4.93s-4.08-4.58-4.43-5.07s-1.62-1.69-1.62-1.69l-.18-.99s3.58.17 7.78-1.13c6.39-1.93 8.85-7.47 8.85-7.47\"/><path fill=\"#bebebe\" d=\"M47.8 20.02s3.38-6.01 6.29-6.38s12.37-1.4 17.27.38c2.46.89 8.47 6.87 10.3 9.92c1.77 2.95 4.06 6.87 3.4 11.85c-.65 4.97-2.06 4.97-2.06 6.19s.47 4.13-1.41 6.29s-3.94.19-5.16 1.69s-.85 5.26-2.53 7.04c-1.69 1.78-5.26 1.6-6.66 2.72c-1.41 1.13-1.78 4.97-5.35 5.73c-3.57.75-4.97-2.82-6.01-9.29c-1.03-6.48-1.55-17.12-3.19-17.08c-1.68.04-1.07 3.25-.87 7.57c.21 4.55 1.81 14.02-1.29 18.06s-6.38 5.73-9.76 5.91c-3.38.19-6.59-2.18-8.09-1.9s-.63 2.1-2.98 4.25c-2.44 2.23-4.32 4.41-5.07 6.29s-2.82 5.73-2.72 9.76s1.36 5.7 2.96 5.33c1.6-.38.67-4.79 2.11-5.7c1.34-.84 4.97 1.13 4.88 6.57s-5.37 10.04-12.62 7.65c-7.67-2.53-8.66-13.87-6.97-19.78s2.44-10.65 2.53-13.94c.09-3.28-1.34-5.19-1.06-7.53c.28-2.35 0-2.91.09-7.13s-.38-10.23.47-11.73c.84-1.5 2.25-3.1 2.25-3.1s-.91-6.69 1.03-10.32c3-5.63 8.82-8.35 15.49-9.01c6.66-.68 14.73-.31 14.73-.31\"/><ellipse cx=\"40.38\" cy=\"50.16\" fill=\"#010101\" rx=\"3.34\" ry=\"3.41\"/><path fill=\"#fae9ae\" d=\"M34.38 66.72c.42-1.92 3.04-4.65 5.02-3.99c1.27.42 2.11 3.47 1.69 5.44s-2.21 3.43-4.6 2.67c-2.39-.75-2.37-2.91-2.11-4.12M3.79 56.58c-.77 1.71 1.55 4.08 3.1 5.35s4.93 3.66 5.91 4.22s1.97.8 1.97.8s-.89-3.47-.89-4.5s.05-3.14.05-3.14s-2.96-1.6-4.65-2.16c-1.69-.57-4.84-2.03-5.49-.57\"/></svg>", "hiking-boot": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#263238\" d=\"M12.78 29.74v-9.19c.98-1.14 3.82-3.48 10.83-4.16c1.86-.18 3.66-.27 5.35-.27c6.68 0 14.85.63 18.15 3.35c1.79 1.48 3.25 2.64 3.8 3.52L35.49 35.12z\"/><path fill=\"#784d30\" d=\"M118.95 94.9s-3.7-13.45-9.94-15.32c-4.67-1.4-9.57-1.61-14.4-1.94c-3.25-.22-6.3-1.09-8.75-3.31c-2.62-2.37-14.79-17.24-19.89-24.67c-1.93-2.81-.25-7.49.63-10.89c.88-3.41 2-6.85 1.77-10.42c-.26-3.87-2.2-6.47-8.3-7.26c-4.7-.61-7.03-.38-7.03-.38c-3.54-4.36-13.82-7.02-23.17-6.48c-6.17.36-14.64 1.19-19.46 5.52c-3.08 2.77-4.19 8.96-.27 13.17C6.88 35 6.5 38.99 7.4 41.89c.89 2.87 2.91 4.02 3.01 4.86c.1.81.44 8.81.82 11.96c.43 3.59-1.39 7.01-2.56 10.43c-.86 2.5-1.45 7.13-1.22 10.62c.07 1-.03 1.84.19 2.58c.22.73.75 1.37 1.14 1.69c7.91 6.45 24.66 10.61 28.2 12.7c3.54 2.08 21.02 14.15 32.26 16.03c11.24 1.87 25.7 1.47 38.6-6.65c12.9-8.15 11.11-11.21 11.11-11.21M25.04 18.62c14.97-.98 20.68 2.04 22.54 3.99c0 0-5.29 1.07-7.07 4.49c-.78 1.49-1.75 3.18-1.69 4.87c-3.51-3.06-7.2-2.42-11.52-2.7c-5.83-.38-12.48-2.16-12.31-5.72c.18-3.94 8.01-4.8 10.05-4.93\"/><path fill=\"none\" d=\"M34.86 29.25c-1.08 3.29.16 6.85 1.4 10.09c1.31 3.43 2.62 6.87 3.92 10.3\"/><path fill=\"#a06841\" d=\"M93.94 96.39c.89-.61 1.76-1.31 2.27-2.25s.62-2.19-.01-3.06c-.72-1-2.16-1.24-3.36-.93s-2.23 1.04-3.3 1.66c-1.39.8-4.83 2.12-7.95 2.98c-3.09.86-4.98 2.6-4.48 4.48c.85 3.21 6.28 1.73 8.08 1.25c3-.8 6.17-2.36 8.75-4.13M23.66 65.37c1.63 2.37 1.34 6.02-.93 7.78c-1.2.93-2.74 1.27-4.03 2.06c-.77.47-2.71 2.51-4.81 1.98c-1.19-.3-1.7-1.74-1.92-2.94c-.67-3.63.47-7.59 3.14-10.25c2.43-2.43 6.86-1.09 8.55 1.37\"/><path fill=\"#e2a610\" d=\"M123.63 100.16c.75-2.26.26-4.77-.46-6.98c-.55-.93-2.06-1.17-3.02-1.55c-.27-.09-2.53-.52-2.59-.7c.3.98.8 1.93.91 2.96c.07 1.43-4.13 6.99-12.78 10.99c-21.95 10.14-35.57 5.95-39.03 5.37c-10.91-1.99-21.99-9.38-29.43-14c-7.86-3.59-19.61-6.32-27.06-11.83c-.93-.66-1.96-1.3-2.39-2.42c0 0-.1-.25-.14-.51c-.07-.51-.2-1.75-.2-1.75c-1.56.96-3.39 2.4-3.37 4.43L4 91.15c-.01.7.28 1.37.8 1.84c1.12 1.03 3.1 2.28 4.55 3.15c.86.51 1.81.32 2.02-.72q.12-.585.3-1.17c.41-1.49 1.4-.52 2.45-.09c.36.17.81.32.8.78v3.22c0 .88.52 1.66 1.34 1.99c1.29.35 3.63 2.1 4.94.79c.43-.96.27-2.27.98-3.08c.53-.32 1.9.39 2.41.58c.79.3.18 3.16.15 3.53c-.07.89.39 1.62 1.25 1.95l2.74 1.04c.58.22 1.75.22 2.18-.33c.53-.87.36-2.04.86-2.92c.61-.84 2.11.31 2.76.64c1.18.57 2.54 1.4 3.64 2.13c3.24 2.08 5.03 2.96 9.94 5.57c.2.11.33.31.34.53l.17 3.19c.2 2.13 3 2.53 4.52 3.54c.58.29 1.69.41 2.11-.21c.37-.69.4-1.53.79-2.23c.39-.83 1.34-.6 2.03-.34c2.83.72 1.8 2.37 1.85 4.55c.05.81.83 1.54 1.59 1.77c1.41.42 3.16.84 4.08 1.05c2.24.51 2.1-1.88 2.24-3.2c.05-.58.14-1.6.99-1.5c.77.09 1.54.17 2.32.24c.32.03.57.28.59.6l.15 2.85c.06 1.12.98 2.02 2.09 2.05c1.55.04 3.83.06 5.6.04c.91.02 1.75-.74 1.67-1.69c.06-1.56-.93-3.25 1.13-3.79c.76-.24 2.91-.51 3.77-.55c.75-.03.85.54.96 1.66c.08.76.07 1.65.63 2.16c.4.37 1.01.39 1.55.31c12.84-1.84 28.22-9.4 34.35-20.92\"/><path fill=\"none\" stroke=\"#c62828\" stroke-linecap=\"round\" stroke-miterlimit=\"10\" stroke-width=\"3.067\" d=\"M44.21 50.49c2.66 3.84 19.02.28 24.34 2.77m-19.73 7.45c1.9 2.88 18.85-2.59 24.69-.98m-18.44 9.65c2.35 2.72 15.96-4.61 23.69-3.14\"/><path fill=\"none\" stroke=\"#c62828\" stroke-miterlimit=\"10\" stroke-width=\"3.067\" d=\"M62.31 76.5c1.73 3.3 15.38-5.46 22.96-2.24c.87.37 1.75.9.89 1.29c-6.12 2.77-14.23 9.37-17.18 7.27\"/><path fill=\"none\" stroke=\"#f44336\" stroke-linecap=\"round\" stroke-miterlimit=\"10\" stroke-width=\"3.067\" d=\"M67.32 82.23c.48-6.63 6.51-12.4 11.43-15.99m-18.46 9.3c0-5.74 10.26-14.36 13.22-15.81m-20.49 8.46c2.35-6.47 9.95-11.85 15.52-14.94m-20.83 5.28c3.72-5.59 11.69-9.35 17.43-11.19m-20.67.56c4.89-5.52 13.88-6.96 21.2-6.09\"/><path fill=\"#a06841\" d=\"M39.54 34.97c1.04 4.38 1.04 9.15.86 13.58c4.84-4.16 5.05-11.14 4.86-17.08c-.11-1.21.11-2.51 1.7-3.53c5.16-3.33 10.69-4.64 16.51-4.26c2.33.16 4 1.23 4 1.23c-1.15-2.25-3.5-3.91-7.69-4.26c-5.59-.46-12.14.05-16.93 3.23c-4.01 2.68-5.26 6.78-3.31 11.09\"/><path fill=\"#78a3ac\" d=\"m44.21 50.49l3.21.88c.53.14 1.01-.34.87-.86l-1.19-4.46c-.14-.53-.8-.7-1.19-.31l-2.36 2.4a2.49 2.49 0 0 0-3.07-1.74l-.99.27c-1.14.31-1.81 1.5-1.5 2.64l.84 3.03c.31 1.14 1.5 1.81 2.64 1.5l.99-.27a2.505 2.505 0 0 0 1.75-3.08M63.7 86.61l2.54 1.85c.96.7 2.3.49 3-.47l.61-.83c.81-1.11.57-2.68-.55-3.49l3.06-1.31c.5-.21.58-.89.14-1.22l-3.71-2.75a.701.701 0 0 0-1.12.49l-.35 3.35a2.497 2.497 0 0 0-3.49.55l-.61.83c-.69.96-.48 2.3.48 3m-7.72-7.36l2.2 2.25c.83.85 2.19.87 3.04.04l.74-.72c.99-.96 1.01-2.54.04-3.53l3.24-.78c.53-.13.72-.78.34-1.18L62.39 72a.704.704 0 0 0-1.19.3l-.9 3.24a2.487 2.487 0 0 0-3.53-.04l-.74.72c-.86.82-.87 2.18-.05 3.03m-7.18-9.04l1.75 2.62c.66.99 1.99 1.25 2.98.59l.86-.57c1.15-.77 1.45-2.32.69-3.46l3.32-.18c.54-.03.85-.64.55-1.09l-2.53-3.86a.707.707 0 0 0-1.23.08l-1.48 3.02a2.5 2.5 0 0 0-3.46-.69l-.86.57a2.14 2.14 0 0 0-.59 2.97m-6.3-9.4l1.44 2.8a2.153 2.153 0 0 0 2.89.93l.92-.47a2.49 2.49 0 0 0 1.08-3.36l3.32.2c.54.03.92-.54.67-1.02l-2.07-4.12a.706.706 0 0 0-1.23-.06l-1.82 2.83a2.49 2.49 0 0 0-3.36-1.08l-.92.47c-1.05.53-1.46 1.83-.92 2.88\"/><path fill=\"#4e342e\" d=\"M28.51 41.23c-7.76 0-17.44-2.68-18.91-6.11c-.65-1.53.55-2.24.55-2.24c4.18 3.44 11.04 5.37 18.87 5.28c.84-.01 1.54.63 1.57 1.46c.04.87-.65 1.59-1.52 1.6c-.19 0-.38.01-.56.01m-.37 12.23c-6.8 0-12.98-1.45-17.57-4.05c0 0 .19-2.03-.46-2.74c-.95-1.05-1.61-2.61-1.61-2.61c4 4.05 11.35 6.38 19.83 6.33c.84 0 1.53.64 1.56 1.47c.03.86-.65 1.59-1.5 1.59c-.09.01-.17.01-.25.01\"/><path fill=\"#a06841\" d=\"M23.87 18.73c-1.68.13-3.58.55-5.16 1.14c-1.4.52-3.06 1.33-3.52 2.74c-.55 1.7.45 3.02 1.63 3.92c1.66 1.42 5.86 1.54 5.14 4.24c-1.02 3.81-9.09 1.56-11.03-.31c-6.01-5.36-1.5-11.74 4.85-13.85c3.03-1.01 6.41-1.78 9.17-1.73c.67.01 2.87.21 2.67 1.91c-.17 1.48-1.57 1.77-3.75 1.94M12.43 39.42c1.52.85 4.87 1.28 5.07 3.01c.31 2.61-4.26 2.42-6.02 1.53c-1.34-.47-2.87-1.72-3.26-3.53c-.47-2.14.94-2.84 4.21-1.01\"/></svg>", "luggage": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><circle cx=\"58.5\" cy=\"117.94\" r=\"6.06\" fill=\"#616161\"/><circle cx=\"58.5\" cy=\"117.94\" r=\"2.56\" fill=\"#9e9e9e\"/><path fill=\"#616161\" d=\"m44.18 115.27l-1.16-.71a3.136 3.136 0 0 1-1.03-4.32l2.62-4.26a3.136 3.136 0 0 1 4.32-1.03l1.16.71c1.48.91 1.94 2.84 1.03 4.32l-2.62 4.26a3.14 3.14 0 0 1-4.32 1.03\"/><circle cx=\"28.75\" cy=\"99.64\" r=\"6.06\" fill=\"#616161\"/><circle cx=\"28.75\" cy=\"99.64\" r=\"2.56\" fill=\"#9e9e9e\"/><path fill=\"#616161\" d=\"m14.42 96.97l-1.16-.71a3.136 3.136 0 0 1-1.03-4.32l2.62-4.26a3.136 3.136 0 0 1 4.32-1.03l1.16.71c1.48.91 1.94 2.84 1.03 4.32l-2.62 4.26a3.154 3.154 0 0 1-4.32 1.03\"/><linearGradient id=\"SVGuaA3bcac\" x1=\"55.086\" x2=\"60.074\" y1=\"20.409\" y2=\"20.409\" gradientTransform=\"rotate(31.501 66.979 58.61)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#eee\"/><stop offset=\"1\" stop-color=\"#757575\"/></linearGradient><path fill=\"#bdbdbd\" stroke=\"url(#SVGuaA3bcac)\" stroke-miterlimit=\"10\" stroke-width=\"1.022\" d=\"M85.89 13.56L75.21 30.98l-3.35-2.12L82.63 11.3z\"/><linearGradient id=\"SVGih77jcQO\" x1=\"74.671\" x2=\"79.66\" y1=\"20.366\" y2=\"20.366\" gradientTransform=\"rotate(31.501 66.979 58.61)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\"0\" stop-color=\"#eee\"/><stop offset=\"1\" stop-color=\"#757575\"/></linearGradient><path fill=\"#bdbdbd\" stroke=\"url(#SVGih77jcQO)\" stroke-miterlimit=\"10\" stroke-width=\"1.022\" d=\"M102.87 23.34L91.81 41.38l-3.38-2.07l11.05-18.04z\"/><path fill=\"#616161\" d=\"m84.25 6.02l-3.07 5.01c-.29.47-.26 1.02.19 1.29c0 0 .82-.47 2.43.57s1.75 2.02 1.75 2.02c.45.27.88-.08 1.17-.55l1.19-1.95c.79-1.29 2.16-1.84 3.39-1.09l7.33 4.49c1.23.75 1.58 2.41.79 3.7l-.51.85c-.34.56-.91 1.21-.38 1.54c0 0 .8-.2 2.44.87c1.64 1.08 1.76 1.71 1.76 1.71c.53.33 1.06.01 1.4-.55l2.55-4.17c.64-1.04 1.11-3.09-.39-5.31c-1.21-1.79-2.3-2.88-7.91-6.32c-5.65-3.46-6.76-3.64-8.85-4.07c-2.35-.41-4.65.93-5.28 1.96\"/><path fill=\"#bdbdbd\" d=\"M90.23 7.69a7.44 7.44 0 0 0-3.51.07c-.14.04-.28.08-.42.05c-.26-.05-.42-.33-.41-.6c.01-.26.15-.5.31-.72c1.64-2.18 4.82-1.31 6.95-.13c.72.4 2.65 1.57 1.53 2.59c-.3.28-.77.3-1.16.18s-.73-.37-1.08-.58c-.68-.4-1.43-.69-2.21-.86\" opacity=\".65\"/><path fill=\"#0277bd\" d=\"M107.11 57.86c2.05-3.33 1-7.7-2.33-9.74L90.11 39.1l-40.68 66.13l14.71 9.05c3.33 2.05 7.7 1 9.74-2.33z\"/><path fill=\"#03a9f4\" d=\"m19.09 86.64l30.66 18.86c3.33 2.05 7.7 1 9.74-2.33l33.26-54.14c2.05-3.33 1-7.7-2.33-9.74L59.76 20.44c-3.33-2.05-7.7-1-9.74 2.33L16.76 76.9c-2.05 3.34-1.01 7.7 2.33 9.74\"/><path fill=\"#212121\" d=\"M58.96 111.09c1.44-.03 2.78-.41 4.21-.85c1.81-.56 3.33-1.46 4.35-3.11l32.18-52.4c1.18-1.92 1.18-4.23.46-6.31c-.36-1.05-.8-2.21-1.64-3.33c-.7-.93-1.95-2.04-2.01-2.07c.78 0 1.94.72 3.54 2.22c2.93 2.74 3.38 7.17 1.33 10.51c0 .01-32.18 52.4-32.18 52.4a8.9 8.9 0 0 1-5.17 3.9c-.97.27-2.17.38-3.2.27c-1.54-.16-1.87-1.23-1.87-1.23\"/><ellipse cx=\"45.99\" cy=\"58.75\" fill=\"#784d30\" rx=\"4.94\" ry=\"7.98\" transform=\"rotate(-14.644 45.993 58.75)\"/><path fill=\"#ffe0b2\" d=\"M44.39 65.92c-1.57-1.18-2.92-3.27-3.59-5.82c-.56-2.14-.57-4.29-.02-6.05c.57-1.84 1.66-3.06 3.08-3.43c2.86-.75 6.14 2.29 7.31 6.77c.56 2.14.57 4.29.02 6.05c-.57 1.84-1.66 3.06-3.08 3.43c-1.23.32-2.53-.05-3.72-.95m2.71-13.7c-.97-.73-2.03-1.05-3.02-.79c-1.13.3-2.02 1.31-2.49 2.86c-.5 1.62-.49 3.61.03 5.59c1.05 4.03 3.87 6.8 6.28 6.17c1.13-.3 2.02-1.31 2.49-2.86c.5-1.62.49-3.61-.03-5.59c-.62-2.38-1.86-4.32-3.26-5.38\"/><path fill=\"#7cb342\" stroke=\"#f1f8e9\" stroke-miterlimit=\"10\" stroke-width=\".753\" d=\"m68.78 46.18l1.15 9.16l14.98-3.8l-4.79-3.51l3.65-5.21z\"/><path fill=\"#ffe36c\" d=\"M64.59 44.94c2.15-2.05 1.54-6.33-1.99-5.41c-1.04.27-2.17.85-3.15.13c-.23-.19-.38-.51-.31-.81c.13-.56.86-.98 1.31-1.2c1.37-.61 2.52-.67 2.86-2.28c.42-1.96-2.51-3.91-4.39-3.8c-2.57.15-2.68 2.06-2.36 4.31c.19 1.09-.96 1.89-1.69.96c-.51-.97-.08-2.5-.55-3.51c-.49-1.72-2.62-1.79-3.97-.98c-1.27.76-2.41 2.29-1.97 3.79c.43 1.46 1.52 1.75 2.7 2.02c.58.13 1.32.37 1.63.96c.48 1.34-1.87.71-2.58.81c-.75 0-1.46.08-2.05.56c-1.62 1.22-1.38 4.18.66 5.15c1.82 1.14 3.53-.24 4.51-1.93c.26-.39.57-.83 1.03-.88c.86-.09.87 1 .73 1.56c-.22.91-.71 1.74-.93 2.65c-.72 3.09 3.76 4.25 5.55 1.86c1.09-1.48.35-3.13-1.01-4.36c-.34-.31-.64-.92-.28-1.33c.72-.76 2.01.51 2.41.84c1.2 1 2.34 2.05 3.84.89\"/><circle cx=\"56\" cy=\"40.16\" r=\"1.94\" fill=\"#ff7555\"/><path fill=\"#424242\" d=\"m54.92 108.65l-4.49-2.72l4.37-7.14l7.67 4.65c.66.4.86 1.26.46 1.91c.01.01-3.14 6.3-8.01 3.3\"/><path fill=\"#757575\" d=\"M50.75 96.3c-.66-.4-1.51-.19-1.92.46l-1.51 2.47a4.085 4.085 0 0 0 1.32 5.59l1.11.68c3.02 1.86 7.59 1.9 10.25-2.93c.15-.27.05-.61-.21-.76z\"/><path fill=\"#424242\" d=\"M73.11 110.06c-1.04-.63-2.01-.39-2.84.73c-2.22 2.99-4.53 3.54-6.12 3.5l.58.35c3.53 2.25 7.65.79 9.76-3.5c.05-.1.01-.22-.08-.28z\"/><path fill=\"#757575\" d=\"M26.9 81.76c.66.4.86 1.26.46 1.91l-1.51 2.47a4.096 4.096 0 0 1-5.58 1.39l-1.11-.67c-3.06-1.85-5.14-6.22-2.07-10.64c.12-.17.36-.22.53-.11z\"/><path fill=\"#ffe0b2\" d=\"M47.95 64.05c.36-1.04-.69-1.52-1.04-2.22c.06-1.05.96-2.06.25-3.14c2.38-1.89.33-2.7-1.76-2.8c.12-.34.59-.49.79-.84c.34-.5.31-1.19-.09-1.65c-.42-.65-2.47-.72-1.92.4c.46.52.79-.48 1.28-.23c.67.45-.26 1.09-.58 1.44c-.39.37-.52.87-.33 1.27c.42.89 1.64.49 2.39.61c.83.19.14.97-.3 1.18c-.11.07-.57-.18-.72-.19c-4.27-.94-2.74 4.52.34 1.52c.91.65-.57 1.67-.39 2.47c.19.99 1.68 1.61.95 2.81c-.03.04-.06.09-.03.14c.4.21 1-.38 1.16-.77m-2.84-4.64c-.28.23-.86.23-.92-.2c.09-.62 1.06-.61 1.46-.31c-.16.18-.35.36-.54.51\"/></svg>", "one-piece-swimsuit": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#008deb\" d=\"M64.94 79.63c-16.35-5.02-26.46-12.97-27.47-14.18c.03.89.03 1.79-.01 2.7c-.42 8.72-4.93 20.18-6.9 24.79a2.65 2.65 0 0 0 .93 3.24s6.84 5.85 13 12.73c5.01 5.59 8.98 11.18 10.71 13.71c.6.88 1.59 1.4 2.66 1.4h11.32c1.05 0 2.04-.51 2.64-1.37c1.74-2.5 5.75-8.06 10.7-13.73c1.85-2.12 3.48-3.92 4.93-5.47c-1.3-3.94-4.75-18.37-22.51-23.82\"/><path fill=\"#214485\" d=\"M92.78 98.17c-.59-2.34-4.07-17.84-21.13-27.77c-37.96-22.09-32.44-49.78-32.44-49.78h-1.64c-1.95 7.73-3.75 16.14-3.84 19.09c-.29 8.88 4.23 18.07 3.74 28.45c-.01.11-.02.22-.02.33c9.14 10.16 29.34 11.86 37.91 19.78c9.75 8.99 10.3 17.11 10.3 17.11c3.65-4.22 5.03-5.64 7.12-7.21\"/><path fill=\"#59c7bd\" d=\"M92.22 80.85S79.73 67.16 74.73 61.31c-5.38-6.29-7.9-15.18-9.01-20.62c-.72.1-1.46.16-2.22.16c-11.54 0-16.49-11.27-16.71-21.59c-.15-6.77.15-11.6.37-14.05c.07-.85-.78-1.46-1.56-1.12c-.94.4-2.12.94-3.17 1.52c-.88.48-1.89 3.54-4.26 12.41c-2.9 10.74 1.2 21.99 4.48 27.76C57.51 71.91 86.53 72.9 91.39 99.32c2.72-2.19 5.67-3.83 5.67-3.83c.49-.26.74-.82.5-1.32c-1.15-2.42-3.02-6.57-5.34-13.32\"/><path fill=\"#00796b\" d=\"M93.42 39.7c-.13-3.89-3.13-16.66-5.53-25.04c-1.74-6.3-2.59-8.64-3.35-9.05c-1.05-.58-2.23-1.12-3.17-1.52c-.78-.34-1.63.27-1.56 1.12c.21 2.45.51 7.28.37 14.05c-.17 7.81-3.05 16.17-9.45 19.76v.01c-1.69.95-3.61 1.58-5.78 1.76c.51 7.95 3.29 16.01 9.95 22.9c8.19 8.48 14.65 15.78 18.35 20.16c-1.65-4.93-3.33-10.79-3.57-15.7c-.5-10.38 4.03-19.56 3.74-28.45\"/></svg>", "tent": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#2f2f2f\" d=\"M85.97 62.07L68.2 117.71l9.91 2.45l21.26-1.29l-1.03-35.93z\"/><path fill=\"#f19f40\" d=\"M35.74 44.29c-1.32.99-4.51 12.37-12.24 27.95s-17.65 36.2-17.65 36.2s1.16 1.67 15.84 6.96s26.81 7.61 26.81 7.61s32.7-50.9 32.96-52.05c.26-1.16 5.48-22.38 5.48-22.38s-20.81-1.45-29.83-2.22s-19.83-3.23-21.37-2.07\"/><path fill=\"#ec5f32\" d=\"m110.4 118.76l10.98-1.87s-10.13-21.19-15.67-31.88s-15.1-33.38-16-35.05s-4.64-2.45-6.31.52s-15.61 33.56-18.23 38.45c-2.95 5.5-17.61 32.59-17.74 34.01s24.68-.93 24.68-.93l6.4-18.85l7.73-33.49l1.29.26l6.18 27.31z\"/><path fill=\"#9c2d1b\" d=\"M79.33 121.12c-.22 1.3-6.76 2.43-10.48 2.51c-3.73.09-10.4.35-11.18-.52s8.4-9.01 14.3-19.67c5.89-10.66 9.36-18.02 10.22-20.97c.87-2.95 2.6-11.78 3.29-13.26s2.08-1.21 2.51.17c.43 1.39 4.94 18.46 6.5 22.53s7.97 12.56 9.88 15.25s11.35 9.85 11.52 10.54s-5.84 2.8-9.93 3.27c-2.93.33-9.76-.18-10.28-1.05s-4.05-23.94-5.35-31.65s-3.55-18.02-3.55-18.02s-5.11 24.78-5.81 31.37c-.69 6.59-1.3 17.42-1.64 19.5M4.2 98.52s.73-.76 2.11-.85c1.38-.08 2.6.76 2.6.76l.89 12.82s-1.06.93-2.36.93s-2.52-.68-2.52-.68zm37.26 12.89s1.13-.95 2.86-.95s3.03.87 3.03.87l.09 13s-1.39.78-2.43.78s-2.69-.52-2.69-.52zM119 105.7s.93-1.08 2.58-1s2.55.65 2.55.65l-.78 13.34s-.61.87-2.08.87s-2.77-.69-2.77-.69z\"/></svg>", "wrapped-gift": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 128 128\" aria-hidden=\"true\"><path fill=\"#f5b03e\" d=\"M16.4 31.73s-6.45.51-7.31 1.96c-.87 1.45-.92 3.68-.92 6.13c0 2.46-.1 8.1-.1 8.1l1.54 3.31s.29 42.19.29 43.5c0 1.3 0 2.89 1.88 3.9s49.66 24.09 51.15 24.71c2.25.93 3.32.58 3.32.58l53.09-88.79s-.17-2.43-2.38-3.01c-1.27-.32-100.56-.39-100.56-.39\"/><path fill=\"#e07f14\" d=\"M65.68 60.92c-.81 2.23-.44 25.29-.3 42.06c.14 16.76-.43 20.23 0 20.81s1.6.02 4.91-1.45c6.15-2.72 35.69-17.34 37.86-18.64s7.47-3.99 8.34-5.44s1.34-14.94 1.63-25.77c.29-10.84.58-19.51.58-19.51l1.3-3.9s-.28-10.54-.33-11.7c-.09-1.92-.3-2.91-.79-2.67c-.7.33-6.54 5.12-22 12.64c-9.71 4.71-30.64 12.03-31.2 13.57\"/><path fill=\"#fdd717\" d=\"M65.82 11.21c-4.33-.2-16.18 6.65-27.6 10.4S9.56 32.9 9.41 33.34c-.14.43 6.94 3.6 11.46 5.77c5.37 2.57 25.87 12.28 29.62 13.87c3.76 1.59 12.72 5.31 14.16 5.2c2.02-.14 21.1-7.66 30.78-12.28s21.78-11.78 21.94-13.52c.07-.78-17.8-7.45-26.71-11.48c-17.2-7.79-21.67-9.54-24.84-9.69\"/><path fill=\"#e37d14\" d=\"M8.12 49.77c.15 1.88 1.18 2.55 3.8 3.69s52.15 26.87 53.29 26.87s1.48-4.08.23-3.97c-.68.06-16.95-7.67-32.15-15.39C20.39 54.43 8.04 47.9 8.04 47.9z\"/><path fill=\"#ba5e0d\" d=\"M120.01 48.99S67.12 75.89 66.6 76.15s-1.35.17-1.35.17l-.04 4.01s.49.11 1.04-.06c.32-.1 52.23-26.97 52.46-27.05s1.23-.68 1.44-1.95c.18-1.02-.14-2.28-.14-2.28\"/><path fill=\"#af0f1b\" d=\"m28.86 97.42l10.35 15.4l4.53 1.55s.37-16.8.52-29.25c.21-18.19.13-34.78.39-35.72c.43-1.59 20.56-8.12 20.56-8.12S87.95 48.41 88.67 50c.32.7.07 12.48 0 26.21c-.09 17.34-.06 37.36-.06 37.36s2.35-.01 2.63-.88c.29-.87 1.45-7.58 1.45-7.58l8.82-58.79l4.48-5.78l-6.22-11.84l-25.52-12.56l-8.77 1.97l-9.49-1.45l-30.1 21.63l3.51 7.12l8.61 4.39z\"/><path fill=\"#dc0d28\" d=\"M91.28 49.39c-.55 1.21-.23 63.56-.23 63.56s2.75-1.52 6.29-3.22c3.52-1.69 6.05-2.74 6.27-3.62s.61-62.54.61-62.54z\"/><path fill=\"#ff2a23\" d=\"M41.35 48.1c.33.36-.21 65.06-.88 65.21c-.53.13-12.58-5.25-12.58-5.8s.97-62.38.97-62.38S40.37 47 41.35 48.1m23.88-33.85c-3.33 0-7.01.95-8.08 3.74s-1.31 6.94-1.31 10.04c0 2.97-.48 10.57 8.67 10.45s9.42-3.51 9.56-10.99c.12-6.24-.71-9.27-1.54-10.57c-.74-1.17-3.2-2.67-7.3-2.67\"/><path fill=\"#fcc9d2\" d=\"M59.94 29.69c2.08.12 2.97-4.45 4.57-6.95c1.6-2.49 3.27-4.16 2.67-5.46c-.49-1.08-4.84-1.43-7.19 1.84c-1.65 2.31-1.94 10.46-.05 10.57\"/><path fill=\"#ff2a23\" d=\"M73.33 16.42s2.95 3 3.72 8.88s-.12 10.45-.12 10.45s14.66-.44 19.72.53c4.99.97 6.73 3.17 6.73 4.77s-3.28 2.89-6.61 2.65s-5.58-.42-6 .42s.18 2.14 4.81 2.49c4.63.36 9.98-.3 11.64-6.06s1.72-15.74 1.13-22.93s-1.89-11.3-5.11-12.86c-3.39-1.63-11.88-1.9-19.9 2.61s-10.01 9.05-10.01 9.05\"/><path fill=\"#fcc9d2\" d=\"M89.94 9.58c-1.04-1.34-4.39-1.3-6.18.77c-1.9 2.2-2.32 10.57.12 11.05c2.76.54 2.26-3.98 4.28-6.77c1.98-2.73 2.79-3.74 1.78-5.05\"/><path fill=\"#ff2a23\" d=\"M56.38 16.71S45.15 3.62 32.32 3.82c-7.72.12-9.68 4.57-10.1 6.41s-3.62 20.14.65 30.05S36 47.62 37.39 47.3c1.78-.42 5.57-1.72 5.21-3.09s-12.95 3.56-13.07-2.08s8.91-6.24 13.07-6.36s11.29.83 11.29.83s-1.25-6.83-.42-11.7s2.91-8.19 2.91-8.19\"/><path fill=\"#fcc9d2\" d=\"M28.88 8.57c-1.6 1.66-2.26 11.23-1.25 15.98s1.9 6.77 3.98 6.36c1.74-.35 2.79-9.67 3.62-12.95c.89-3.5 3.09-7.22 2.2-8.85c-1.36-2.5-6.88-2.27-8.55-.54\"/></svg>"};
+// TITLE: Going on Holiday!
+// EYEBROW: Spotlight 4 Grammar · Module 8 · Unit 15a, 15b
+// SUB: be going to — планы на будущее: I'm/he's/we're going to..., отрицание, вопрос, вопросительные слова Where/What.
+// BOARD: Твои правила
+// LEAD: Каждый правильный ответ — одна точка. Все точки зелёные — правило усвоено. Красная рамка — повтори это правило.
+// HOME: index.html
+// HUB: We're going to go to Australia! Are you going to swim? Where are you going to go on holiday?
+const META = { ls: "s4g-m8-goingto", cards: false, boardLabel: "Правила" };
+const P = [
+  { id: "am", phrase: "I am (I'm) going to …", ru: "я собираюсь" },
+  { id: "is", phrase: "he/she/it is (…'s) going to …", ru: "он/она собирается" },
+  { id: "are", phrase: "we/you/they are (…'re) going to …", ru: "мы/вы/они собираются" },
+  { id: "neg", phrase: "isn't / aren't going to …", ru: "не собирается(ются)" },
+  { id: "q", phrase: "Is/Are … going to …?", ru: "вопрос" },
+  { id: "wh", phrase: "Where/What … going to …?", ru: "вопрос со словом" }
+];
+const DRILLS = [
+  { type: "rule", title: "Запомни!", short: "Правило", instr: "Прочитай правило. Жёлтым выделено самое важное.",
+    blocks: [
+      { h: "🧳 be going to — планы на будущее", lines: [
+        ["We're *going to* go to Australia!", "Мы собираемся поехать в Австралию."],
+        ["I'm *going to* travel to Portugal.", "Я собираюсь поехать в Португалию."],
+        ["He's *going to* spend the summer with the chimps.", "Он собирается провести лето с шимпанзе."] ] },
+      { h: "am / is / are — кто собирается?", lines: [
+        ["I *am* going to pack my suitcase.", "я — am"],
+        ["She *is* going to swim every day.", "он/она/оно — is"],
+        ["We *are* going to go to Australia.", "мы/вы/они — are"] ] },
+      { h: "❌ Отрицание и ❓ вопрос", lines: [
+        ["He *isn't* going to travel by plane.", "isn't — он/она/оно"],
+        ["You *aren't* going to need boots.", "aren't — мы/вы/они"],
+        ["*Are* you going to travel to Portugal? — Yes, I am.", "вопрос"],
+        ["*Is* he going to go with you? — No, he isn't.", "вопрос"] ] },
+      { h: "❓ Вопросительные слова + going to", lines: [
+        ["*Where* are you going to go on holiday?", "где/куда ты собираешься?"],
+        ["*What* are you going to buy?", "что ты собираешься?"] ] },
+      { h: "Ловушка!", warn: true, lines: [
+        ["✗ He going to go.  ✓ He*'s* going to go.", "не теряй am/is/are!"],
+        ["✗ going to to go.  ✓ going to *go*.", "после going to — просто глагол, второго to не нужно"] ] }
+    ] },
+  { type: "sort", title: "Кто собирается?", short: "am/is/are", instr: "Прочитай слово. am, is или are?",
+    buckets: ["I am", "he/she/it is", "we/you/they are"],
+    items: [
+      { id: "am", t: "I", b: 0 },
+      { id: "is", t: "Lulu", b: 1 },
+      { id: "is", t: "he", b: 1 },
+      { id: "are", t: "we", b: 2 },
+      { id: "is", img: "elephant", t: "Chuckles", b: 1 },
+      { id: "are", t: "they", b: 2 },
+      { id: "are", t: "you", b: 2 },
+      { id: "is", t: "it", b: 1 }
+    ] },
+  { type: "gaps", title: "am, is или are?", short: "Планы", instr: "Посмотри на картинку и выбери am, is или are.",
+    items: [
+      { id: "are", img: "airplane", t: "We {{*are|is|am}} going to go to Australia." },
+      { id: "am", img: "luggage", t: "I {{*am|is|are}} going to pack my suitcase." },
+      { id: "is", img: "one-piece-swimsuit", t: "She {{*is|are|am}} going to swim every day." },
+      { id: "are", img: "tent", t: "They {{*are|is|am}} going to sleep in a tent." }
+    ] },
+  { type: "gaps", title: "Отрицание", short: "Isn't / aren't", instr: "Напиши isn't или aren't.",
+    items: [
+      { id: "neg", img: "airplane", t: "He [[isn't]] going to travel by plane." },
+      { id: "neg", img: "hiking-boot", t: "You [[aren't]] going to need boots." },
+      { id: "neg", img: "wrapped-gift", t: "She [[isn't]] going to buy a present." },
+      { id: "neg", img: "tent", t: "We [[aren't]] going to sleep in a hotel." }
+    ] },
+  { type: "gaps", title: "Задай вопрос", short: "Is / Are?", instr: "Выбери Is, Are или Am.",
+    items: [
+      { id: "q", img: "airplane", t: "{{*Are|Is|Am}} you going to travel to Portugal? — Yes, I am." },
+      { id: "q", img: "elephant", t: "{{*Is|Are|Am}} Chuckles going to go on holiday? — Yes, he is." },
+      { id: "q", img: "one-piece-swimsuit", t: "{{*Are|Is|Am}} they going to swim? — Yes, they are." },
+      { id: "q", img: "wrapped-gift", t: "{{*Is|Are|Am}} she going to buy a gift? — No, she isn't." }
+    ] },
+  { type: "gaps", title: "Where или What?", short: "Вопрос", instr: "Напиши Where или What.",
+    items: [
+      { id: "wh", img: "airplane", t: "[[Where]] are you going to go on holiday?" },
+      { id: "wh", img: "wrapped-gift", t: "[[What]] are you going to buy?" },
+      { id: "wh", img: "tent", t: "[[Where]] are they going to sleep?" },
+      { id: "wh", img: "one-piece-swimsuit", t: "[[What]] is she going to do this summer?" }
+    ] },
+  { type: "tf", title: "Найди ошибку", short: "Ошибки", instr: "Предложение верное или с ошибкой?",
+    items: [
+      { id: "is", t: "He's going to spend the summer with the chimps.", ok: true },
+      { id: "are", t: "We going to go to Australia.", ok: false, fix: "We're going to go to Australia." },
+      { id: "neg", t: "She isn't going to buy a present.", ok: true },
+      { id: "q", t: "Is you going to travel?", ok: false, fix: "Are you going to travel?" },
+      { id: "wh", t: "Where are you going to go?", ok: true },
+      { id: "am", t: "I going to pack my bag.", ok: false, fix: "I'm going to pack my bag." }
+    ] },
+  { type: "order", title: "Собери предложение", short: "Порядок", instr: "Нажимай на слова по порядку.",
+    items: [
+      { id: "are", img: "airplane", q: "Мы собираемся поехать в Австралию.", s: "We're going to go to Australia." },
+      { id: "is", img: "tent", q: "Он собирается спать в палатке.", s: "He's going to sleep in a tent." },
+      { id: "neg", img: "wrapped-gift", q: "Она не собирается покупать подарок.", s: "She isn't going to buy a present." },
+      { id: "q", img: "one-piece-swimsuit", q: "Ты собираешься плавать?", s: "Are you going to swim?" },
+      { id: "wh", img: "luggage", q: "Куда ты собираешься поехать на каникулы?", s: "Where are you going to go on holiday?" },
+      { id: "am", img: "hiking-boot", q: "Я собираюсь взять ботинки.", s: "I'm going to take my boots." }
+    ] },
+  { type: "translate", title: "Скажи по-английски", short: "Перевод", instr: "Скажи вслух, потом напиши. Проверяется главная часть.",
+    items: [
+      { id: "are", ru: "Мы собираемся поехать в Турцию.", en: "We're going to go to Turkey.", key: "going to go to turkey" },
+      { id: "is", ru: "Она собирается плавать каждый день.", en: "She's going to swim every day.", key: "going to swim" },
+      { id: "neg", ru: "Он не собирается путешествовать на самолёте.", en: "He isn't going to travel by plane.", key: "isn't going to travel" },
+      { id: "q", ru: "Ты собираешься купить подарок?", en: "Are you going to buy a present?", key: "are you going to buy" },
+      { id: "wh", ru: "Что ты собираешься делать летом?", en: "What are you going to do this summer?", key: "what are you going to do" },
+      { id: "am", ru: "Я собираюсь упаковать чемодан.", en: "I'm going to pack my suitcase.", key: "going to pack" }
+    ] }
+];
+
+/* ===== Drill engine (shared). Expects META, P, DRILLS defined before this script. ===== */
+const byId = Object.fromEntries(P.map(p => [p.id, p]));
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const norm = s => (s || "").toLowerCase().replace(/[’‘]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, " ").trim().replace(/[.!?,;:]+$/, "");
+
+let M = {};
+try { M = JSON.parse(localStorage.getItem(META.ls) || "{}") || {}; } catch (e) { M = {}; }
+const save = () => { try { localStorage.setItem(META.ls, JSON.stringify(M)); } catch (e) {} };
+const COUNT = {};
+let COUNTING = true;
+const reg = id => { if (COUNTING && id && byId[id]) COUNT[id] = (COUNT[id] || 0) + 1; };
+const goal = id => Math.max(1, Math.min(5, COUNT[id] || 5));
+function hit(id, ok) {
+  if (!id || !byId[id]) return;
+  const r = M[id] || (M[id] = { c: 0, m: 0 });
+  if (ok) r.c++; else r.m++;
+  save(); renderBoard();
+}
+function renderBoard() {
+  const b = document.getElementById("board");
+  b.innerHTML = "";
+  let learned = 0;
+  P.forEach(p => {
+    const r = M[p.id] || { c: 0, m: 0 };
+    const g = goal(p.id);
+    const n = Math.min(g, r.c);
+    if (n >= g) learned++;
+    const chip = el("div", "chip" + (n >= g ? " master" : r.m > r.c ? " weak" : ""));
+    if (p.img) { chip.classList.add("with-pic"); chip.append(picEl(p, "pic chip-pic")); }
+    chip.append(el("span", "ph", p.phrase));
+    if (p.past) chip.append(el("span", "past", `прош.: ${p.past}`));
+    chip.append(el("span", "ru", p.ru));
+    const dots = el("span", "dots");
+    dots.setAttribute("aria-label", `${n} of ${g}`);
+    for (let i = 0; i < g; i++) dots.append(el("i", i < n ? "on" : ""));
+    chip.append(dots);
+    b.append(chip);
+  });
+  document.getElementById("mastered").textContent = learned;
+  document.getElementById("ptotal").textContent = P.length;
+  document.getElementById("fill").style.width = `${(learned / P.length) * 100}%`;
+}
+
+function card(num, def) {
+  const sec = el("section");
+  sec.id = `d${num}`;
+  const ex = el("article", "ex");
+  const head = el("div", "ex-head");
+  const h3 = el("h3");
+  h3.append(el("span", "num", `Задание ${num}`), def.title);
+  const score = el("span", "score");
+  head.append(h3, score);
+  ex.append(head, el("p", "instr", def.instr));
+  if (def.pic || def.story) {
+    const st = el("div", "story-head");
+    if (def.pic) st.append(el("span", "pic", def.pic));
+    if (def.story) st.append(el("b", "story-t", def.story));
+    ex.append(st);
+  }
+  if (def.bank) {
+    const bank = el("div", "bank");
+    def.bank.forEach(w => bank.append(el("span", null, w)));
+    ex.append(bank);
+  }
+  const body = el("div");
+  const foot = el("div", "foot");
+  ex.append(body, foot);
+  if (def.note) ex.append(el("p", "note", def.note));
+  sec.append(ex);
+  document.getElementById("main").append(sec);
+  const a = el("a", null, `${num} · ${def.short}`);
+  a.href = `#d${num}`;
+  document.getElementById("nav").append(a);
+  return { body, foot, score, total: 0, ok: 0, def };
+}
+const setScore = d => { d.score.hidden = !d.total; d.score.textContent = `${d.ok} / ${d.total}`; d.score.classList.toggle("done", d.total > 0 && d.ok === d.total); };
+function resetBtn(d, build) {
+  const r = el("button", "btn", "Начать заново");
+  r.type = "button";
+  r.addEventListener("click", () => { d.body.innerHTML = ""; d.foot.innerHTML = ""; build(); });
+  d.foot.append(r);
+}
+function splitId(spec, fallback) {
+  const i = spec.lastIndexOf("#");
+  return i > -1 ? [spec.slice(0, i), spec.slice(i + 1)] : [spec, fallback];
+}
+function options(list, correctSet, id, d, shuf, onOk) {
+  reg(id);
+  const wrap = el("span", "choice");
+  let done = false;
+  (shuf ? shuffle(list) : list).forEach(o => {
+    const b = el("button", "opt", o);
+    b.type = "button";
+    b.addEventListener("click", () => {
+      if (done || b.disabled) return;
+      if (correctSet.includes(o)) {
+        done = true;
+        b.classList.add("ok");
+        wrap.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+        d.ok++; setScore(d); hit(id, true);
+        if (onOk) onOk();
+      } else {
+        b.classList.add("bad", "shake");
+        b.disabled = true;
+        hit(id, false);
+      }
+    });
+    wrap.append(b);
+  });
+  return wrap;
+}
+
+/* Inline text with {{*right|wrong#id}} choices, [[ans/alt#id]] typed gaps, ^CUE^ word-formation cues */
+const TOK = /\{\{(.+?)\}\}|\[\[(.+?)\]\]|\^(.+?)\^/g;
+function inline(text, id, d, gaps, shuf) {
+  const frag = document.createDocumentFragment();
+  let last = 0;
+  text.replace(TOK, (m, c, t, q, off) => {
+    frag.append(text.slice(last, off));
+    if (c) {
+      const [spec, gid] = splitId(c, id);
+      const raw = spec.split("|");
+      const right = raw.filter(o => o.startsWith("*")).map(o => o.slice(1));
+      frag.append(options(raw.map(o => o.replace(/^\*/, "")), right, gid, d, shuf));
+      d.total++;
+    } else if (t) {
+      const [spec, gid] = splitId(t, id);
+      const answers = spec.split("/");
+      const inp = el("input", "gap");
+      inp.type = "text"; inp.autocomplete = "off"; inp.spellcheck = false;
+      inp.id = `g${d.num}-${gaps.length}`;
+      inp.setAttribute("autocapitalize", "off"); inp.setAttribute("aria-label", "gap");
+      inp.style.width = `${Math.max(6, Math.max(...answers.map(a => a.length)) + 2)}ch`;
+      reg(gid);
+      const g = { inp, answers: answers.map(norm), show: answers[0], id: gid, ok: false };
+      gaps.push(g);
+      inp.addEventListener("input", () => inp.classList.remove("ok", "bad", "shown"));
+      inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); d.check(); } });
+      frag.append(inp);
+      d.total++;
+    } else {
+      frag.append(el("span", "cue", q));
+    }
+    last = off + m.length;
+    return m;
+  });
+  frag.append(text.slice(last));
+  return frag;
+}
+
+const RENDER = {
+  /* sentences with inline choices and/or typed gaps */
+  gaps(d) {
+    const def = d.def;
+    const gaps = [];
+    d.check = () => {
+      gaps.forEach(g => {
+        if (g.ok) return;
+        const v = norm(g.inp.value);
+        if (!v) return;
+        g.inp.classList.remove("ok", "bad", "shown");
+        if (g.answers.includes(v)) { g.ok = true; g.inp.classList.add("ok"); g.inp.readOnly = true; d.ok++; hit(g.id, true); }
+        else { g.inp.classList.add("bad"); hit(g.id, false); }
+      });
+      setScore(d);
+    };
+    const items = def.keepOrder ? def.items : shuffle(def.items);
+    const shuf = def.shuffleOptions !== false;
+    if (def.layout === "text") {
+      items.forEach(it => { const p = el("p", "text"); p.append(inline(it.t, it.id, d, gaps, shuf)); d.body.append(p); });
+    } else {
+      const ol = el("ol", "items");
+      items.forEach(it => { const li = el("li"); const ip = itemPic(it); if (ip) { li.classList.add("has-ip"); li.append(ip); } const tx = el("span", "gl"); tx.append(inline(it.t, it.id, d, gaps, shuf)); li.append(tx); ol.append(li); });
+      d.body.append(ol);
+    }
+    if (gaps.length) {
+      const c = el("button", "btn primary", "Проверить"); c.type = "button"; c.addEventListener("click", d.check);
+      const s = el("button", "btn", "Показать ответы"); s.type = "button";
+      s.addEventListener("click", () => gaps.forEach(g => { if (!g.ok) { g.inp.value = g.show; g.inp.classList.remove("bad"); g.inp.classList.add("shown"); } }));
+      d.foot.append(c, s);
+    }
+  },
+  /* question + option buttons; first option in o is the correct one */
+  mcq(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      li.append(el("p", "q", it.q));
+      const box = el("div", "mcq");
+      const why = el("p", "fix ok"); why.hidden = true;
+      if (it.why) why.append("✓ ", it.why);
+      box.append(options([...it.o], [it.o[0]], it.id, d, true, () => { if (it.why) why.hidden = false; }));
+      d.total++;
+      li.append(box, why);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* meaning -> phrase, built from P */
+  meaning(d) {
+    const ol = el("ol", "items");
+    const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+    shuffle(pool).forEach(p => {
+      const li = el("li");
+      li.append(el("p", "q", p.en));
+      const lab = x => x.opt || x.phrase;
+      const others = [...new Set(shuffle(pool.filter(x => x.id !== p.id)).map(lab))].filter(t => t !== lab(p)).slice(0, 3);
+      const box = el("div", "mcq");
+      box.append(options([lab(p), ...others], [lab(p)], p.id, d, true));
+      d.total++;
+      li.append(box);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* right or wrong */
+  tf(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      li.append(el("p", "tf-line", it.t));
+      const btns = el("div", "tf-btns");
+      const fb = el("p", "fix"); fb.hidden = true;
+      let done = false;
+      [["Верно", true], ["Неверно", false]].forEach(([label, val]) => {
+        const b = el("button", "opt", label);
+        b.type = "button";
+        b.addEventListener("click", () => {
+          if (done) return;
+          done = true;
+          const correct = val === it.ok;
+          b.classList.add(correct ? "ok" : "bad");
+          btns.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+          fb.hidden = false;
+          fb.className = "fix " + (correct ? "ok" : "bad");
+          fb.innerHTML = "";
+          if (it.ok) fb.append(correct ? "Да, верно." : "Это было верно.");
+          else fb.append(correct ? "Да! Правильно: " : "Здесь ошибка. Правильно: ", el("b", null, it.fix));
+          if (it.why) fb.append(el("span", "why", " " + it.why));
+          if (correct) { d.ok++; setScore(d); }
+          hit(it.id, correct);
+        });
+        btns.append(b);
+      });
+      li.append(btns, fb);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* word order */
+  order(d) {
+    const ol = el("ol", "items");
+    shuffle(d.def.items).forEach(it => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      if (it.q) li.append(el("p", "q", it.q));
+      const wrap = el("div", "uns");
+      const target = it.s.split(" ");
+      const line = el("div", "answer-line");
+      line.setAttribute("aria-label", "Your sentence");
+      const pool = el("div", "tiles");
+      const fb = el("p", "fix"); fb.hidden = true;
+      let solved = false;
+      const mk = w => {
+        const t = el("button", "tile", w);
+        t.type = "button";
+        t.addEventListener("click", () => {
+          if (solved) return;
+          (t.parentElement === pool ? line : pool).append(t);
+          line.classList.remove("bad"); fb.hidden = true;
+        });
+        return t;
+      };
+      let order = shuffle(target);
+      if (order.join(" ") === it.s && target.length > 1) order = [...order.slice(1), order[0]];
+      order.forEach(w => pool.append(mk(w)));
+      const controls = el("div", "line");
+      const c = el("button", "btn small primary", "Проверить"); c.type = "button";
+      const sh = el("button", "btn small", "Показать ответ"); sh.type = "button";
+      c.addEventListener("click", () => {
+        if (solved) return;
+        const built = [...line.children].map(x => x.textContent).join(" ");
+        if (!built) return;
+        fb.hidden = false;
+        const alts = [it.s, ...(it.alt || [])];
+        if (alts.includes(built)) {
+          solved = true; line.classList.add("ok"); fb.className = "fix ok"; fb.textContent = "Правильно!";
+          d.ok++; setScore(d); hit(it.id, true);
+        } else if (pool.children.length) {
+          fb.className = "fix bad"; fb.textContent = "Используй все карточки.";
+        } else {
+          line.classList.add("bad"); fb.className = "fix bad"; fb.textContent = "Не совсем. Нажимай на слова, чтобы переставить, и попробуй ещё раз.";
+          hit(it.id, false);
+        }
+      });
+      sh.addEventListener("click", () => { fb.hidden = false; fb.className = "fix"; fb.innerHTML = ""; fb.append("Ответ: ", el("b", null, it.s)); });
+      controls.append(c, sh);
+      wrap.append(line, pool, controls, fb);
+      li.append(wrap);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  },
+  /* translation; key = regex the answer must contain */
+  translate(d) {
+    const ol = el("ol", "items tr");
+    shuffle(d.def.items).forEach((it, i) => {
+      d.total++; reg(it.id);
+      const li = el("li");
+      const ip = itemPic(it); if (ip) li.append(ip);
+      li.append(el("p", "ru-line", it.ru));
+      const ta = el("textarea");
+      ta.id = `t${d.num}-${i}`; ta.rows = 1; ta.placeholder = "Напиши по-английски…"; ta.setAttribute("aria-label", "Your translation");
+      const line = el("div", "line");
+      const c = el("button", "btn small primary", "Проверить"); c.type = "button";
+      const sh = el("button", "btn small", "Показать ответ"); sh.type = "button";
+      const model = el("p", "model"); model.hidden = true;
+      let solved = false;
+      const re = new RegExp(`(^|[^a-z'])(${it.key})($|[^a-z'])`, "i");
+      const check = () => {
+        if (solved || !ta.value.trim()) return;
+        const v = norm(ta.value);
+        ta.classList.remove("ok", "bad");
+        model.hidden = false; model.innerHTML = "";
+        if (re.test(v)) {
+          solved = true; ta.classList.add("ok"); ta.readOnly = true;
+          model.append("Правильно! Ответ: ", el("b", null, it.en));
+          d.ok++; setScore(d); hit(it.id, true);
+        } else {
+          ta.classList.add("bad");
+          model.append("Нужно слово: ", el("b", null, it.hint || (byId[it.id] ? byId[it.id].phrase : "the target phrase")), ". Попробуй ещё раз.");
+          hit(it.id, false);
+        }
+      };
+      c.addEventListener("click", check);
+      ta.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); check(); } });
+      sh.addEventListener("click", () => { model.hidden = false; model.innerHTML = ""; model.append("Ответ: ", el("b", null, it.en)); });
+      line.append(c, sh);
+      li.append(ta, line, model);
+      ol.append(li);
+    });
+    d.body.append(ol);
+  }
+};
+
+
+/* ===== Flashcards (auto Drill 1) ===== */
+const sayText = p => (p.say || p.phrase)
+  .replace(/\([^)]*\)/g, " ").replace(/→/g, ", ").replace(/…|\.\.\./g, " ")
+  .replace(/\bsb\b/g, "someone").replace(/\bsth\b/g, "something")
+  .replace(/\s\/\s/g, " or ").replace(/^-/, "").replace(/\s+/g, " ").trim();
+let VOICE = null;
+function pickVoice() {
+  try {
+    const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+    VOICE = vs.find(v => /en[-_]GB/i.test(v.lang) && /google|natural|online|serena|daniel|kate/i.test(v.name))
+      || vs.find(v => /en[-_]GB/i.test(v.lang)) || vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0] || null;
+  } catch (e) { VOICE = null; }
+}
+try { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } catch (e) {}
+function speak(text) {
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if (VOICE) u.voice = VOICE;
+    u.lang = VOICE ? VOICE.lang : "en-GB";
+    u.rate = 0.9;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+const HAS_TTS = typeof window !== "undefined" && "speechSynthesis" in window;
+
+RENDER.cards = function (d) {
+  let deck = P.map(p => p.id), pos = 0, flipped = false, ruFirst = false, known = 0, auto = false;
+  d.total = deck.length;
+  const box = el("div", "fc");
+  const tools = el("div", "fc-tools");
+  const mk = (txt, title) => { const b = el("button", "btn ghost", txt); b.type = "button"; if (title) b.title = title; return b; };
+  const bShuf = mk("Перемешать"), bDir = mk("Сначала русский"), bAuto = mk("Автозвук: выкл");
+  tools.append(bShuf, bDir);
+  if (HAS_TTS) tools.append(bAuto);
+  const flip = el("div", "flip" + (P.some(hasPic) ? " has-pic" : "")); flip.tabIndex = 0; flip.setAttribute("role", "button");
+  const inner = el("div", "flip-in");
+  const front = el("div", "face front"), back = el("div", "face back");
+  inner.append(front, back); flip.append(inner);
+  const nav = el("div", "fc-nav");
+  const bPrev = mk("‹"), bNext = mk("›"), count = el("span", "fc-count");
+  bPrev.setAttribute("aria-label", "previous"); bNext.setAttribute("aria-label", "next");
+  nav.append(bPrev, count, bNext);
+  const rate = el("div", "fc-rate");
+  const bAgain = el("button", "btn again", "Ещё раз"), bKnow = el("button", "btn know", "Знаю ✓");
+  bAgain.type = bKnow.type = "button";
+  rate.append(bAgain, bKnow);
+  const done = el("div", "fc-done");
+  box.append(tools, flip, nav, rate, done);
+  d.body.append(box);
+
+  const face = (node, p, en) => {
+    node.innerHTML = "";
+    if (hasPic(p)) node.append(picEl(p, "pic fc-pic"));
+    if (en) {
+      node.append(el("div", "fc-word", p.phrase));
+      if (p.past) node.append(el("div", "fc-past", `прошедшее время: ${p.past}`));
+      if (HAS_TTS) {
+        const s = el("button", "speak", "🔊"); s.type = "button"; s.setAttribute("aria-label", "listen");
+        s.addEventListener("click", e => { e.stopPropagation(); speak(sayText(p)); });
+        node.append(s);
+      }
+    } else {
+      node.append(el("div", "fc-ru", p.ru));
+      if (p.en) node.append(el("div", "fc-def", p.en));
+    }
+    node.append(el("div", "fc-hint", "нажми, чтобы перевернуть"));
+  };
+  function show() {
+    done.innerHTML = "";
+    const left = deck.length > 0;
+    [flip, nav, rate].forEach(x => x.hidden = !left);
+    if (!left) {
+      done.append(el("p", null, `Все ${P.length} карточек пройдены! Теперь переходи к заданию 2.`));
+      const r = mk("Пройти карточки ещё раз"); r.addEventListener("click", () => { deck = P.map(p => p.id); known = 0; d.ok = 0; setScore(d); pos = 0; show(); });
+      done.append(r);
+      return;
+    }
+    pos = (pos + deck.length) % deck.length;
+    const p = byId[deck[pos]];
+    flipped = false; flip.classList.remove("on");
+    face(front, p, !ruFirst); face(back, p, ruFirst);
+    count.textContent = `${pos + 1} / ${deck.length}`;
+    if (auto && !ruFirst) speak(sayText(p));
+  }
+  function turn() {
+    flipped = !flipped; flip.classList.toggle("on", flipped);
+    if (auto && ruFirst && flipped) speak(sayText(byId[deck[pos]]));
+  }
+  flip.addEventListener("click", turn);
+  flip.addEventListener("keydown", e => {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); turn(); }
+    else if (e.key === "ArrowRight") { pos++; show(); }
+    else if (e.key === "ArrowLeft") { pos--; show(); }
+  });
+  bPrev.addEventListener("click", () => { pos--; show(); });
+  bNext.addEventListener("click", () => { pos++; show(); });
+  bShuf.addEventListener("click", () => { deck = shuffle(deck); pos = 0; show(); });
+  bDir.addEventListener("click", () => { ruFirst = !ruFirst; bDir.textContent = ruFirst ? "Сначала английский" : "Сначала русский"; show(); });
+  bAuto.addEventListener("click", () => { auto = !auto; bAuto.textContent = `Автозвук: ${auto ? "вкл" : "выкл"}`; if (auto) show(); });
+  bKnow.addEventListener("click", () => { deck.splice(pos, 1); known++; d.ok = known; setScore(d); show(); });
+  bAgain.addEventListener("click", () => { const id = deck.splice(pos, 1)[0]; deck.push(id); if (pos >= deck.length - 1 && deck.length > 1) pos = deck.length - 1; show(); });
+  show();
+};
+
+
+/* ===== Beginner drills: match pairs, listen and choose ===== */
+RENDER.match = function (d) {
+  const ids = d.def.ids || P.map(p => p.id);
+  const size = d.def.size || 6;
+  const groups = [];
+  const sh = shuffle(ids);
+  for (let i = 0; i < sh.length; i += size) groups.push(sh.slice(i, i + size));
+  if (groups.length > 1 && groups[groups.length - 1].length < 3) { const last = groups.pop(); groups[groups.length - 1].push(...last); }
+  groups.forEach((g, gi) => {
+    const box = el("div", "match");
+    if (groups.length > 1) box.append(el("p", "match-n", `Часть ${gi + 1} из ${groups.length}`));
+    const cols = el("div", "match-cols");
+    const L = el("div", "match-col"), Rc = el("div", "match-col");
+    let sel = null;
+    const mkb = (id, txt, side) => {
+      const b = el("button", "opt pair", txt); b.type = "button"; b.dataset.id = id; b.dataset.side = side;
+      b.addEventListener("click", () => {
+        if (b.disabled) return;
+        if (!sel || sel.dataset.side === side) { if (sel) sel.classList.remove("sel"); sel = b; b.classList.add("sel"); return; }
+        const a = sel; sel = null; a.classList.remove("sel");
+        if (a.dataset.id === b.dataset.id) {
+          [a, b].forEach(x => { x.classList.add("ok"); x.disabled = true; });
+          d.ok++; setScore(d); hit(id, true);
+        } else {
+          [a, b].forEach(x => { x.classList.remove("shake"); void x.offsetWidth; x.classList.add("shake", "wrong"); setTimeout(() => x.classList.remove("wrong"), 600); });
+          hit(a.dataset.side === "en" ? a.dataset.id : b.dataset.id, false);
+        }
+      });
+      return b;
+    };
+    shuffle(g).forEach(id => { reg(id); d.total++; L.append(mkb(id, byId[id].phrase, "en")); });
+    shuffle(g).forEach(id => Rc.append(mkb(id, byId[id].ru, "ru")));
+    cols.append(L, Rc); box.append(cols); d.body.append(box);
+  });
+};
+RENDER.listen = function (d) {
+  const ol = el("ol", "items");
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    const q = el("div", "listen-q");
+    if (HAS_TTS) {
+      const s = el("button", "speak", "🔊"); s.type = "button"; s.setAttribute("aria-label", "слушать");
+      s.addEventListener("click", () => speak(sayText(p)));
+      q.append(s);
+      const w = el("button", "btn small ghost", "показать слово"); w.type = "button";
+      w.addEventListener("click", () => { w.replaceWith(el("b", "listen-word", p.phrase)); });
+      q.append(w);
+    } else q.append(el("b", "listen-word", p.phrase));
+    li.append(q);
+    const others = [...new Set(shuffle(pool.filter(x => x.id !== p.id)).map(x => x.ru))].filter(t => t !== p.ru).slice(0, 3);
+    const box = el("div", "mcq");
+    box.append(options([p.ru, ...others], [p.ru], p.id, d, true));
+    d.total++;
+    li.append(box); ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* ===== Grammar: rule sheet and sort-into-baskets ===== */
+RENDER.rule = function (d) {
+  const box = el("div", "rule");
+  d.def.blocks.forEach(bl => {
+    const b = el("div", "rule-b" + (bl.warn ? " warn" : ""));
+    b.append(el("h4", null, bl.h));
+    bl.lines.forEach(ln => {
+      const row = el("p", "rule-l");
+      if (Array.isArray(ln)) {
+        const en = el("span", "rule-en"); en.innerHTML = ln[0].replace(/\*(.+?)\*/g, "<mark>$1</mark>");
+        row.append(en);
+        if (ln[1]) row.append(el("span", "rule-ru", ln[1]));
+      } else row.append(ln);
+      b.append(row);
+    });
+    box.append(b);
+  });
+  d.body.append(box);
+  d.foot.hidden = true;
+};
+RENDER.sort = function (d) {
+  const bk = d.def.buckets;
+  const ol = el("ol", "items");
+  shuffle(d.def.items).forEach(it => {
+    d.total++; reg(it.id);
+    const li = el("li");
+    const ip = itemPic(it); if (ip) li.append(ip);
+    li.append(el("p", "tf-line", it.t));
+    const btns = el("div", "tf-btns sort-btns");
+    const fb = el("p", "fix"); fb.hidden = true;
+    let done = false;
+    bk.forEach((label, i) => {
+      const b = el("button", "opt", label); b.type = "button";
+      b.addEventListener("click", () => {
+        if (done || b.disabled) return;
+        if (i === it.b) {
+          done = true; b.classList.add("ok");
+          btns.querySelectorAll(".opt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+          d.ok++; setScore(d); hit(it.id, true);
+          if (it.why) { fb.hidden = false; fb.className = "fix ok"; fb.textContent = "✓ " + it.why; }
+        } else {
+          b.classList.add("bad", "shake"); b.disabled = true; hit(it.id, false);
+          if (it.why) { fb.hidden = false; fb.className = "fix bad"; fb.textContent = "Подсказка: " + it.why; }
+        }
+      });
+      btns.append(b);
+    });
+    li.append(btns, fb); ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* ===== Pictures (Noto Emoji, Apache 2.0). p.img / it.img = "giraffe" or "bicycle !no" or "mouse elephant" =====
+   PICS = { name: "<svg…>" } is injected by build.py with only the pictures a page uses. */
+const hasPic = p => !!(p && p.img);
+function picHTML(spec) {
+  const parts = spec.split(/\s+/).filter(Boolean);
+  const no = parts.includes("!no"), yes = parts.includes("!yes");
+  const names = parts.filter(x => x[0] !== "!");
+  const imgs = names.map(n => `<span class="pi">${PICS[n] || ""}</span>`).join("");
+  return `<span class="pics n${names.length}">${imgs}</span>` +
+    (no ? `<span class="pic-no">${PICS["prohibited"] || ""}</span>` : "") +
+    (yes ? `<span class="pic-yes">${PICS["check-mark-button"] || ""}</span>` : "");
+}
+const picEl = (p, cls) => { const d = el("div", (cls || "pic") + " has-img"); d.innerHTML = picHTML(p.img); return d; };
+const itemPic = (it, cls) => it && it.img ? picEl(it, cls || "pic i-pic") : null;
+
+/* picture → choose the word */
+RENDER.pic = function (d) {
+  const ol = el("ol", "items pic-items");
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(hasPic);
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    li.append(picEl(p, "pic q-pic"));
+    const others = shuffle(pool.filter(x => x.id !== p.id)).map(x => x.phrase).slice(0, (d.def.n || 4) - 1);
+    const box = el("div", "mcq");
+    box.append(options([p.phrase, ...others], [p.phrase], p.id, d, true));
+    d.total++;
+    li.append(box); ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* buttons with pictures; first is correct */
+function picOptions(right, pool, d, n) {
+  const wrap = el("div", "pic-opts");
+  let done = false;
+  const others = shuffle(pool.filter(x => x.id !== right.id && x.img !== right.img)).slice(0, (n || 4) - 1);
+  reg(right.id);
+  shuffle([right, ...others]).forEach(p => {
+    const b = el("button", "popt"); b.type = "button";
+    b.innerHTML = picHTML(p.img);
+    b.setAttribute("aria-label", p.phrase);
+    b.addEventListener("click", () => {
+      if (done || b.disabled) return;
+      if (p.id === right.id) {
+        done = true; b.classList.add("ok");
+        wrap.querySelectorAll(".popt").forEach(x => { if (x !== b) { x.classList.add("dim"); x.disabled = true; } });
+        d.ok++; setScore(d); hit(right.id, true);
+      } else { b.classList.add("bad", "shake"); b.disabled = true; hit(right.id, false); }
+    });
+    wrap.append(b);
+  });
+  return wrap;
+}
+/* read the word → tap the picture */
+RENDER.pick = function (d) {
+  const ol = el("ol", "items");
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(hasPic);
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    const q = el("p", "q big-q", p.phrase);
+    li.append(q, picOptions(p, pool, d, d.def.n)); d.total++;
+    ol.append(li);
+  });
+  d.body.append(ol);
+};
+/* listen → tap the picture */
+RENDER.listenpic = function (d) {
+  const ol = el("ol", "items");
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(hasPic);
+  shuffle(pool).forEach(p => {
+    const li = el("li");
+    const q = el("div", "listen-q");
+    if (HAS_TTS) {
+      const s = el("button", "speak", "🔊"); s.type = "button"; s.setAttribute("aria-label", "слушать");
+      s.addEventListener("click", () => speak(sayText(p)));
+      const w = el("button", "btn small ghost", "показать слово"); w.type = "button";
+      w.addEventListener("click", () => { w.replaceWith(el("b", "listen-word", p.phrase)); });
+      q.append(s, w);
+    } else q.append(el("b", "listen-word", p.phrase));
+    li.append(q, picOptions(p, pool, d, d.def.n)); d.total++;
+    ol.append(li);
+  });
+  d.body.append(ol);
+};
+
+/* auto drills built from P (pictures carried into each item) */
+RENDER.ru2en = function (d) {
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, img: p.img, q: p.ru, o: [p.phrase, ...shuffle(pool.filter(x => x.id !== p.id)).slice(0, 3).map(x => x.phrase)] })) });
+  RENDER.mcq(d);
+};
+RENDER.en2ru = function (d) {
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, q: p.phrase, o: [p.ru, ...shuffle(pool.filter(x => x.id !== p.id)).slice(0, 3).map(x => x.ru)] })) });
+  RENDER.mcq(d);
+};
+RENDER.letters = function (d) {
+  const pool = (d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P).filter(p => !/\s/.test(p.spell || p.phrase));
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, img: p.img, q: p.ru, s: (p.spell || p.phrase).split("").join(" ") })) });
+  RENDER.order(d);
+};
+RENDER.write = function (d) {
+  const pool = d.def.ids ? P.filter(p => d.def.ids.includes(p.id)) : P;
+  d.def = Object.assign({}, d.def, { items: pool.map(p => ({ id: p.id, img: p.img, t: `${p.ru} — [[${p.ans || p.phrase}]]` })) });
+  RENDER.gaps(d);
+};
+
+function startDrill(num, def) {
+  const d = card(num, def);
+  d.num = num;
+  const build = () => {
+    d.ok = 0; d.total = 0;
+    RENDER[def.type](d);
+    setScore(d);
+    resetBtn(d, build);
+  };
+  build();
+}
+
+document.getElementById("reset-all").addEventListener("click", e => {
+  const b = e.currentTarget;
+  if (b.dataset.armed) { M = {}; save(); renderBoard(); b.textContent = "Сбросить прогресс"; delete b.dataset.armed; }
+  else { b.dataset.armed = "1"; b.textContent = "Нажми ещё раз для сброса"; setTimeout(() => { if (b.dataset.armed) { delete b.dataset.armed; b.textContent = "Сбросить прогресс"; } }, 3000); }
+});
+const boardLink = el("a", null, META.boardLabel || "Слова"); boardLink.href = "#board-sec";
+document.getElementById("nav").append(boardLink);
+const CARDS = { type: "cards", title: "Карточки", short: "Карточки",
+  instr: "Посмотри на слово и вспомни перевод. Нажми на карточку, чтобы перевернуть, 🔊 — послушать. Потом нажми «Знаю» или «Ещё раз» — эти карточки вернутся в конце." };
+(META.cards === false ? DRILLS : [CARDS, ...DRILLS]).forEach((def, i) => startDrill(i + 1, def));
+COUNTING = false;
+renderBoard();
+
+</script>
+</body>
+</html>
