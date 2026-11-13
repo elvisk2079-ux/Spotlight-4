@@ -1,0 +1,9 @@
+{
+  "biscuit-packet": "<img src=\"../assets/pack/biscuit-packet.png\" alt=\"пачка печенья\" loading=\"lazy\">",
+  "jam-jar": "<img src=\"../assets/pack/jam-jar.png\" alt=\"банка варенья\" loading=\"lazy\">",
+  "choco-bar-wrapped": "<img src=\"../assets/pack/choco-bar.png\" alt=\"плитка шоколада\" loading=\"lazy\">",
+  "milk-carton": "<img src=\"../assets/pack/milk-carton.png\" alt=\"пакет молока\" loading=\"lazy\">",
+  "potato-sack": "<img src=\"../assets/pack/potato-sack.png\" alt=\"килограмм картошки\" loading=\"lazy\">",
+  "bread-loaf-custom": "<img src=\"../assets/pack/bread-loaf.png\" alt=\"булка хлеба\" loading=\"lazy\">",
+  "beans-tin-custom": "<img src=\"../assets/pack/beans-tin.png\" alt=\"банка бобов\" loading=\"lazy\">"
+}

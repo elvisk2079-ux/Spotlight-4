@@ -9,6 +9,9 @@ pics_js = open(os.path.join(base, 'pics.js')).read()
 eng = eng.replace('function startDrill(', pics_js + '\nfunction startDrill(', 1)
 # pictures: only the ones this page uses (subset of Noto Emoji, Apache 2.0, in noto.json)
 lib = json.load(open(os.path.join(base, 'noto.json')))
+raster_path = os.path.join(base, 'raster.json')
+if os.path.exists(raster_path):
+    lib.update(json.load(open(raster_path)))  # real photos/drawings override emoji+custom for matching names
 names = set()
 for spec in re.findall(r'\bimg:\s*"([^"]+)"', src):
     for t in spec.split():
