@@ -36,5 +36,54 @@
     "top": 4,
     "width": 88,
     "height": 122
+  },
+  "biscuit-packet": {
+    "body": "<path d=\"M30 30 L34 20 L40 30 L46 20 L52 30 L58 20 L64 30 L70 20 L76 30 L82 20 L88 30 L92 36 L96 112 Q96 120 88 120 L36 120 Q28 120 28 112 L32 36 Z\" fill=\"#f3e2c0\" stroke=\"#c9a876\" stroke-width=\"2.5\"/><rect x=\"30\" y=\"46\" width=\"64\" height=\"48\" rx=\"6\" fill=\"#e8574a\"/><circle cx=\"62\" cy=\"70\" r=\"20\" fill=\"#c98a4e\" stroke=\"#a36a30\" stroke-width=\"2\"/><circle cx=\"54\" cy=\"63\" r=\"2.6\" fill=\"#5a3418\"/><circle cx=\"70\" cy=\"64\" r=\"2.4\" fill=\"#5a3418\"/><circle cx=\"62\" cy=\"73\" r=\"2.6\" fill=\"#5a3418\"/><circle cx=\"55\" cy=\"78\" r=\"2.2\" fill=\"#5a3418\"/><circle cx=\"69\" cy=\"78\" r=\"2.2\" fill=\"#5a3418\"/><rect x=\"30\" y=\"100\" width=\"64\" height=\"14\" fill=\"#fdfaf3\" opacity=\"0.9\"/>",
+    "left": 20,
+    "top": 12,
+    "width": 88,
+    "height": 114
+  },
+  "jam-jar": {
+    "body": "<ellipse cx=\"64\" cy=\"118\" rx=\"28\" ry=\"5\" fill=\"#e3e0d0\" opacity=\"0.6\"/><path d=\"M38 50 Q36 112 40 114 Q64 122 88 114 Q92 112 90 50 Z\" fill=\"#f2f8fb\" stroke=\"#b9c7cf\" stroke-width=\"2.5\"/><path d=\"M40 58 Q38 110 41 112 Q64 119 87 112 Q90 110 88 58 Z\" fill=\"#a8234a\"/><path d=\"M44 64 Q50 70 58 64 Q66 70 74 64 Q80 70 86 65\" fill=\"none\" stroke=\"#c84060\" stroke-width=\"3\" opacity=\"0.6\"/><rect x=\"46\" y=\"30\" width=\"36\" height=\"22\" rx=\"4\" fill=\"#e3e0d0\" stroke=\"#b9c7cf\" stroke-width=\"2\"/><path d=\"M40 30 Q64 20 88 30 Q90 36 88 40 Q64 32 40 40 Q38 36 40 30 Z\" fill=\"#c62828\"/><path d=\"M40 30 Q64 20 88 30\" fill=\"none\" stroke=\"#8e1c1c\" stroke-width=\"2\"/><circle cx=\"64\" cy=\"82\" r=\"7\" fill=\"#c62828\"/><circle cx=\"58\" cy=\"90\" r=\"4\" fill=\"#c62828\"/><circle cx=\"71\" cy=\"90\" r=\"4.5\" fill=\"#c62828\"/>",
+    "left": 16,
+    "top": 10,
+    "width": 96,
+    "height": 116
+  },
+  "choco-bar-wrapped": {
+    "body": "<rect x=\"18\" y=\"38\" width=\"92\" height=\"52\" rx=\"6\" fill=\"#c62828\"/><path d=\"M18 44 L48 38 L48 90 L18 84 Z\" fill=\"#dcdcdc\"/><path d=\"M18 44 L48 38 M18 84 L48 90\" stroke=\"#bdbdbd\" stroke-width=\"1.5\" fill=\"none\"/><rect x=\"50\" y=\"46\" width=\"56\" height=\"36\" rx=\"3\" fill=\"#5a3418\"/><path d=\"M68 46 V82 M86 46 V82 M50 64 H106\" stroke=\"#3e2410\" stroke-width=\"2.5\"/><rect x=\"50\" y=\"46\" width=\"56\" height=\"36\" rx=\"3\" fill=\"none\" stroke=\"#3e2410\" stroke-width=\"2\"/>",
+    "left": 10,
+    "top": 30,
+    "width": 108,
+    "height": 68
+  },
+  "milk-carton": {
+    "body": "<ellipse cx=\"64\" cy=\"120\" rx=\"28\" ry=\"4\" fill=\"#dfe6ea\" opacity=\"0.6\"/><rect x=\"34\" y=\"50\" width=\"60\" height=\"66\" rx=\"2\" fill=\"#fbfdff\" stroke=\"#9fb3bf\" stroke-width=\"2.5\"/><path d=\"M34 50 L64 26 L94 50 Z\" fill=\"#fbfdff\" stroke=\"#9fb3bf\" stroke-width=\"2.5\" stroke-linejoin=\"round\"/><path d=\"M64 26 L64 50\" stroke=\"#9fb3bf\" stroke-width=\"2\"/><rect x=\"58\" y=\"16\" width=\"12\" height=\"12\" rx=\"1\" fill=\"#5aa7d6\" stroke=\"#3d7ba8\" stroke-width=\"1.5\"/><rect x=\"34\" y=\"68\" width=\"60\" height=\"22\" fill=\"#5aa7d6\"/><path d=\"M40 79 Q50 70 60 79 Q70 88 80 79 Q86 74 90 77\" fill=\"none\" stroke=\"#fdfdfd\" stroke-width=\"3.5\"/><rect x=\"34\" y=\"104\" width=\"60\" height=\"6\" fill=\"#e3edf2\"/>",
+    "left": 18,
+    "top": 10,
+    "width": 88,
+    "height": 112
+  },
+  "potato-sack": {
+    "body": "<ellipse cx=\"64\" cy=\"118\" rx=\"32\" ry=\"5\" fill=\"#d9c9a8\" opacity=\"0.6\"/><path d=\"M30 54 Q26 90 34 110 Q40 120 64 120 Q88 120 94 110 Q102 90 98 54 Z\" fill=\"#c9a569\" stroke=\"#9c7a44\" stroke-width=\"2.5\"/><path d=\"M34 60 L94 60 M32 76 L96 76 M32 92 L96 92 M38 106 L90 106\" stroke=\"#a9875a\" stroke-width=\"2\" opacity=\"0.6\"/><path d=\"M44 54 Q64 34 84 54\" fill=\"none\" stroke=\"#9c7a44\" stroke-width=\"3\"/><ellipse cx=\"64\" cy=\"34\" rx=\"10\" ry=\"6\" fill=\"#a9875a\"/><ellipse cx=\"46\" cy=\"42\" rx=\"13\" ry=\"10\" fill=\"#c88a4e\" stroke=\"#9c6a30\" stroke-width=\"2\"/><ellipse cx=\"68\" cy=\"38\" rx=\"12\" ry=\"9\" fill=\"#d4986a\" stroke=\"#9c6a30\" stroke-width=\"2\"/><ellipse cx=\"84\" cy=\"46\" rx=\"11\" ry=\"9\" fill=\"#c88a4e\" stroke=\"#9c6a30\" stroke-width=\"2\"/>",
+    "left": 14,
+    "top": 22,
+    "width": 100,
+    "height": 102
+  },
+  "bread-loaf-custom": {
+    "body": "<ellipse cx=\"64\" cy=\"106\" rx=\"46\" ry=\"7\" fill=\"#e6d2a8\" opacity=\"0.5\"/><path d=\"M20 70 Q18 44 64 38 Q110 44 108 70 Q110 100 64 102 Q18 100 20 70 Z\" fill=\"#e0a85c\" stroke=\"#a9702f\" stroke-width=\"2.5\"/><path d=\"M20 70 Q64 86 108 70\" fill=\"none\" stroke=\"#a9702f\" stroke-width=\"2\" opacity=\"0.5\"/><path d=\"M36 50 Q40 44 46 50\" fill=\"none\" stroke=\"#a9702f\" stroke-width=\"3\"/><path d=\"M58 46 Q62 40 68 46\" fill=\"none\" stroke=\"#a9702f\" stroke-width=\"3\"/><path d=\"M80 50 Q84 44 90 50\" fill=\"none\" stroke=\"#a9702f\" stroke-width=\"3\"/><circle cx=\"30\" cy=\"62\" r=\"1.8\" fill=\"#fff6e3\" opacity=\"0.8\"/><circle cx=\"90\" cy=\"60\" r=\"1.6\" fill=\"#fff6e3\" opacity=\"0.8\"/><circle cx=\"64\" cy=\"54\" r=\"1.8\" fill=\"#fff6e3\" opacity=\"0.8\"/>",
+    "left": 10,
+    "top": 30,
+    "width": 108,
+    "height": 82
+  },
+  "beans-tin-custom": {
+    "body": "<ellipse cx=\"64\" cy=\"112\" rx=\"34\" ry=\"7\" fill=\"#d8d8d8\"/><rect x=\"30\" y=\"38\" width=\"68\" height=\"70\" rx=\"4\" fill=\"#dcdcdc\" stroke=\"#9e9e9e\" stroke-width=\"2.5\"/><ellipse cx=\"64\" cy=\"38\" rx=\"34\" ry=\"7\" fill=\"#eeeeee\" stroke=\"#9e9e9e\" stroke-width=\"2.5\"/><rect x=\"30\" y=\"56\" width=\"68\" height=\"36\" fill=\"#43a047\"/><ellipse cx=\"46\" cy=\"70\" rx=\"8\" ry=\"6\" fill=\"#c0392b\"/><ellipse cx=\"64\" cy=\"76\" rx=\"8\" ry=\"6\" fill=\"#a93226\"/><ellipse cx=\"82\" cy=\"68\" rx=\"8\" ry=\"6\" fill=\"#c0392b\"/><rect x=\"30\" y=\"56\" width=\"68\" height=\"4\" fill=\"#fdfaf3\" opacity=\"0.8\"/><rect x=\"30\" y=\"88\" width=\"68\" height=\"4\" fill=\"#fdfaf3\" opacity=\"0.8\"/><ellipse cx=\"64\" cy=\"38\" rx=\"16\" ry=\"4\" fill=\"#bdbdbd\"/><rect x=\"58\" y=\"32\" width=\"12\" height=\"5\" rx=\"2\" fill=\"#9e9e9e\"/>",
+    "left": 20,
+    "top": 26,
+    "width": 88,
+    "height": 92
   }
 }
