@@ -42,13 +42,13 @@ const DRILLS = [
       { id: "yes", img: "soap", t: "May I wash my hands? — Yes, the bathroom is next to the bedroom.", b: 0 },
       { id: "yes", img: "door", t: "May I come in, please? — Yes, of course you may.", b: 0 },
       { id: "no", img: "television", t: "May I watch TV now? — No, do your homework first.", b: 1 },
-      { id: "yes", img: "jar", t: "May I have some jam? — Yes, here you are.", b: 0 },
+      { id: "yes", img: "jar strawberry", t: "May I have some jam? — Yes, here you are.", b: 0 },
       { id: "no", img: "chocolate-bar", t: "May I eat chocolate before dinner? — No, you may not.", b: 1 }
     ] },
   { type: "gaps", title: "May, Must или Mustn't?", short: "Вежливая просьба", instr: "Выбери правильное слово для вежливой просьбы.",
     items: [
       { id: "may", img: "fork-and-knife-with-plate", t: "{{*May|Must|Mustn't}} I have some more juice, please?" },
-      { id: "may", img: "jar", t: "{{*May|Many|Much}} I try the jam, please?" },
+      { id: "may", img: "jar strawberry", t: "{{*May|Many|Much}} I try the jam, please?" },
       { id: "may", img: "door", t: "{{*May|Can|Mays}} I come in, please?" },
       { id: "may", img: "toothbrush", t: "{{*May|Must|May to}} I clean my teeth now?" },
       { id: "may", img: "television", t: "{{*May|Mustn't|Many}} I watch TV, please?" }
@@ -62,12 +62,12 @@ const DRILLS = [
     ] },
   { type: "gaps", title: "Какое слово-упаковка?", short: "Упаковки", instr: "Посмотри на картинку и напиши слово.",
     items: [
-      { id: "pack", img: "package", t: "a [[packet]] of biscuits" },
-      { id: "pack", img: "jar", t: "a [[jar]] of jam" },
+      { id: "pack", img: "package cookie", t: "a [[packet]] of biscuits" },
+      { id: "pack", img: "jar strawberry", t: "a [[jar]] of jam" },
       { id: "pack", img: "chocolate-bar", t: "a [[bar]] of chocolate" },
-      { id: "more", img: "beverage-box", t: "a [[carton]] of milk" },
+      { id: "more", img: "glass-of-milk", t: "a [[carton]] of milk" },
       { id: "more", img: "potato", t: "a [[kilo]] of potatoes" },
-      { id: "more", img: "tropical-drink", t: "a [[bottle]] of Coke" },
+      { id: "more", img: "cola-bottle", t: "a [[bottle]] of Coke" },
       { id: "more", img: "bread", t: "a [[loaf]] of bread" },
       { id: "more", img: "canned-food beans", t: "a [[tin]] of beans" }
     ] },
@@ -86,7 +86,7 @@ const DRILLS = [
       { id: "may", img: "fork-and-knife-with-plate", q: "Можно мне ещё картошки, пожалуйста?", s: "May I have some more potatoes, please?" },
       { id: "may", img: "door", q: "Можно войти?", s: "May I come in?" },
       { id: "no", img: "pie", q: "Нет, ещё нельзя.", s: "No, you may not." },
-      { id: "pack", img: "jar", q: "Банка варенья.", s: "A jar of jam." },
+      { id: "pack", img: "jar strawberry", q: "Банка варенья.", s: "A jar of jam." },
       { id: "more", img: "bread", q: "Булка хлеба.", s: "A loaf of bread." }
     ] },
   { type: "translate", title: "Скажи по-английски", short: "Перевод", instr: "Скажи вслух, потом напиши. Проверяется главная часть.",
