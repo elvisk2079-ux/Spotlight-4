@@ -6,13 +6,13 @@
 // TABS: book
 const META = { ls: "s4-cat-club-ch1" };
 const P = [
-  { id: "group", phrase: "group", ru: "группа", img: "people-holding-hands" },
+  { id: "group", phrase: "group", ru: "группа", img: "cc-group" },
   { id: "sometimes", phrase: "sometimes", ru: "иногда" },
-  { id: "calendar", phrase: "calendar", ru: "календарь", img: "spiral-calendar" },
-  { id: "whisper", phrase: "whisper", ru: "шептать", img: "shushing-face" },
-  { id: "surprise", phrase: "surprise", ru: "сюрприз", img: "wrapped-gift" },
-  { id: "bake", phrase: "bake", ru: "печь (выпекать)", img: "bread" },
-  { id: "secret", phrase: "secret", ru: "секрет", img: "zipper-mouth-face" }
+  { id: "calendar", phrase: "calendar", ru: "календарь", img: "cc-calendar" },
+  { id: "whisper", phrase: "whisper", ru: "шептать", img: "cc-whisper" },
+  { id: "surprise", phrase: "surprise", ru: "сюрприз", img: "cc-surprise" },
+  { id: "bake", phrase: "bake", ru: "печь (выпекать)", img: "cc-bake" },
+  { id: "secret", phrase: "secret", ru: "секрет", img: "cc-secret" }
 ];
 P.forEach(p => { p.en = p.ru; });
 const DRILLS = [
@@ -44,34 +44,34 @@ const DRILLS = [
     ] },
   { type: "gaps", title: "Новые предложения", short: "Предложения", instr: "Это уже не из книжки! Прочитай и выбери подходящее слово.",
     items: [
-      { id: "group", img: "people-holding-hands", t: "Our class is a big {{*group|secret|calendar}}." },
+      { id: "group", img: "cc-group", t: "Our class is a big {{*group|secret|calendar}}." },
       { id: "sometimes", t: "I {{*sometimes|whisper|bake}} play football. Not every day." },
-      { id: "calendar", img: "spiral-calendar", t: "Look at the {{*calendar|surprise|group}}! Today is Monday." },
-      { id: "whisper", img: "shushing-face", t: "Shhh! Please {{*whisper|bake|sometimes}}. The baby is sleeping." },
-      { id: "surprise", img: "wrapped-gift", t: "Happy birthday! Here is a {{*surprise|calendar|group}} for you!" },
-      { id: "bake", img: "bread", t: "Granny likes to {{*bake|whisper|sometimes}} cakes and pies." },
-      { id: "secret", img: "zipper-mouth-face", t: "Don't tell anyone! It's a {{*secret|calendar|group}}!" }
+      { id: "calendar", img: "cc-calendar", t: "Look at the {{*calendar|surprise|group}}! Today is Monday." },
+      { id: "whisper", img: "cc-whisper", t: "Shhh! Please {{*whisper|bake|sometimes}}. The baby is sleeping." },
+      { id: "surprise", img: "cc-surprise", t: "Happy birthday! Here is a {{*surprise|calendar|group}} for you!" },
+      { id: "bake", img: "cc-bake", t: "Granny likes to {{*bake|whisper|sometimes}} cakes and pies." },
+      { id: "secret", img: "cc-secret", t: "Don't tell anyone! It's a {{*secret|calendar|group}}!" }
     ] },
   { type: "order", title: "Собери фразу", short: "Фразы", instr: "Нажимай на слова по порядку.",
     items: [
-      { id: "bake", img: "bread", q: "Давайте испечём торт!", s: "Let's bake a cake!" },
-      { id: "secret", img: "zipper-mouth-face", q: "Это секрет!", s: "It's a secret!" },
-      { id: "surprise", img: "wrapped-gift", q: "Давайте сделаем сюрприз!", s: "Let's make a surprise!" },
-      { id: "group", img: "people-holding-hands", q: "Мы не просто группа.", s: "We are not just a group." },
+      { id: "bake", img: "cc-bake", q: "Давайте испечём торт!", s: "Let's bake a cake!" },
+      { id: "secret", img: "cc-secret", q: "Это секрет!", s: "It's a secret!" },
+      { id: "surprise", img: "cc-surprise", q: "Давайте сделаем сюрприз!", s: "Let's make a surprise!" },
+      { id: "group", img: "cc-group", q: "Мы не просто группа.", s: "We are not just a group." },
       { id: "sometimes", q: "Иногда они спят на домашнем задании.", s: "Sometimes they sleep on the homework." },
-      { id: "calendar", img: "spiral-calendar", q: "Посмотри на календарь!", s: "Look at the calendar!" },
-      { id: "whisper", img: "shushing-face", q: "Она шепчет.", s: "She whispers." }
+      { id: "calendar", img: "cc-calendar", q: "Посмотри на календарь!", s: "Look at the calendar!" },
+      { id: "whisper", img: "cc-whisper", q: "Она шепчет.", s: "She whispers." }
     ] },
   { type: "gaps", title: "Впиши слово", short: "Впиши", instr: "Выбери слово из рамки и впиши его в предложение.",
     bank: ["bake", "calendar", "group", "secret", "sometimes", "surprise", "whispers"],
     items: [
-      { id: "group", img: "people-holding-hands", t: "The girls are a [[group]] of friends." },
+      { id: "group", img: "cc-group", t: "The girls are a [[group]] of friends." },
       { id: "sometimes", t: "The cats [[sometimes]] sleep on the books." },
-      { id: "calendar", img: "spiral-calendar", t: "There is a red heart on the [[calendar]]." },
-      { id: "whisper", img: "shushing-face", t: "Veronika [[whispers]]: \"It's our teacher's birthday!\"" },
-      { id: "surprise", img: "wrapped-gift", t: "Let's make a [[surprise]]!" },
-      { id: "bake", img: "bread", t: "Let's [[bake]] a cake!" },
-      { id: "secret", img: "zipper-mouth-face", t: "Shhh... It's a [[secret]]!" }
+      { id: "calendar", img: "cc-calendar", t: "There is a red heart on the [[calendar]]." },
+      { id: "whisper", img: "cc-whisper", t: "Veronika [[whispers]]: \"It's our teacher's birthday!\"" },
+      { id: "surprise", img: "cc-surprise", t: "Let's make a [[surprise]]!" },
+      { id: "bake", img: "cc-bake", t: "Let's [[bake]] a cake!" },
+      { id: "secret", img: "cc-secret", t: "Shhh... It's a [[secret]]!" }
     ] },
   { type: "letters", title: "Собери слово из букв", short: "Буквы", instr: "Нажимай на буквы по порядку, чтобы получилось слово.", ids: ["group", "sometimes", "calendar", "whisper", "surprise", "bake", "secret"] },
   { type: "write", title: "Напиши по-английски", short: "Пишем", instr: "Прочитай перевод и напиши слово по-английски. Забыл — вернись к карточкам." }

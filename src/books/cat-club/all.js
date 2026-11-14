@@ -7,13 +7,13 @@
 const META = { ls: "s4-cat-club-cake" };
 const P = [
   // Chapter 1. The Cat Club
-  { id: "group", phrase: "group", ru: "группа", img: "people-holding-hands" },
+  { id: "group", phrase: "group", ru: "группа", img: "cc-group" },
   { id: "sometimes", phrase: "sometimes", ru: "иногда" },
-  { id: "calendar", phrase: "calendar", ru: "календарь", img: "spiral-calendar" },
-  { id: "whisper", phrase: "whisper", ru: "шептать", img: "shushing-face" },
-  { id: "surprise", phrase: "surprise", ru: "сюрприз", img: "wrapped-gift" },
-  { id: "bake", phrase: "bake", ru: "печь (выпекать)", img: "bread" },
-  { id: "secret", phrase: "secret", ru: "секрет", img: "zipper-mouth-face" },
+  { id: "calendar", phrase: "calendar", ru: "календарь", img: "cc-calendar" },
+  { id: "whisper", phrase: "whisper", ru: "шептать", img: "cc-whisper" },
+  { id: "surprise", phrase: "surprise", ru: "сюрприз", img: "cc-surprise" },
+  { id: "bake", phrase: "bake", ru: "печь (выпекать)", img: "cc-bake" },
+  { id: "secret", phrase: "secret", ru: "секрет", img: "cc-secret" },
   // Chapter 2. The Empty Jar
   { id: "recipe", phrase: "recipe", ru: "рецепт", img: "open-book" },
   { id: "ingredients", phrase: "ingredients", ru: "ингредиенты", img: "flour butter" },
@@ -171,9 +171,9 @@ const DRILLS = [
     items: [
       { id: "jar", img: "jar", t: "jar", b: 0 }, { id: "bowl", img: "bowl-with-spoon", t: "bowl", b: 0 },
       { id: "spoon", img: "spoon", t: "spoon", b: 0 }, { id: "oven", t: "oven", b: 0 },
-      { id: "fridge", t: "fridge", b: 0 }, { id: "calendar", img: "spiral-calendar", t: "calendar", b: 0 },
+      { id: "fridge", t: "fridge", b: 0 }, { id: "calendar", img: "cc-calendar", t: "calendar", b: 0 },
       { id: "recipe", img: "open-book", t: "recipe", b: 0 }, { id: "ceiling", t: "ceiling", b: 0 },
-      { id: "bake", img: "bread", t: "bake", b: 1 }, { id: "whisper", img: "shushing-face", t: "whisper", b: 1 },
+      { id: "bake", img: "cc-bake", t: "bake", b: 1 }, { id: "whisper", img: "cc-whisper", t: "whisper", b: 1 },
       { id: "sneeze", img: "sneezing-face", t: "sneeze", b: 1 }, { id: "wash", img: "soap", t: "wash", b: 1 },
       { id: "mix", t: "mix", b: 1 }, { id: "taste", img: "tongue", t: "taste", b: 1 },
       { id: "cut", img: "kitchen-knife", t: "cut", b: 1 }, { id: "push", t: "push", b: 1 },
@@ -184,8 +184,8 @@ const DRILLS = [
     ] },
   { type: "order", title: "Собери фразу", short: "Фразы", instr: "Нажимай на слова по порядку.",
     items: [
-      { id: "bake", img: "bread", q: "Давайте испечём торт!", s: "Let's bake a cake!" },
-      { id: "secret", img: "zipper-mouth-face", q: "Это секрет!", s: "It's a secret!" },
+      { id: "bake", img: "cc-bake", q: "Давайте испечём торт!", s: "Let's bake a cake!" },
+      { id: "secret", img: "cc-secret", q: "Это секрет!", s: "It's a secret!" },
       { id: "empty", q: "Банка пустая.", s: "The jar is empty." },
       { id: "mess", q: "Какой беспорядок!", s: "What a mess!" },
       { id: "sneeze", img: "sneezing-face", q: "Кошка чихает.", s: "The cat sneezes." },
@@ -202,7 +202,7 @@ const DRILLS = [
       { id: "tail", t: "My cat has got a long [[tail]]." },
       { id: "spoon", img: "spoon", t: "I eat soup with a [[spoon]]." },
       { id: "heavy", img: "person-lifting-weights", t: "This bag is very [[heavy]]!" },
-      { id: "secret", img: "zipper-mouth-face", t: "Don't tell Mum! It's a [[secret]]!" },
+      { id: "secret", img: "cc-secret", t: "Don't tell Mum! It's a [[secret]]!" },
       { id: "oven", t: "Granny puts the pie in the [[oven]]." },
       { id: "empty", t: "The jar is [[empty]]. There is no jam in it." },
       { id: "paw", img: "paw-prints", t: "My dog has got four [[paws]]." },

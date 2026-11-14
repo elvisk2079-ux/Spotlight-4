@@ -6,5 +6,11 @@
   "potato-sack": "<img src=\"../assets/pack/potato-sack.png\" alt=\"килограмм картошки\" loading=\"lazy\">",
   "bread-loaf-custom": "<img src=\"../assets/pack/bread-loaf.png\" alt=\"булка хлеба\" loading=\"lazy\">",
   "beans-tin-custom": "<img src=\"../assets/pack/beans-tin.png\" alt=\"банка бобов\" loading=\"lazy\">",
-  "cola-bottle": "<img src=\"../assets/pack/cola-bottle.png\" alt=\"бутылка колы\" loading=\"lazy\">"
+  "cola-bottle": "<img src=\"../assets/pack/cola-bottle.png\" alt=\"бутылка колы\" loading=\"lazy\">",
+  "cc-bake": "<img src=\"../assets/cat-club/bake.webp\" alt=\"bake\" loading=\"lazy\">",
+  "cc-calendar": "<img src=\"../assets/cat-club/calendar.webp\" alt=\"calendar\" loading=\"lazy\">",
+  "cc-group": "<img src=\"../assets/cat-club/group.webp\" alt=\"group\" loading=\"lazy\">",
+  "cc-secret": "<img src=\"../assets/cat-club/secret.webp\" alt=\"secret\" loading=\"lazy\">",
+  "cc-surprise": "<img src=\"../assets/cat-club/surprise.webp\" alt=\"surprise\" loading=\"lazy\">",
+  "cc-whisper": "<img src=\"../assets/cat-club/whisper.webp\" alt=\"whisper\" loading=\"lazy\">"
 }
