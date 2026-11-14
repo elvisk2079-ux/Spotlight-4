@@ -8,7 +8,7 @@ const META = { ls: "s4-cat-club-cake" };
 const P = [
   // Chapter 1. The Cat Club
   { id: "group", phrase: "group", ru: "группа", img: "cc-group" },
-  { id: "sometimes", phrase: "sometimes", ru: "иногда" },
+  { id: "sometimes", phrase: "sometimes", ru: "иногда", img: "cc-sometimes" },
   { id: "calendar", phrase: "calendar", ru: "календарь", img: "cc-calendar" },
   { id: "whisper", phrase: "whisper", ru: "шептать", img: "cc-whisper" },
   { id: "surprise", phrase: "surprise", ru: "сюрприз", img: "cc-surprise" },
