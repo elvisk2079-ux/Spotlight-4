@@ -14,8 +14,8 @@ for f in sorted(glob.glob(os.path.join(sys.argv[1], '*.png'))):
     name = os.path.splitext(os.path.basename(f))[0].lower(); wid = ALIAS.get(name, name)
     line = re.search(r'\{ id: "%s", phrase: "([^"]*)", ru: "([^"]*)"(?:, img: "([^"]*)")? \}' % re.escape(wid), texts[packs[0]] + ''.join(texts.values()))
     if not line: print('?? no word for', name); continue
-    im = Image.open(f).convert('RGB'); im.thumbnail((420, 420), Image.LANCZOS)
-    im.save(os.path.join(assets, wid + '.webp'), 'WEBP', quality=82, method=6)
+    im = Image.open(f).convert('RGBA'); im.thumbnail((420, 420), Image.LANCZOS)
+    im.save(os.path.join(assets, wid + '.webp'), 'WEBP', quality=85, method=6)  # keeps transparency
     key = 'cc-' + wid
     raster[key] = f'<img src="../assets/cat-club/{wid}.webp" alt="{line.group(1)}" loading="lazy">'
     old = line.group(3)
