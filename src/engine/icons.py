@@ -7,7 +7,7 @@ full = json.load(open(sys.argv[1])); W = full.get('width', 128); H = full.get('h
 # own drawings in the same style (sugar, flour, olive oil, pepper shaker…)
 full['icons'].update(json.load(open(os.path.join(base, 'custom.json'))))
 names = {'prohibited', 'check-mark-button'}
-for f in glob.glob(os.path.join(root, 'packs', '*.js')) + glob.glob(os.path.join(root, 'grammar', '*.js')):
+for f in glob.glob(os.path.join(root, 'packs', '*.js')) + glob.glob(os.path.join(root, 'grammar', '*.js')) + glob.glob(os.path.join(root, 'books', '*', '*.js')):
     for spec in re.findall(r'\bimg:\s*"([^"]+)"', open(f).read()):
         names |= {t for t in spec.split() if t[0] != '!'}
 out = {}
